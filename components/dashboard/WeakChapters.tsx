@@ -1,96 +1,80 @@
+import React from 'react'
 import Link from 'next/link'
-import type { ChapterMeta } from '@/types'
+import { CHAPTERS, PART_TITLES } from '@/lib/chapters'
+import { useProgress } from '@/context/ProgressContext'
 
-type ChapterStatMap = Record<string, { attempted: number; correct: number }>
+export default function WeakChapters() {
+  const { stats, isHydrated } = useProgress()
 
-interface WeakChaptersProps {
-  chapters: ChapterMeta[]
-  chapterStats: ChapterStatMap
-}
-
-export default function WeakChapters({ chapters, chapterStats }: WeakChaptersProps) {
-  // 시도한 챕터만 필터링 후 정답률 오름차순 정렬, 상위 3개
-  const ranked = chapters
-    .map((ch) => {
-      const s = chapterStats[ch.id] ?? { attempted: 0, correct: 0 }
-      const correctPct = s.attempted > 0 ? Math.round((s.correct / s.attempted) * 100) : null
-      return { ch, s, correctPct }
-    })
-    .filter((item) => item.correctPct !== null)
-    .sort((a, b) => (a.correctPct as number) - (b.correctPct as number))
-    .slice(0, 3)
-
-  if (ranked.length === 0) {
-    return (
-      <div className="text-center py-8 text-gray-400">
-        <div className="text-4xl mb-3 select-none">--</div>
-        <p className="text-sm font-medium">아직 풀이한 문제가 없습니다.</p>
-        <p className="text-xs mt-1">문제를 풀면 취약 챕터가 자동으로 표시됩니다.</p>
-      </div>
-    )
-  }
+  const weakChapters = isHydrated
+    ? CHAPTERS
+        .map(ch => {
+          const s = stats.byChapter[ch.id]
+          if (!s || s.attempted === 0) return null
+          const rate = Math.round((s.correct / s.attempted) * 100)
+          return { ch, rate, attempted: s.attempted }
+        })
+        .filter((x): x is NonNullable<typeof x> => x !== null)
+        .sort((a, b) => a.rate - b.rate)
+        .slice(0, 3)
+    : []
 
   return (
-    <div className="space-y-3">
-      {ranked.map(({ ch, s, correctPct }, idx) => {
-        const pct = correctPct as number
-        const barColor =
-          pct < 40 ? 'bg-red-500' : pct < 60 ? 'bg-yellow-500' : 'bg-green-500'
-        const badgeColor =
-          pct < 40
-            ? 'bg-red-100 text-red-700'
-            : pct < 60
-            ? 'bg-yellow-100 text-yellow-700'
-            : 'bg-green-100 text-green-700'
+    <div className="q-card space-y-4">
+      <div className="flex items-center gap-2">
+        <h2 className="text-base font-semibold text-ink">취약 챕터</h2>
+        <span className="text-sm text-ink-faint">정답률 낮은 순</span>
+      </div>
 
-        return (
-          <div
-            key={ch.id}
-            className="flex items-center gap-3 bg-gray-50 rounded-lg border border-gray-200 p-3"
-          >
-            {/* 순위 번호 */}
-            <span className="text-lg font-bold text-gray-300 w-6 text-center shrink-0">
-              {idx + 1}
-            </span>
-
-            {/* 챕터 정보 + 바 */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1.5">
-                <span
-                  className={`shrink-0 text-xs font-semibold px-1.5 py-0.5 rounded ${
-                    ch.part === 1 ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'
-                  }`}
-                >
-                  {ch.part}과목
-                </span>
-                <span className="text-sm font-medium text-gray-800 truncate">{ch.title}</span>
+      {weakChapters.length === 0 ? (
+        <div className="text-center py-6 text-ink-faint text-sm">
+          <div className="text-3xl mb-2">📊</div>
+          <div>문제를 풀면 취약 챕터가 표시됩니다.</div>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {weakChapters.map(({ ch, rate, attempted }, idx) => (
+            <Link
+              key={ch.id}
+              href={`/quiz/chapter/${ch.id}`}
+              className="flex items-center gap-3 p-3 rounded-xl border border-[var(--q-border)] hover:border-red-200 hover:bg-red-50/50 transition-all group"
+            >
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0 ${
+                idx === 0 ? 'bg-red-500' : idx === 1 ? 'bg-orange-400' : 'bg-yellow-400'
+              }`}>
+                {idx + 1}
               </div>
-              <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                <div
-                  className={`h-full rounded-full transition-all duration-500 ${barColor}`}
-                  style={{ width: `${pct}%` }}
-                />
+              <div className="flex-1 min-w-0">
+                <div className="text-xs text-ink-faint mb-0.5">{ch.part}과목 {ch.chapter}장</div>
+                <div className="text-sm font-semibold text-ink group-hover:text-red-700 transition-colors truncate">
+                  {ch.title}
+                </div>
+                <div className="h-1.5 bg-surface-soft rounded-full overflow-hidden mt-1.5">
+                  <div
+                    className={`h-full rounded-full ${rate < 40 ? 'bg-red-400' : rate < 60 ? 'bg-orange-400' : 'bg-yellow-400'}`}
+                    style={{ width: `${rate}%` }}
+                  />
+                </div>
               </div>
-              <p className="text-xs text-gray-400 mt-1">
-                {s.correct} / {s.attempted} 정답
-              </p>
-            </div>
+              <div className="text-right shrink-0">
+                <div className={`text-lg font-bold ${rate < 40 ? 'text-red-500' : rate < 60 ? 'text-orange-500' : 'text-yellow-600'}`}>
+                  {rate}%
+                </div>
+                <div className="text-xs text-ink-faint">{attempted}문항</div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
 
-            {/* 정답률 배지 + 풀기 링크 */}
-            <div className="flex flex-col items-end gap-1.5 shrink-0">
-              <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${badgeColor}`}>
-                {pct}%
-              </span>
-              <Link
-                href={`/quiz/chapter/${ch.id}`}
-                className="text-xs text-primary-600 hover:text-primary-800 font-semibold"
-              >
-                풀기 →
-              </Link>
-            </div>
-          </div>
-        )
-      })}
+      {weakChapters.length > 0 && (
+        <Link
+          href="/quiz/wrong"
+          className="block text-center text-sm font-semibold text-primary-600 hover:text-primary-700 transition-colors"
+        >
+          오답 노트로 복습하기 →
+        </Link>
+      )}
     </div>
   )
 }

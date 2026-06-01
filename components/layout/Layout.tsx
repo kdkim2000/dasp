@@ -1,16 +1,13 @@
-import TopBar from '@/components/layout/TopBar'
+import React, { ReactNode } from 'react'
+import TopBar from './TopBar'
 
-interface LayoutProps {
-  children: React.ReactNode
-}
+interface LayoutProps { children: ReactNode }
 
 export default function Layout({ children }: LayoutProps) {
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: 'var(--q-bg)', color: 'var(--q-ink)' }} className="flex flex-col">
+    <div style={{ minHeight: '100vh', background: 'var(--q-bg)' }}>
       <TopBar />
-      <main className="flex-1">
-        {children}
-      </main>
+      <main className="pt-16">{children}</main>
     </div>
   )
 }

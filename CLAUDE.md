@@ -2,98 +2,111 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## 🚀 처음 시작하기
-
-**👉 [`docs/WORKPLAN.md`](docs/WORKPLAN.md) 부터 읽으세요.** 단일 진입점입니다.
-
-전체 구축 흐름·검증 게이트·트러블슈팅이 정리되어 있습니다.  
-빠른 상태 확인은 `/status` 명령으로.
-
----
-
 ## 프로젝트 개요
 
-SQLD(SQL Developer) 자격증 시험 준비용 웹 사이트. 이론 학습 + 예상문제 풀이.
+**DAsP Master** — DAsP(데이터아키텍처 준전문가) 자격증 시험 준비용 웹 사이트.
+이론 학습 + 예상문제 풀이 + 모의고사.
 
-| 영역 | 문서 |
-|------|------|
-| 무엇을 만드는가 | `docs/PRD.md` |
-| 어떻게 만드는가 | `docs/ARCHITECTURE.md` |
-| 누가 만드는가 | `docs/AGENTS.md` |
-| 어떻게 자동화하는가 | `docs/HARNESS.md`, `docs/MCP_SKILLS.md` |
-| 단계별 실행 | `docs/WORKPLAN.md` ← **시작점** |
-| 개발 기록 | `docs/journal/JOURNAL.md`, `docs/journal/LESSONS.md` |
+## DAsP 시험 구조
+
+| 과목 | 제목 | 문항 |
+|------|------|------|
+| 1과목 | 전사아키텍처 이해 | 20문항 |
+| 2과목 | 데이터 요건 분석 | 20문항 |
+| 3과목 | 데이터 표준화 | 20문항 |
+| 4과목 | 데이터 모델링 | 20문항 |
+| 5과목 | 데이터베이스 설계와 이용 | 20문항 |
+| 합계 | | 100문항 / 120분 |
+
+합격 기준: 전체 60점 이상 + 각 과목 40% 이상
 
 ## 기술 스택
 
 - **Next.js 14** (Pages Router, TypeScript)
-- **Tailwind CSS** — 스타일링
-- **React Context + localStorage** — 학습 진도 관리 (서버/DB 없음)
-- **react-markdown + rehype-highlight** — 이론 콘텐츠 렌더링
-- **Vercel** — 배포
+- **Tailwind CSS** — 인디고/블루 팔레트 (primary: #6366F1)
+- **React Context + localStorage** — 진도 관리 (`dasp_progress` 키)
+- **react-markdown + rehype-highlight** — 이론 렌더링
+- **Vitest + jsdom** — 단위 테스트
 
 ## 핵심 명령어
 
 ```bash
-npm run dev      # 개발 서버 (localhost:3000)
-npm run build    # SSG 빌드
-npm run lint     # ESLint
-npx tsc --noEmit # 타입 검사
+npm run dev          # 개발 서버 (localhost:3000)
+npm run build        # SSG 빌드
+npm run lint         # ESLint
+npm run type-check   # TypeScript 검사 (tsc --noEmit)
+npm run test         # Vitest (1회)
+npm run test:watch   # Vitest (watch)
 ```
+
+## 챕터 레지스트리 (lib/chapters.ts) — 17개
+
+`CHAPTERS` 배열이 유일한 소스. SSG `getStaticPaths`, 네비게이션, 문제 필터 모두 이 배열 참조.
+
+| 챕터 ID | 과목 | 공식 주요항목 제목 |
+|---------|------|-----------------|
+| `part1_ch1` | 1과목 | 전사아키텍처 개요 |
+| `part1_ch2` | 1과목 | 전사아키텍처 구축 |
+| `part1_ch3` | 1과목 | 전사아키텍처 관리 및 활용 |
+| `part2_ch1` | 2과목 | 정보 요구 사항 개요 |
+| `part2_ch2` | 2과목 | 정보 요구 사항 조사 |
+| `part2_ch3` | 2과목 | 정보 요구 사항 분석 |
+| `part2_ch4` | 2과목 | 정보 요구 검증 |
+| `part3_ch1` | 3과목 | 데이터 표준화 개요 |
+| `part3_ch2` | 3과목 | 데이터 표준 수립 |
+| `part3_ch3` | 3과목 | 데이터 표준 관리 |
+| `part4_ch1` | 4과목 | 데이터 모델링 이해 |
+| `part4_ch2` | 4과목 | 개념 데이터 모델링 |
+| `part4_ch3` | 4과목 | 논리 데이터 모델링 |
+| `part4_ch4` | 4과목 | 물리 데이터 모델링 |
+| `part5_ch1` | 5과목 | 데이터베이스 설계 |
+| `part5_ch2` | 5과목 | 데이터베이스 이용 |
+| `part5_ch3` | 5과목 | SQL 응용 |
 
 ## 핵심 구조
 
 ```
-pages/           → 라우팅
-components/      → layout/, theory/, quiz/, dashboard/
-lib/             → questions, theory, progress 유틸
-context/         → ProgressContext (전역 진도)
-types/           → 공통 TypeScript 인터페이스
+pages/
+  index.tsx                    → 대시보드 홈
+  theory/index.tsx             → 이론 목차 (5과목 그리드)
+  theory/[chapterId].tsx       → 이론 본문 (SSG, 17개 경로)
+  quiz/index.tsx               → 문제풀기 허브
+  quiz/chapter/[chapterId].tsx → 단원별 풀이 (SSG, 17개 경로)
+  quiz/exam.tsx                → 모의고사 (100문항, 120분)
+  quiz/result.tsx              → 결과 (5과목별 점수)
+  quiz/wrong.tsx               → 오답 노트
+  quiz/bookmarks.tsx           → 북마크
+components/
+  layout/Layout.tsx, TopBar.tsx
+  ui/Mascot.tsx, Badge.tsx
+  quiz/QuestionCard, AnswerFeedback, QuizNavigator(100문항 그리드), ExamTimer(7200초)
+  theory/TheoryContent, TheoryTOC, RelatedQuestions
+  dashboard/HeroBanner, LearningPath, ChapterProgress, WeakChapters, WeeklyXP, ProgressChart
+lib/
+  chapters.ts   → CHAPTERS(17개), CHAPTER_IDS, PART_TITLES
+  questions.ts  → getAllQuestions, sampleExamQuestions(100문항)
+  theory.ts     → getChapterContent
+  progress.ts   → loadProgress/saveProgress (dasp_progress)
+context/ProgressContext.tsx    → useProgress hook
+types/index.ts                 → Question(part: 1|2|3|4|5), ProgressStore, ExamResult, Stats
 data/
-  questions/     → 챕터별 문제 JSON
-  theory/        → 챕터별 이론 마크다운
-docs/journal/    → 바이브 코딩 기록
+  theory/part{1-5}_ch{1-4}.md       → 17개 이론 파일
+  questions/part{1-5}_ch{1-4}.json  → 17개 문제 파일
+  questions/mockexam/exam1.json     → 모의고사 1회 (100문항)
+  questions/mockexam/exam2.json     → 모의고사 2회 (100문항)
+scripts/validate-questions.ts       → JSON 스키마 검증 (p[1-5]c[1-4]_\d{3})
+docs/plans/                         → 개선 계획 문서
 ```
 
 ## 핵심 데이터 패턴
 
-- 이론·문제 페이지는 `getStaticPaths` + `getStaticProps`로 SSG
+- 이론·문제 페이지: `getStaticPaths` + `getStaticProps`로 SSG
 - `localStorage` 접근 전 반드시 `typeof window !== 'undefined'` 가드
-- 문제 ID 형식: `p{과목}c{챕터}_{3자리번호}` (예: `p2c1_001`)
-
-## 슬래시 명령 목록
-
-| 명령 | 용도 |
-|------|------|
-| `/status` | 현재 Phase·진도 확인, 다음 액션 제시 |
-| `/run-agent [N]` | N번 에이전트 역할로 작업 시작 (`docs/AGENTS.md` 참조) |
-| `/build-check` | tsc + lint + build 통합 검증 |
-| `/validate-data` | 문제 JSON 스키마 검증 |
-| `/add-question [챕터]` | 대화형 문제 추가 |
-| `/add-theory [챕터]` | 이론 섹션 추가 |
-| `/log [내용]` | 개발 과정 저널 기록 |
-| `/retrospect` | 전체 회고 → `LESSONS.md` 합성 |
-
-## 자동 훅 (`.claude/settings.json`)
-
-- **questions JSON 저장** → 스키마 검증
-- **theory MD 저장** → 섹션 수 확인
-- **핵심 파일 완성** → `JOURNAL.md` 마일스톤 자동 기록 (멱등성 보장)
-- **응답 종료** → TypeScript 오류 수 표시
-
-## 에이전트 (요약)
-
-| 번호 | 이름 | 담당 영역 |
-|------|------|---------|
-| 1 | scaffold | 프로젝트 초기화 |
-| **9** | **pdf-extractor** | **`data/` (PDF 원본 기반) — PDF 있을 때 Agent 2 대신 사용** |
-| 2 | content-writer | `data/` (JSON·MD, 수동/AI 생성) |
-| 3 | foundation-builder | `types/`, `lib/`, `context/` |
-| 4 | layout-builder | `components/layout/`, `_app.tsx` |
-| 5 | quiz-builder | `components/quiz/`, `pages/quiz/` |
-| 6 | theory-builder | `components/theory/`, `pages/theory/` |
-| 7 | dashboard-builder | `components/dashboard/`, `pages/index.tsx` |
-| 8 | qa | 전체 검증·버그 수정 |
-| chronicle | (특수) | 저널 기록·회고 합성 |
-
-> 상세 명세는 `docs/AGENTS.md`, 시스템 프롬프트는 `.claude/agents/*.md` 참조.
+- **두 가지 ID 형식**:
+  - 파일명/라우팅: `part2_ch4` (언더스코어)
+  - 문제 JSON id: `p2c4_001` (`p{과목}c{챕터}_{3자리}`)
+  - 모의고사 id: `exam1_001`, `exam2_001`
+- `part: 1 | 2 | 3 | 4 | 5` (5과목 지원)
+- `chapter: number` (1~4, 과목에 따라 다름)
+- 모의고사: 100문항, ExamTimer 7200초(120분)
+- 다크모드: CSS 변수(`--q-bg` 등) + `[data-theme="dark"]`, `localStorage('q-theme')`

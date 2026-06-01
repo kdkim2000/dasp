@@ -1,12 +1,9 @@
 import type { ProgressStore, AnswerResult, ExamResult, Stats } from '@/types'
-import { getAllQuestions } from '@/lib/questions'
+import { CHAPTERS } from './chapters'
 
-const STORAGE_KEY = 'sqld_progress'
-const MAX_EXAM_HISTORY = 10
+const STORAGE_KEY = 'dasp_progress'
 
-const isBrowser = typeof window !== 'undefined'
-
-function defaultProgress(): ProgressStore {
+function cloneDefault(): ProgressStore {
   return {
     answers: {},
     bookmarks: [],
@@ -16,81 +13,79 @@ function defaultProgress(): ProgressStore {
 }
 
 export function loadProgress(): ProgressStore {
-  if (!isBrowser) return defaultProgress()
+  if (typeof window === 'undefined') return cloneDefault()
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return defaultProgress()
-    return JSON.parse(raw) as ProgressStore
-  } catch (err) {
-    console.warn('[progress] failed to parse stored progress, resetting', err)
-    return defaultProgress()
+    if (!raw) return cloneDefault()
+    return { ...cloneDefault(), ...JSON.parse(raw) }
+  } catch {
+    return cloneDefault()
   }
 }
 
 export function saveProgress(store: ProgressStore): void {
-  if (!isBrowser) return
+  if (typeof window === 'undefined') return
   localStorage.setItem(STORAGE_KEY, JSON.stringify(store))
 }
 
-export function markAnswer(id: string, result: AnswerResult): void {
+export function markAnswer(id: string, result: AnswerResult): ProgressStore {
   const store = loadProgress()
   store.answers[id] = result
   saveProgress(store)
+  return store
 }
 
-export function toggleBookmark(id: string): void {
+export function toggleBookmark(id: string): ProgressStore {
   const store = loadProgress()
   const idx = store.bookmarks.indexOf(id)
-  if (idx === -1) {
-    store.bookmarks.push(id)
-  } else {
-    store.bookmarks.splice(idx, 1)
-  }
+  if (idx >= 0) store.bookmarks.splice(idx, 1)
+  else store.bookmarks.push(id)
   saveProgress(store)
+  return store
 }
 
-export function saveExamResult(result: ExamResult): void {
+export function saveExamResult(result: ExamResult): ProgressStore {
   const store = loadProgress()
-  store.examHistory = [result, ...store.examHistory].slice(0, MAX_EXAM_HISTORY)
+  store.examHistory = [result, ...store.examHistory].slice(0, 10)
   saveProgress(store)
+  return store
 }
 
-export function resetProgress(): void {
-  if (!isBrowser) return
-  localStorage.removeItem(STORAGE_KEY)
+export function resetProgress(): ProgressStore {
+  const fresh = cloneDefault()
+  saveProgress(fresh)
+  return fresh
 }
 
-export function getStats(): Stats {
-  const store = loadProgress()
-  const questions = getAllQuestions()
-
+export function getStats(store: ProgressStore, allQuestionIds: Record<string, string>): Stats {
   const byChapter: Stats['byChapter'] = {}
-  const byPart: Stats['byPart'] = {
-    1: { total: 0, correct: 0, attempted: 0 },
-    2: { total: 0, correct: 0, attempted: 0 },
+  const byPart: Stats['byPart'] = {}
+
+  for (const ch of CHAPTERS) {
+    byChapter[ch.id] = { total: 0, correct: 0, attempted: 0 }
+    byPart[ch.part] = byPart[ch.part] ?? { total: 0, correct: 0, attempted: 0 }
   }
 
-  for (const q of questions) {
-    if (!byChapter[q.chapter]) {
-      byChapter[q.chapter] = { total: 0, correct: 0, attempted: 0 }
-    }
-    byChapter[q.chapter].total++
-    byPart[q.part].total++
-
-    const result = store.answers[q.id]
-    if (result && result !== 'skipped') {
-      byChapter[q.chapter].attempted++
-      byPart[q.part].attempted++
+  for (const [qid, chapterId] of Object.entries(allQuestionIds)) {
+    const ch = byChapter[chapterId]
+    const chDef = CHAPTERS.find(c => c.id === chapterId)
+    if (!ch || !chDef) continue
+    ch.total++
+    byPart[chDef.part].total++
+    const result = store.answers[qid]
+    if (result) {
+      ch.attempted++
+      byPart[chDef.part].attempted++
       if (result === 'correct') {
-        byChapter[q.chapter].correct++
-        byPart[q.part].correct++
+        ch.correct++
+        byPart[chDef.part].correct++
       }
     }
   }
 
-  const total = questions.length
-  const attempted = Object.values(store.answers).filter((r) => r !== 'skipped').length
-  const correct = Object.values(store.answers).filter((r) => r === 'correct').length
+  const total = Object.values(byChapter).reduce((s, v) => s + v.total, 0)
+  const attempted = Object.values(byChapter).reduce((s, v) => s + v.attempted, 0)
+  const correct = Object.values(byChapter).reduce((s, v) => s + v.correct, 0)
 
   return { total, attempted, correct, byChapter, byPart }
 }

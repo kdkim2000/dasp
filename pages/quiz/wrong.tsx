@@ -1,24 +1,26 @@
-import { useState, useCallback, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
+import { useProgress } from '@/context/ProgressContext'
+import { getQuestionsByIds } from '@/lib/questions'
 import QuestionCard from '@/components/quiz/QuestionCard'
 import AnswerFeedback from '@/components/quiz/AnswerFeedback'
 import QuizNavigator from '@/components/quiz/QuizNavigator'
-import { getQuestionsByIds } from '@/lib/questions'
-import { useProgress } from '@/context/ProgressContext'
 import type { Question, AnswerResult } from '@/types'
 
+interface LocalAnswer {
+  selectedIndex: number
+  result: AnswerResult
+}
+
 export default function WrongPage() {
-  const { progress, isHydrated, markAnswer, toggleBookmark, isBookmarked } = useProgress()
-
+  const { progress, markAnswer, toggleBookmark, isBookmarked, isHydrated } = useProgress()
   const [questions, setQuestions] = useState<Question[]>([])
-  const [loaded, setLoaded] = useState(false)
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [selectedOptions, setSelectedOptions] = useState<(number | null)[]>([])
-  const [sessionAnswers, setSessionAnswers] = useState<(AnswerResult | null)[]>([])
-  const [completed, setCompleted] = useState(false)
+  const [localAnswers, setLocalAnswers] = useState<Record<number, LocalAnswer>>({})
+  const [showFeedback, setShowFeedback] = useState(false)
+  const [selectedOption, setSelectedOption] = useState<number | null>(null)
+  const [isFinished, setIsFinished] = useState(false)
 
-  // isHydrated가 true가 된 최초 1회만 세션을 초기화
-  // progress.answers를 의존성에서 제거하여 markAnswer 호출 시 재초기화 방지
   useEffect(() => {
     if (!isHydrated) return
     const wrongIds = Object.entries(progress.answers)
@@ -26,180 +28,174 @@ export default function WrongPage() {
       .map(([id]) => id)
     const qs = getQuestionsByIds(wrongIds)
     setQuestions(qs)
-    setSelectedOptions(Array(qs.length).fill(null))
-    setSessionAnswers(Array(qs.length).fill(null))
-    setLoaded(true)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isHydrated])
+    setCurrentIndex(0)
+    setLocalAnswers({})
+    setShowFeedback(false)
+    setSelectedOption(null)
+    setIsFinished(false)
+  }, [isHydrated, progress.answers])
 
-  const handleAnswer = useCallback(
-    (result: AnswerResult, selectedIndex: number) => {
-      setSelectedOptions((prev) => {
-        const next = [...prev]
-        next[currentIndex] = selectedIndex
-        return next
-      })
-      setSessionAnswers((prev) => {
-        const next = [...prev]
-        next[currentIndex] = result
-        return next
-      })
-      markAnswer(questions[currentIndex].id, result)
-    },
-    [currentIndex, questions, markAnswer]
-  )
+  const currentQuestion = questions[currentIndex]
+
+  const handleAnswer = useCallback((optionIndex: number) => {
+    if (showFeedback || !currentQuestion) return
+    setSelectedOption(optionIndex)
+    const result: AnswerResult = optionIndex === currentQuestion.answer ? 'correct' : 'wrong'
+    markAnswer(currentQuestion.id, result)
+    setLocalAnswers(prev => ({
+      ...prev,
+      [currentIndex]: { selectedIndex: optionIndex, result },
+    }))
+    setShowFeedback(true)
+  }, [showFeedback, currentQuestion, currentIndex, markAnswer])
 
   const handleNext = useCallback(() => {
-    if (currentIndex < questions.length - 1) {
-      setCurrentIndex((prev) => prev + 1)
-    } else {
-      setCompleted(true)
+    if (currentIndex >= questions.length - 1) {
+      setIsFinished(true)
+      return
     }
-  }, [currentIndex, questions.length])
+    const nextIndex = currentIndex + 1
+    setCurrentIndex(nextIndex)
+    setShowFeedback(false)
+    setSelectedOption(localAnswers[nextIndex]?.selectedIndex ?? null)
+  }, [currentIndex, questions.length, localAnswers])
 
-  const handleToggleBookmark = useCallback(() => {
-    if (questions[currentIndex]) {
-      toggleBookmark(questions[currentIndex].id)
-    }
-  }, [currentIndex, questions, toggleBookmark])
+  const handleNavigate = useCallback((index: number) => {
+    setCurrentIndex(index)
+    const prev = localAnswers[index]
+    setSelectedOption(prev?.selectedIndex ?? null)
+    setShowFeedback(prev !== undefined)
+  }, [localAnswers])
 
-  // 로딩 중
-  if (!loaded) {
+  const navigatorAnswers: Record<number, AnswerResult | null> = Object.fromEntries(
+    Object.entries(localAnswers).map(([k, v]) => [Number(k), v.result])
+  )
+
+  const bookmarkIndices = new Set(
+    questions
+      .map((q, i) => (isBookmarked(q.id) ? i : -1))
+      .filter(i => i >= 0)
+  )
+
+  if (!isHydrated) {
     return (
-      <>
-        <div className="flex items-center justify-center h-64">
-          <p className="text-gray-400">불러오는 중...</p>
-        </div>
-      </>
+      <div className="max-w-2xl mx-auto px-4 py-16 text-center">
+        <div className="text-ink-faint text-sm">로딩 중...</div>
+      </div>
     )
   }
 
-  // 오답 없음
   if (questions.length === 0) {
     return (
-      <>
-        <div className="max-w-lg mx-auto text-center py-20">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <h1 className="text-xl font-bold text-gray-800 mb-2">오답 문제가 없습니다</h1>
-          <p className="text-gray-500 mb-6">
-            아직 풀지 않은 문제가 있거나 모든 문제를 맞혔습니다.
-          </p>
-          <Link
-            href="/quiz"
-            className="px-6 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700"
-          >
-            문제 목록으로
+      <div className="max-w-2xl mx-auto px-4 py-16 text-center space-y-4">
+        <div className="text-5xl">🎉</div>
+        <h1 className="text-xl font-bold text-ink">오답이 없습니다!</h1>
+        <p className="text-ink-muted text-sm">아직 풀지 않았거나 모든 문제를 맞혔습니다.</p>
+        <div className="flex gap-3 justify-center">
+          <Link href="/quiz" className="px-5 py-2.5 bg-primary-600 text-white rounded-xl font-semibold text-sm hover:bg-primary-700 transition-colors">
+            문제 풀러 가기
           </Link>
         </div>
-      </>
+      </div>
     )
   }
 
-  // 완료 화면
-  if (completed) {
-    const correctCount = sessionAnswers.filter((a) => a === 'correct').length
+  if (isFinished) {
+    const correct = Object.values(localAnswers).filter(a => a.result === 'correct').length
     const total = questions.length
-    const percentage = Math.round((correctCount / total) * 100)
+    const rate = Math.round((correct / total) * 100)
 
     return (
-      <>
-        <div className="max-w-2xl mx-auto text-center py-12">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-6">
-            <h1 className="text-xl font-bold text-gray-800 mb-4">오답 노트 완료</h1>
-            <div
-              className={`text-5xl font-bold mb-2 ${
-                percentage >= 80 ? 'text-green-600' : percentage >= 60 ? 'text-yellow-600' : 'text-red-600'
-              }`}
-            >
-              {percentage}%
+      <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
+        <div className="q-card text-center space-y-4">
+          <div className="text-5xl">{rate >= 80 ? '🏆' : rate >= 60 ? '👍' : '💪'}</div>
+          <h1 className="text-xl font-bold text-ink">오답 노트 완료!</h1>
+          <div className="flex justify-center gap-8 py-4">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-mint-600">{correct}</div>
+              <div className="text-xs text-ink-muted mt-1">정답</div>
             </div>
-            <p className="text-gray-600">
-              {total}문제 중 <span className="text-green-600 font-bold">{correctCount}문제</span> 정답
-            </p>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-red-500">{total - correct}</div>
+              <div className="text-xs text-ink-muted mt-1">오답</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-primary-600">{rate}%</div>
+              <div className="text-xs text-ink-muted mt-1">정답률</div>
+            </div>
           </div>
           <div className="flex gap-3 justify-center">
             <button
               onClick={() => {
                 setCurrentIndex(0)
-                setSelectedOptions(Array(questions.length).fill(null))
-                setSessionAnswers(Array(questions.length).fill(null))
-                setCompleted(false)
+                setLocalAnswers({})
+                setShowFeedback(false)
+                setSelectedOption(null)
+                setIsFinished(false)
               }}
-              className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 font-medium"
+              className="px-5 py-2.5 border-2 border-primary-600 text-primary-600 rounded-xl font-semibold text-sm hover:bg-primary-50 transition-colors"
             >
               다시 풀기
             </button>
-            <Link href="/quiz" className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium">
-              문제 목록으로
+            <Link href="/quiz" className="px-5 py-2.5 bg-primary-600 text-white rounded-xl font-semibold text-sm hover:bg-primary-700 transition-colors">
+              문제풀기 홈
             </Link>
           </div>
         </div>
-      </>
+      </div>
     )
   }
 
-  const currentQuestion = questions[currentIndex]
-  const currentAnswer = sessionAnswers[currentIndex]
-  const showResult = currentAnswer !== null
-
   return (
-    <>
-      <div className="max-w-4xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <Link href="/quiz" className="text-sm text-blue-600 hover:underline">
-              &larr; 문제 목록
-            </Link>
-            <h1 className="text-xl font-bold text-gray-900 mt-1">
-              오답 노트
-              <span className="ml-2 text-sm font-normal text-red-500">
-                {questions.length}문제
-              </span>
-            </h1>
-          </div>
+    <div className="max-w-5xl mx-auto px-4 py-6">
+      {/* Header */}
+      <div className="flex items-center gap-2 text-sm text-ink-muted mb-4">
+        <Link href="/quiz" className="hover:text-primary-600 transition-colors">문제풀기</Link>
+        <span>›</span>
+        <span className="text-ink font-medium">오답 노트</span>
+        <span className="ml-auto text-xs bg-red-50 text-red-600 border border-red-200 px-2 py-0.5 rounded-full font-semibold">
+          {questions.length}문항
+        </span>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-4">
+          {currentQuestion && (
+            <>
+              <QuestionCard
+                question={currentQuestion}
+                questionNumber={currentIndex + 1}
+                totalQuestions={questions.length}
+                selectedOption={selectedOption}
+                showResult={showFeedback}
+                onAnswer={handleAnswer}
+                isBookmarked={isBookmarked(currentQuestion.id)}
+                onToggleBookmark={() => toggleBookmark(currentQuestion.id)}
+              />
+              {showFeedback && (
+                <AnswerFeedback
+                  question={currentQuestion}
+                  selectedIndex={selectedOption}
+                  onNext={handleNext}
+                  isLast={currentIndex === questions.length - 1}
+                />
+              )}
+            </>
+          )}
         </div>
 
-        <div className="flex gap-6">
-          <div className="flex-1 min-w-0">
-            <QuestionCard
-              question={currentQuestion}
-              questionNumber={currentIndex + 1}
-              totalQuestions={questions.length}
-              selectedOption={selectedOptions[currentIndex]}
-              showResult={showResult}
-              onAnswer={handleAnswer}
-              isBookmarked={isBookmarked(currentQuestion.id)}
-              onToggleBookmark={handleToggleBookmark}
-            />
-
-            {showResult && currentAnswer && (
-              <AnswerFeedback
-                question={currentQuestion}
-                result={currentAnswer}
-                selectedOption={selectedOptions[currentIndex] ?? 0}
-                onNext={handleNext}
-                isBookmarked={isBookmarked(currentQuestion.id)}
-                onToggleBookmark={handleToggleBookmark}
-                isLast={currentIndex === questions.length - 1}
-              />
-            )}
-          </div>
-
-          <div className="hidden lg:block w-52 flex-shrink-0">
+        <div className="lg:col-span-1">
+          <div className="sticky top-20">
             <QuizNavigator
               total={questions.length}
               current={currentIndex}
-              answers={sessionAnswers}
-              bookmarked={questions.map((q) => isBookmarked(q.id))}
-              onJump={setCurrentIndex}
+              answers={navigatorAnswers}
+              onNavigate={handleNavigate}
+              bookmarks={bookmarkIndices}
             />
           </div>
         </div>
       </div>
-    </>
+    </div>
   )
 }

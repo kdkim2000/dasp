@@ -1,79 +1,63 @@
+import React from 'react'
 import Link from 'next/link'
-import type { ChapterMeta } from '@/types'
+import { CHAPTERS, PART_TITLES } from '@/lib/chapters'
+import { useProgress } from '@/context/ProgressContext'
 
-type ChapterStatMap = Record<string, { attempted: number; correct: number }>
-
-interface ChapterProgressProps {
-  chapters: ChapterMeta[]
-  chapterStats: ChapterStatMap
+const PART_COLORS: Record<number, { bar: string; badge: string; text: string }> = {
+  1: { bar: 'bg-indigo-500', badge: 'bg-indigo-100 text-indigo-700', text: 'text-indigo-700' },
+  2: { bar: 'bg-blue-500', badge: 'bg-blue-100 text-blue-700', text: 'text-blue-700' },
+  3: { bar: 'bg-green-500', badge: 'bg-green-100 text-green-700', text: 'text-green-700' },
+  4: { bar: 'bg-purple-500', badge: 'bg-purple-100 text-purple-700', text: 'text-purple-700' },
+  5: { bar: 'bg-teal-500', badge: 'bg-teal-100 text-teal-700', text: 'text-teal-700' },
 }
 
-export default function ChapterProgress({ chapters, chapterStats }: ChapterProgressProps) {
+export default function ChapterProgress() {
+  const { stats, isHydrated } = useProgress()
+
   return (
-    <div className="space-y-3">
-      {chapters.map((ch) => {
-        const s = chapterStats[ch.id] ?? { attempted: 0, correct: 0 }
-        // questionCount 가 0 이면 전체 문항 수를 표시할 수 없으므로 attempted 기준으로만 표시
-        const attempted = s.attempted
-        const correct = s.correct
-        // 진행률: 전체 문항 수를 알 수 없으므로 풀이 여부(attempted > 0)로 표시
-        const hasData = attempted > 0
-        const correctPct = hasData ? Math.round((correct / attempted) * 100) : 0
+    <div className="q-card space-y-4">
+      <h2 className="text-base font-semibold text-ink">챕터별 진도</h2>
 
-        return (
-          <div key={ch.id} className="bg-gray-50 rounded-lg border border-gray-200 p-4">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2 min-w-0">
-                <span
-                  className={`shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full ${
-                    ch.part === 1
-                      ? 'bg-blue-100 text-blue-700'
-                      : 'bg-green-100 text-green-700'
-                  }`}
-                >
-                  {ch.part}과목
+      <div className="space-y-3">
+        {CHAPTERS.map(ch => {
+          const colors = PART_COLORS[ch.part]
+          const chStats = stats.byChapter[ch.id]
+          const attempted = chStats?.attempted ?? 0
+          const correct = chStats?.correct ?? 0
+          const rate = attempted > 0 ? Math.round((correct / attempted) * 100) : 0
+
+          return (
+            <Link
+              key={ch.id}
+              href={`/quiz/chapter/${ch.id}`}
+              className="block group"
+            >
+              <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs font-semibold px-1.5 py-0.5 rounded-full ${colors.badge}`}>
+                    {ch.part}-{ch.chapter}
+                  </span>
+                  <span className="text-sm text-ink group-hover:text-primary-700 transition-colors font-medium truncate max-w-[160px]">
+                    {ch.title}
+                  </span>
+                </div>
+                <span className={`text-sm font-bold ${isHydrated && attempted > 0 ? colors.text : 'text-ink-faint'}`}>
+                  {isHydrated && attempted > 0 ? `${rate}%` : '-'}
                 </span>
-                <span className="text-sm font-medium text-gray-800 truncate">{ch.title}</span>
               </div>
-              <div className="shrink-0 flex items-center gap-2 text-xs text-gray-500 ml-2">
-                {hasData ? (
-                  <>
-                    <span>{correct}/{attempted} 정답</span>
-                    <span className="font-semibold text-primary-600">{correctPct}%</span>
-                  </>
-                ) : (
-                  <span className="text-gray-400">미풀이</span>
-                )}
+              <div className="h-2 bg-surface-soft rounded-full overflow-hidden">
+                <div
+                  className={`h-full ${colors.bar} rounded-full transition-all duration-500`}
+                  style={{ width: isHydrated ? `${rate}%` : '0%' }}
+                />
               </div>
-            </div>
-
-            {/* 정답률 바 */}
-            <div className="h-2 bg-gray-200 rounded-full overflow-hidden mb-3">
-              <div
-                className={`h-full rounded-full transition-all duration-500 ${
-                  ch.part === 1 ? 'bg-blue-500' : 'bg-green-500'
-                }`}
-                style={{ width: hasData ? `${correctPct}%` : '0%' }}
-              />
-            </div>
-
-            <div className="flex justify-end gap-3">
-              <Link
-                href={`/theory/${ch.id}`}
-                className="text-xs text-gray-500 hover:text-primary-600 underline underline-offset-2"
-              >
-                이론 보기
-              </Link>
-              <Link
-                href={`/quiz/chapter/${ch.id}`}
-                className="text-xs text-primary-600 hover:text-primary-800 font-semibold underline underline-offset-2"
-              >
-                문제 풀기
-              </Link>
-            </div>
-          </div>
-        )
-      })}
+              {isHydrated && attempted > 0 && (
+                <div className="text-xs text-ink-faint mt-0.5">{attempted}문항 풀이</div>
+              )}
+            </Link>
+          )
+        })}
+      </div>
     </div>
   )
 }

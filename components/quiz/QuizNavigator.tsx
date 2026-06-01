@@ -1,75 +1,102 @@
+import React from 'react'
 import type { AnswerResult } from '@/types'
 
 interface QuizNavigatorProps {
   total: number
   current: number
-  answers: (AnswerResult | null)[]
-  bookmarked?: boolean[]
-  onJump: (index: number) => void
+  answers: Record<number, AnswerResult | null>
+  onNavigate: (index: number) => void
+  bookmarks?: Set<number>
 }
 
-function getButtonStyle(index: number, current: number, result: AnswerResult | null, isBookmarked: boolean): string {
-  const base = 'w-9 h-9 rounded-lg text-xs font-semibold transition-all duration-100 border-2'
-  if (index === current)    return `${base} border-primary-500 bg-primary-500 text-white shadow-q-sm`
-  if (result === 'correct') return `${base} border-mint-500 bg-mint-50 text-mint-600 hover:bg-mint-50`
-  if (result === 'wrong')   return `${base} border-coral bg-coral-light text-red-700 hover:bg-coral-light`
-  if (isBookmarked)         return `${base} border-sun bg-sun-light text-sun hover:bg-sun-light`
-  return `${base} border-transparent hover:border-primary-200`
-}
+export default function QuizNavigator({
+  total,
+  current,
+  answers,
+  onNavigate,
+  bookmarks = new Set(),
+}: QuizNavigatorProps) {
+  const getStyle = (index: number) => {
+    const isCurrent = index === current
+    const result = answers[index]
+    const isBookmarked = bookmarks.has(index)
 
-export default function QuizNavigator({ total, current, answers, bookmarked = [], onJump }: QuizNavigatorProps) {
-  const correctCount  = answers.filter((a) => a === 'correct').length
-  const wrongCount    = answers.filter((a) => a === 'wrong').length
-  const attemptedCount = answers.filter((a) => a !== null).length
+    let base =
+      'relative w-8 h-8 text-xs font-semibold rounded-lg transition-all duration-150 flex items-center justify-center cursor-pointer '
+
+    if (isCurrent) {
+      base += 'ring-2 ring-primary-500 ring-offset-1 '
+    }
+
+    if (isBookmarked && !isCurrent) {
+      base += 'ring-2 ring-yellow-400 ring-offset-1 '
+    }
+
+    if (result === 'correct') {
+      base += 'bg-mint-500 text-white'
+    } else if (result === 'wrong') {
+      base += 'bg-coral text-white'
+    } else if (result === 'skipped') {
+      base += 'bg-ink-faint text-white'
+    } else {
+      // unattempted
+      base += isCurrent
+        ? 'bg-primary-100 text-primary-700'
+        : 'bg-surface-soft text-ink-muted hover:bg-primary-50 hover:text-primary-600'
+    }
+
+    return base
+  }
 
   return (
-    <div className="q-card p-4">
-      <h3 className="text-sm font-semibold mb-3" style={{ color: 'var(--q-ink)' }}>문제 목록</h3>
-
-      {/* 통계 */}
-      <div className="flex gap-3 mb-4 text-xs" style={{ color: 'var(--q-ink-2)' }}>
-        <span className="flex items-center gap-1">
-          <span className="w-2.5 h-2.5 rounded-sm bg-mint-500 inline-block" />
-          정답 {correctCount}
-        </span>
-        <span className="flex items-center gap-1">
-          <span className="w-2.5 h-2.5 rounded-sm bg-coral inline-block" />
-          오답 {wrongCount}
-        </span>
-        <span className="flex items-center gap-1">
-          <span className="w-2.5 h-2.5 rounded-sm inline-block" style={{ backgroundColor: 'var(--q-border)' }} />
-          미풀이 {total - attemptedCount}
-        </span>
+    <div className="q-card space-y-3">
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-semibold text-ink">문제 목록</h3>
+        <div className="flex items-center gap-3 text-xs text-ink-faint">
+          <span className="flex items-center gap-1">
+            <span className="inline-block w-3 h-3 rounded bg-mint-500"></span>정답
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="inline-block w-3 h-3 rounded bg-coral"></span>오답
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="inline-block w-3 h-3 rounded bg-surface-soft border border-[var(--q-border)]"></span>미풀이
+          </span>
+        </div>
       </div>
 
-      {/* 번호 그리드 */}
-      <div className="grid grid-cols-5 gap-1.5">
+      <div className="grid grid-cols-10 gap-1">
         {Array.from({ length: total }, (_, i) => (
           <button
             key={i}
-            onClick={() => onJump(i)}
-            aria-label={`${i + 1}번 문제`}
-            aria-current={i === current ? 'true' : undefined}
-            className={getButtonStyle(i, current, answers[i] ?? null, bookmarked[i] ?? false)}
-            style={i !== current && answers[i] === null && !bookmarked[i]
-              ? { backgroundColor: 'var(--q-surface-soft)', color: 'var(--q-ink-3)' }
-              : undefined}
+            onClick={() => onNavigate(i)}
+            className={getStyle(i)}
+            title={`${i + 1}번 문제`}
+            aria-label={`${i + 1}번 문제로 이동`}
           >
             {i + 1}
+            {bookmarks.has(i) && (
+              <span className="absolute -top-1 -right-1 text-yellow-400 text-xs leading-none">★</span>
+            )}
           </button>
         ))}
       </div>
 
-      {/* 범례 */}
-      <div className="mt-3 pt-3 border-t text-xs space-y-1" style={{ borderColor: 'var(--q-border)', color: 'var(--q-ink-3)' }}>
-        <div className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-sm border-2 border-primary-500 bg-primary-500 inline-block" />
-          현재 문제
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-sm border-2 border-sun bg-sun-light inline-block" />
-          북마크
-        </div>
+      {/* Summary */}
+      <div className="flex items-center gap-4 text-xs text-ink-muted pt-1 border-t border-[var(--q-border)]">
+        <span>
+          풀이: <strong className="text-ink">{Object.keys(answers).length}</strong> / {total}
+        </span>
+        <span>
+          정답: <strong className="text-mint-600">
+            {Object.values(answers).filter(v => v === 'correct').length}
+          </strong>
+        </span>
+        <span>
+          오답: <strong className="text-red-500">
+            {Object.values(answers).filter(v => v === 'wrong').length}
+          </strong>
+        </span>
       </div>
     </div>
   )

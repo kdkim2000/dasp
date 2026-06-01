@@ -1,246 +1,126 @@
-import { useState } from 'react'
-import Head from 'next/head'
+import React from 'react'
 import Link from 'next/link'
 import type { GetStaticPaths, GetStaticProps } from 'next'
-import type { ChapterMeta } from '@/types'
-import { getAllChapters, getChapterMeta, getChapterContent } from '@/lib/theory'
+import { CHAPTER_IDS, getChapterById, PART_TITLES } from '@/lib/chapters'
+import { getChapterContent, getChapterMeta } from '@/lib/theory'
 import TheoryContent from '@/components/theory/TheoryContent'
 import TheoryTOC from '@/components/theory/TheoryTOC'
 import RelatedQuestions from '@/components/theory/RelatedQuestions'
+import type { ChapterMeta } from '@/types'
 
-interface TheoryPageProps {
-  chapter: ChapterMeta
+interface Props {
+  chapterId: string
   content: string
+  meta: ChapterMeta
   prevChapter: ChapterMeta | null
   nextChapter: ChapterMeta | null
 }
 
-export default function TheoryPage({
-  chapter,
-  content,
-  prevChapter,
-  nextChapter,
-}: TheoryPageProps) {
-  const [tocOpen, setTocOpen] = useState(false)
-
+export default function TheoryChapterPage({ chapterId, content, meta, prevChapter, nextChapter }: Props) {
   return (
-    <>
-      <Head>
-        <title>{chapter.title} | SQLD 합격길잡이</title>
-      </Head>
+    <div className="max-w-7xl mx-auto px-4 py-6">
+      {/* Breadcrumb */}
+      <div className="flex items-center gap-2 text-sm text-ink-muted mb-6">
+        <Link href="/theory" className="hover:text-primary-600 transition-colors">이론</Link>
+        <span>›</span>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-primary-100 text-primary-700 font-semibold">
+          {meta.part}과목 {meta.chapter}장
+        </span>
+        <span className="text-ink font-medium">{meta.title}</span>
+      </div>
 
-      <div className="p-4 md:p-6 max-w-7xl mx-auto">
-        {/* 챕터 헤더 */}
-        <div className="mb-6">
-          {/* 브레드크럼 */}
-          <nav className="flex items-center gap-2 text-xs mb-3" style={{ color: 'var(--q-ink-3)' }}>
-            <Link href="/theory" className="hover:underline" style={{ color: 'var(--q-ink-2)' }}>
-              이론 학습
-            </Link>
-            <span>/</span>
-            <span>{chapter.part}과목</span>
-            <span>/</span>
-            <span style={{ color: 'var(--q-ink)' }}>{chapter.title}</span>
-          </nav>
-
-          <div className="flex items-center gap-3 flex-wrap">
-            <span
-              className="text-xs font-semibold px-2 py-0.5 rounded-full"
-              style={{
-                background: 'var(--q-primary)',
-                color: '#fff',
-              }}
-            >
-              {chapter.part}과목 {chapter.chapter}장
-            </span>
-            <h1
-              className="font-display font-bold text-2xl"
-              style={{ color: 'var(--q-ink)' }}
-            >
-              {chapter.title}
-            </h1>
-          </div>
-
-          {/* 탭 네비게이션 */}
-          <div className="mt-4 flex gap-2">
-            <span
-              className="px-4 py-1.5 rounded-full text-sm font-semibold"
-              style={{ background: 'var(--q-primary)', color: '#fff' }}
-            >
-              이론
-            </span>
-            <Link
-              href={`/quiz/chapter/${chapter.id}`}
-              className="px-4 py-1.5 rounded-full text-sm font-semibold transition-colors hover:opacity-80"
-              style={{
-                background: 'var(--q-surface-soft)',
-                color: 'var(--q-ink-2)',
-                border: '1px solid var(--q-border)',
-              }}
-            >
-              문제 풀기
-            </Link>
-          </div>
-        </div>
-
-        {/* ── 데스크톱 3열 그리드 ── */}
-        <div className="hidden md:grid grid-cols-[280px_1fr_280px] gap-6">
-          {/* 왼쪽: TOC */}
-          <aside className="q-card sticky top-20 h-fit">
+      {/* 3-column layout */}
+      <div className="flex gap-6">
+        {/* Left: TOC (sticky) */}
+        <aside className="hidden lg:block w-56 shrink-0">
+          <div className="sticky top-20 q-card">
             <TheoryTOC content={content} />
-          </aside>
+          </div>
+        </aside>
 
-          {/* 중앙: 본문 */}
-          <article className="q-card min-w-0">
-            <TheoryContent content={content} />
-
-            {/* 하단 챕터 네비게이션 */}
-            <div className="mt-8 pt-6 flex justify-between" style={{ borderTop: '1px solid var(--q-border)' }}>
-              {prevChapter ? (
-                <Link
-                  href={`/theory/${prevChapter.id}`}
-                  className="flex items-center gap-1 text-sm rounded-xl px-3 py-2 transition-colors hover:opacity-80"
-                  style={{
-                    color: 'var(--q-ink-2)',
-                    border: '1px solid var(--q-border)',
-                  }}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                  </svg>
-                  {prevChapter.title}
-                </Link>
-              ) : (
-                <div />
-              )}
-              {nextChapter ? (
-                <Link
-                  href={`/theory/${nextChapter.id}`}
-                  className="flex items-center gap-1 text-sm rounded-xl px-3 py-2 transition-colors hover:opacity-80"
-                  style={{
-                    color: 'var(--q-ink-2)',
-                    border: '1px solid var(--q-border)',
-                  }}
-                >
-                  {nextChapter.title}
-                  <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                  </svg>
-                </Link>
-              ) : (
-                <div />
-              )}
+        {/* Center: Content */}
+        <main className="flex-1 min-w-0">
+          {/* Chapter title */}
+          <div className="q-card mb-6">
+            <div className="text-xs text-ink-faint mb-1">
+              {PART_TITLES[meta.part]} · {meta.part}과목 {meta.chapter}장
             </div>
-          </article>
-
-          {/* 오른쪽: 관련 문제 */}
-          <aside className="space-y-4">
-            <RelatedQuestions chapterId={chapter.id} />
-          </aside>
-        </div>
-
-        {/* ── 모바일 단일 컬럼 ── */}
-        <div className="md:hidden space-y-4">
-          {/* TOC 토글 */}
-          <div className="q-card">
-            <button
-              type="button"
-              onClick={() => setTocOpen((prev) => !prev)}
-              className="flex items-center justify-between w-full text-sm font-semibold"
-              style={{ color: 'var(--q-ink)' }}
-            >
-              <span>목차 보기</span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className={`w-4 h-4 transition-transform ${tocOpen ? 'rotate-180' : ''}`}
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            {tocOpen && (
-              <div className="mt-3 pt-3" style={{ borderTop: '1px solid var(--q-border)' }}>
-                <TheoryTOC content={content} />
-              </div>
-            )}
+            <h1 className="text-2xl font-display font-bold text-ink">{meta.title}</h1>
           </div>
 
-          {/* 본문 */}
+          {/* Theory content */}
           <div className="q-card">
             <TheoryContent content={content} />
           </div>
 
-          {/* 관련 문제 */}
-          <RelatedQuestions chapterId={chapter.id} />
-
-          {/* 하단 챕터 네비게이션 */}
-          <div className="flex justify-between">
+          {/* Prev / Next nav */}
+          <div className="flex justify-between mt-6 gap-4">
             {prevChapter ? (
               <Link
                 href={`/theory/${prevChapter.id}`}
-                className="flex items-center gap-1 text-sm rounded-xl px-3 py-2 transition-colors hover:opacity-80"
-                style={{
-                  color: 'var(--q-ink-2)',
-                  border: '1px solid var(--q-border)',
-                  background: 'var(--q-surface)',
-                }}
+                className="flex-1 q-card hover:shadow-q-md transition-all group max-w-xs"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                </svg>
-                이전
+                <div className="text-xs text-ink-faint mb-1">← 이전</div>
+                <div className="text-sm font-semibold text-ink group-hover:text-primary-700 transition-colors">
+                  {prevChapter.title}
+                </div>
               </Link>
-            ) : <div />}
+            ) : <div className="flex-1" />}
+
             {nextChapter ? (
               <Link
                 href={`/theory/${nextChapter.id}`}
-                className="flex items-center gap-1 text-sm rounded-xl px-3 py-2 transition-colors hover:opacity-80"
-                style={{
-                  color: 'var(--q-ink-2)',
-                  border: '1px solid var(--q-border)',
-                  background: 'var(--q-surface)',
-                }}
+                className="flex-1 q-card hover:shadow-q-md transition-all group max-w-xs text-right"
               >
-                다음
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
+                <div className="text-xs text-ink-faint mb-1">다음 →</div>
+                <div className="text-sm font-semibold text-ink group-hover:text-primary-700 transition-colors">
+                  {nextChapter.title}
+                </div>
               </Link>
-            ) : <div />}
+            ) : <div className="flex-1" />}
           </div>
-        </div>
+        </main>
+
+        {/* Right: Related questions (sticky) */}
+        <aside className="hidden xl:block w-56 shrink-0">
+          <div className="sticky top-20 q-card">
+            <RelatedQuestions chapterId={chapterId} />
+          </div>
+        </aside>
       </div>
-    </>
+    </div>
   )
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const chapters = getAllChapters()
-  const paths = chapters.map((c) => ({ params: { chapterId: c.id } }))
-  return { paths, fallback: false }
+  return {
+    paths: CHAPTER_IDS.map(id => ({ params: { chapterId: id } })),
+    fallback: false,
+  }
 }
 
-export const getStaticProps: GetStaticProps<TheoryPageProps> = async ({ params }) => {
+export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
   const chapterId = params?.chapterId as string
-  const chapter = getChapterMeta(chapterId)
+  const content = getChapterContent(chapterId)
+  const meta = getChapterMeta(chapterId)
 
-  if (!chapter) {
+  if (!meta) {
     return { notFound: true }
   }
 
-  const content = getChapterContent(chapterId)
-  const allChapters = getAllChapters()
-  const currentIdx = allChapters.findIndex((c) => c.id === chapterId)
-  const prevChapter = currentIdx > 0 ? allChapters[currentIdx - 1] : null
-  const nextChapter = currentIdx < allChapters.length - 1 ? allChapters[currentIdx + 1] : null
+  // Determine prev/next chapters
+  const idx = CHAPTER_IDS.indexOf(chapterId)
+  const prevId = idx > 0 ? CHAPTER_IDS[idx - 1] : null
+  const nextId = idx < CHAPTER_IDS.length - 1 ? CHAPTER_IDS[idx + 1] : null
+
+  const prevChapter = prevId ? (getChapterMeta(prevId) ?? null) : null
+  const nextChapter = nextId ? (getChapterMeta(nextId) ?? null) : null
 
   return {
     props: {
-      chapter,
+      chapterId,
       content,
+      meta,
       prevChapter: prevChapter ?? null,
       nextChapter: nextChapter ?? null,
     },

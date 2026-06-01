@@ -1,123 +1,138 @@
+import React from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { CHAPTERS, CHAPTERS_BY_PART, PART_TITLES } from '@/lib/chapters'
 import { useProgress } from '@/context/ProgressContext'
-import { CHAPTER_IDS, getChapterFullLabel } from '@/lib/chapters'
 
-export default function QuizIndex() {
-  const { stats, progress } = useProgress()
+const PART_COLORS: Record<number, { bg: string; border: string; badge: string; bar: string }> = {
+  1: { bg: 'bg-indigo-50', border: 'border-indigo-200', badge: 'bg-indigo-100 text-indigo-700', bar: 'bg-indigo-500' },
+  2: { bg: 'bg-blue-50', border: 'border-blue-200', badge: 'bg-blue-100 text-blue-700', bar: 'bg-blue-500' },
+  3: { bg: 'bg-green-50', border: 'border-green-200', badge: 'bg-green-100 text-green-700', bar: 'bg-green-500' },
+  4: { bg: 'bg-purple-50', border: 'border-purple-200', badge: 'bg-purple-100 text-purple-700', bar: 'bg-purple-500' },
+  5: { bg: 'bg-teal-50', border: 'border-teal-200', badge: 'bg-teal-100 text-teal-700', bar: 'bg-teal-500' },
+}
 
-  const wrongCount = Object.values(progress.answers).filter((r) => r === 'wrong').length
-  const bookmarkCount = progress.bookmarks.length
+export default function QuizIndexPage() {
+  const { stats, isHydrated } = useProgress()
+  const router = useRouter()
+
+  const getChapterRate = (chapterId: string) => {
+    const c = stats.byChapter[chapterId]
+    if (!c || c.attempted === 0) return null
+    return Math.round((c.correct / c.attempted) * 100)
+  }
 
   return (
-    <>
-      <div className="max-w-3xl mx-auto p-4 md:p-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">문제 풀기</h1>
-        <p className="text-gray-500 mb-8 text-sm">
-          전체 {stats.total}문제 중 {stats.attempted}문제 풀이 완료 (정답률{' '}
-          {stats.attempted > 0 ? Math.round((stats.correct / stats.attempted) * 100) : 0}%)
-        </p>
+    <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-display font-bold text-ink">문제풀기</h1>
+        <p className="text-ink-muted mt-1 text-sm">챕터별 학습 또는 모의고사로 실전 감각을 키우세요.</p>
+      </div>
 
-        {/* 학습 모드 카드 */}
-        <div className="grid gap-4 mb-8">
-          {/* 챕터별 문제풀기 */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">챕터별 문제풀기</h2>
-            <div className="space-y-2">
-              {CHAPTER_IDS.map((id) => {
+      {/* Quick actions */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <button
+          onClick={() => router.push('/quiz/exam')}
+          className="q-card flex items-center gap-3 hover:border-primary-300 hover:shadow-q-md transition-all cursor-pointer group"
+        >
+          <span className="text-3xl">📝</span>
+          <div className="text-left">
+            <div className="font-bold text-ink group-hover:text-primary-600 transition-colors">모의고사</div>
+            <div className="text-xs text-ink-muted">100문항 · 120분</div>
+          </div>
+        </button>
+
+        <Link href="/quiz/wrong" className="q-card flex items-center gap-3 hover:border-red-200 hover:shadow-q-md transition-all group">
+          <span className="text-3xl">📕</span>
+          <div>
+            <div className="font-bold text-ink group-hover:text-red-600 transition-colors">오답 노트</div>
+            <div className="text-xs text-ink-muted">
+              {isHydrated
+                ? `${Object.values(stats.byChapter).reduce((s, c) => s + (c.attempted - c.correct), 0)}문항`
+                : '로딩 중...'}
+            </div>
+          </div>
+        </Link>
+
+        <Link href="/quiz/bookmarks" className="q-card flex items-center gap-3 hover:border-yellow-200 hover:shadow-q-md transition-all group">
+          <span className="text-3xl">⭐</span>
+          <div>
+            <div className="font-bold text-ink group-hover:text-yellow-600 transition-colors">북마크</div>
+            <div className="text-xs text-ink-muted">저장한 문제</div>
+          </div>
+        </Link>
+      </div>
+
+      {/* Part sections */}
+      {[1, 2, 3, 4, 5].map(part => {
+        const colors = PART_COLORS[part]
+        const partChapters = CHAPTERS_BY_PART[part] ?? []
+        const partStats = stats.byPart[part]
+        const partRate = partStats && partStats.attempted > 0
+          ? Math.round((partStats.correct / partStats.attempted) * 100)
+          : null
+
+        return (
+          <div key={part}>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${colors.badge}`}>
+                  {part}과목
+                </span>
+                <h2 className="text-base font-semibold text-ink">{PART_TITLES[part]}</h2>
+              </div>
+              {partRate !== null && (
+                <span className="text-sm font-semibold text-ink-muted">
+                  정답률 <strong className="text-ink">{partRate}%</strong>
+                </span>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {partChapters.map(chapter => {
+                const rate = isHydrated ? getChapterRate(chapter.id) : null
+                const chStats = stats.byChapter[chapter.id]
+
                 return (
                   <Link
-                    key={id}
-                    href={`/quiz/chapter/${id}`}
-                    className="flex items-center justify-between px-4 py-3 rounded-lg border border-gray-200 hover:border-blue-400 hover:bg-blue-50 transition-colors group"
+                    key={chapter.id}
+                    href={`/quiz/chapter/${chapter.id}`}
+                    className={`q-card hover:shadow-q-md transition-all border ${colors.border} ${colors.bg} group`}
                   >
-                    <span className="font-medium text-gray-800 group-hover:text-blue-700">
-                      {getChapterFullLabel(id)}
-                    </span>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-gray-400 group-hover:text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                    </svg>
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <div className="text-xs text-ink-faint mb-1">{part}과목 {chapter.chapter}장</div>
+                        <div className="font-semibold text-ink text-sm group-hover:text-primary-700 transition-colors">
+                          {chapter.title}
+                        </div>
+                      </div>
+                      <span className="text-xl">📚</span>
+                    </div>
+
+                    {isHydrated && chStats && chStats.attempted > 0 ? (
+                      <div className="mt-3">
+                        <div className="flex justify-between text-xs text-ink-muted mb-1">
+                          <span>{chStats.attempted}문항 풀이</span>
+                          <span className="font-semibold text-ink">{rate}%</span>
+                        </div>
+                        <div className="h-1.5 bg-white/70 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full ${colors.bar} rounded-full transition-all`}
+                            style={{ width: `${rate}%` }}
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="mt-3 text-xs text-ink-faint">아직 풀지 않음</div>
+                    )}
                   </Link>
                 )
               })}
             </div>
           </div>
-
-          {/* 특별 모드 */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <Link
-              href="/quiz/exam"
-              className="flex flex-col items-center p-6 bg-blue-600 text-white rounded-xl shadow-sm hover:bg-blue-700 transition-colors"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              <span className="font-bold text-lg">모의고사</span>
-              <span className="text-blue-200 text-sm mt-1">50문항 / 90분</span>
-            </Link>
-
-            <Link
-              href="/quiz/wrong"
-              className={`flex flex-col items-center p-6 rounded-xl shadow-sm transition-colors ${
-                wrongCount > 0
-                  ? 'bg-red-50 border-2 border-red-300 hover:bg-red-100'
-                  : 'bg-gray-50 border-2 border-gray-200 cursor-not-allowed opacity-60'
-              }`}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 mb-2 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span className="font-bold text-lg text-gray-800">오답 노트</span>
-              <span className="text-gray-500 text-sm mt-1">{wrongCount}문제</span>
-            </Link>
-
-            <Link
-              href="/quiz/bookmarks"
-              className={`flex flex-col items-center p-6 rounded-xl shadow-sm transition-colors ${
-                bookmarkCount > 0
-                  ? 'bg-yellow-50 border-2 border-yellow-300 hover:bg-yellow-100'
-                  : 'bg-gray-50 border-2 border-gray-200 cursor-not-allowed opacity-60'
-              }`}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 mb-2 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
-              </svg>
-              <span className="font-bold text-lg text-gray-800">북마크</span>
-              <span className="text-gray-500 text-sm mt-1">{bookmarkCount}문제</span>
-            </Link>
-          </div>
-        </div>
-
-        {/* 최근 모의고사 기록 */}
-        {progress.examHistory.length > 0 && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">최근 모의고사 기록</h2>
-            <div className="space-y-2">
-              {progress.examHistory.slice(0, 5).map((exam) => (
-                <div key={exam.date} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                  <span className="text-sm text-gray-600">{new Date(exam.date).toLocaleDateString('ko-KR')}</span>
-                  <div className="flex items-center gap-4 text-sm">
-                    <span className="text-gray-500">
-                      1과목 {exam.part1Score}점 / 2과목 {exam.part2Score}점
-                    </span>
-                    <span
-                      className={`font-bold ${
-                        exam.score >= 60 && exam.part1Score >= 40 && exam.part2Score >= 40
-                          ? 'text-green-600'
-                          : 'text-red-600'
-                      }`}
-                    >
-                      {exam.score}점
-                      {exam.score >= 60 && exam.part1Score >= 40 && exam.part2Score >= 40
-                        ? ' 합격'
-                        : ' 불합격'}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-    </>
+        )
+      })}
+    </div>
   )
 }

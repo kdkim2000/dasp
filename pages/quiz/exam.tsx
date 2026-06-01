@@ -1,358 +1,352 @@
-import { useState, useCallback, useEffect, useRef } from 'react'
+import React, { useState, useCallback, useRef } from 'react'
 import Link from 'next/link'
-import Head from 'next/head'
+import { useRouter } from 'next/router'
+import { sampleExamQuestions } from '@/lib/questions'
+import { useProgress } from '@/context/ProgressContext'
 import QuestionCard from '@/components/quiz/QuestionCard'
+import AnswerFeedback from '@/components/quiz/AnswerFeedback'
 import QuizNavigator from '@/components/quiz/QuizNavigator'
 import ExamTimer from '@/components/quiz/ExamTimer'
-import { useProgress } from '@/context/ProgressContext'
-import { saveExamResult } from '@/lib/progress'
-import { sampleExamQuestions, sampleMixedExam, getMockExamQuestions } from '@/lib/questions'
 import type { Question, AnswerResult, ExamResult } from '@/types'
 
-const EXAM_DURATION = 90 * 60
+type ExamPhase = 'intro' | 'exam' | 'result'
 
-type ExamPhase = 'ready' | 'ongoing' | 'result'
-type ExamSource = 'mixed' | 'chapter' | 'exam1' | 'exam2'
+interface LocalAnswer {
+  selectedIndex: number
+  result: AnswerResult
+}
 
-const SOURCE_OPTIONS: { value: ExamSource; label: string; desc: string }[] = [
-  { value: 'mixed',   label: '혼합 랜덤',   desc: '챕터+모의고사 전체 ~215문에서 무작위' },
-  { value: 'chapter', label: '챕터 문제',   desc: '단원별 학습 문제만 (115문 풀)' },
-  { value: 'exam1',   label: '모의고사 1회', desc: '출제예상 1회 50문 순서대로' },
-  { value: 'exam2',   label: '모의고사 2회', desc: '출제예상 2회 50문 순서대로' },
-]
+const PART_TITLES: Record<number, string> = {
+  1: '전사아키텍처 이해',
+  2: '데이터 요건 분석',
+  3: '데이터 표준화',
+  4: '데이터 모델링',
+  5: '데이터베이스 설계와 이용',
+}
 
 export default function ExamPage() {
-  const { markAnswer, toggleBookmark, isBookmarked } = useProgress()
+  const router = useRouter()
+  const { saveExamResult, toggleBookmark, isBookmarked } = useProgress()
+  const [phase, setPhase] = useState<ExamPhase>('intro')
+  const [questions, setQuestions] = useState<Question[]>([])
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [localAnswers, setLocalAnswers] = useState<Record<number, LocalAnswer>>({})
+  const [showFeedback, setShowFeedback] = useState(false)
+  const [selectedOption, setSelectedOption] = useState<number | null>(null)
+  const [examResult, setExamResult] = useState<ExamResult | null>(null)
+  const [timeUsed, setTimeUsed] = useState(0)
+  const startTimeRef = useRef<number>(0)
 
-  const [phase, setPhase]                 = useState<ExamPhase>('ready')
-  const [selectedSource, setSelectedSource] = useState<ExamSource>('mixed')
-  const [questions, setQuestions]         = useState<Question[]>([])
-  const [currentIndex, setCurrentIndex]   = useState(0)
-  const [selectedOptions, setSelectedOptions] = useState<number[]>([])
-  const [sessionAnswers, setSessionAnswers]   = useState<(AnswerResult | null)[]>([])
-  const [examResult, setExamResult]       = useState<ExamResult | null>(null)
-  const startTimeRef  = useRef<number>(0)
-  const timedOutRef   = useRef(false)
+  const EXAM_SECONDS = 7200 // 120분
 
-  useEffect(() => {
-    if (phase === 'ongoing' && questions.length === 0) {
-      let qs: Question[]
-      if (selectedSource === 'chapter')  qs = sampleExamQuestions()
-      else if (selectedSource === 'exam1') qs = getMockExamQuestions(1)
-      else if (selectedSource === 'exam2') qs = getMockExamQuestions(2)
-      else                                 qs = sampleMixedExam()
-      setQuestions(qs)
-      setSelectedOptions(Array(qs.length).fill(0))
-      setSessionAnswers(Array(qs.length).fill(null))
-    }
-  }, [phase, questions.length, selectedSource])
-
-  const handleStart = useCallback(() => {
+  const startExam = () => {
+    const qs = sampleExamQuestions()
+    setQuestions(qs)
+    setCurrentIndex(0)
+    setLocalAnswers({})
+    setShowFeedback(false)
+    setSelectedOption(null)
     startTimeRef.current = Date.now()
-    timedOutRef.current  = false
-    setPhase('ongoing')
-  }, [])
+    setPhase('exam')
+  }
 
-  const handleAnswer = useCallback((_result: AnswerResult, selectedIndex: number) => {
-    setSelectedOptions((prev) => { const n = [...prev]; n[currentIndex] = selectedIndex; return n })
-  }, [currentIndex])
+  const computeResult = useCallback((answers: Record<number, LocalAnswer>, qs: Question[], elapsed: number): ExamResult => {
+    const partScores: Record<number, { correct: number; total: number }> = {
+      1: { correct: 0, total: 0 },
+      2: { correct: 0, total: 0 },
+      3: { correct: 0, total: 0 },
+      4: { correct: 0, total: 0 },
+      5: { correct: 0, total: 0 },
+    }
 
-  const gradeExam = useCallback((timeTaken: number) => {
-    if (questions.length === 0) return
-    const part1Qs = questions.filter((q) => q.part === 1)
-    const part2Qs = questions.filter((q) => q.part === 2)
-    let p1correct = 0, p2correct = 0
-    const answersRecord: Record<string, number> = {}
-    const newSessionAnswers: AnswerResult[] = []
-
-    questions.forEach((q, i) => {
-      const selected = selectedOptions[i] ?? 0
-      answersRecord[q.id] = selected
-      const res: AnswerResult = selected === q.answer ? 'correct' : selected === 0 ? 'skipped' : 'wrong'
-      newSessionAnswers.push(res)
-      markAnswer(q.id, res)
-      if (res === 'correct') { if (q.part === 1) p1correct++; else p2correct++ }
+    qs.forEach((q, i) => {
+      const a = answers[i]
+      partScores[q.part].total++
+      if (a?.result === 'correct') partScores[q.part].correct++
     })
 
-    setSessionAnswers(newSessionAnswers)
-    const part1Score = part1Qs.length > 0 ? Math.round((p1correct / part1Qs.length) * 100) : 0
-    const part2Score = part2Qs.length > 0 ? Math.round((p2correct / part2Qs.length) * 100) : 0
-    const totalScore = Math.round(((p1correct + p2correct) / questions.length) * 100)
-
-    const result: ExamResult = {
-      date: new Date().toISOString(),
-      score: totalScore, part1Score, part2Score, totalTime: timeTaken,
-      answers: answersRecord,
+    const toScore = (part: number) => {
+      const p = partScores[part]
+      if (p.total === 0) return 0
+      return Math.round((p.correct / p.total) * 100)
     }
+
+    const totalCorrect = Object.values(partScores).reduce((s, p) => s + p.correct, 0)
+    const totalQ = qs.length || 1
+    const totalScore = Math.round((totalCorrect / totalQ) * 100)
+
+    const answersMap: Record<string, number> = {}
+    qs.forEach((q, i) => {
+      if (answers[i] !== undefined) answersMap[q.id] = answers[i].selectedIndex
+    })
+
+    return {
+      date: new Date().toISOString(),
+      score: totalScore,
+      part1Score: toScore(1),
+      part2Score: toScore(2),
+      part3Score: toScore(3),
+      part4Score: toScore(4),
+      part5Score: toScore(5),
+      totalTime: elapsed,
+      answers: answersMap,
+    }
+  }, [])
+
+  const finishExam = useCallback((answers: Record<number, LocalAnswer>, forced = false) => {
+    const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000)
+    setTimeUsed(elapsed)
+    const result = computeResult(answers, questions, elapsed)
     saveExamResult(result)
     setExamResult(result)
     setPhase('result')
-  }, [questions, selectedOptions, markAnswer])
+  }, [questions, computeResult, saveExamResult])
 
-  const handleSubmit  = useCallback(() => gradeExam(Math.floor((Date.now() - startTimeRef.current) / 1000)), [gradeExam])
-  const handleTimeUp  = useCallback(() => { if (timedOutRef.current) return; timedOutRef.current = true; gradeExam(EXAM_DURATION) }, [gradeExam])
+  const handleTimeUp = useCallback(() => {
+    finishExam(localAnswers, true)
+  }, [finishExam, localAnswers])
 
-  /* ── 준비 화면 ── */
-  if (phase === 'ready') {
+  const handleAnswer = useCallback((optionIndex: number) => {
+    if (showFeedback) return
+    const currentQuestion = questions[currentIndex]
+    setSelectedOption(optionIndex)
+    const result: AnswerResult = optionIndex === currentQuestion.answer ? 'correct' : 'wrong'
+    const newAnswers = { ...localAnswers, [currentIndex]: { selectedIndex: optionIndex, result } }
+    setLocalAnswers(newAnswers)
+    setShowFeedback(true)
+  }, [showFeedback, questions, currentIndex, localAnswers])
+
+  const handleNext = useCallback(() => {
+    if (currentIndex >= questions.length - 1) {
+      finishExam(localAnswers)
+      return
+    }
+    const nextIndex = currentIndex + 1
+    setCurrentIndex(nextIndex)
+    setShowFeedback(false)
+    setSelectedOption(localAnswers[nextIndex]?.selectedIndex ?? null)
+  }, [currentIndex, questions.length, localAnswers, finishExam])
+
+  const handleNavigate = useCallback((index: number) => {
+    setCurrentIndex(index)
+    const prev = localAnswers[index]
+    setSelectedOption(prev?.selectedIndex ?? null)
+    setShowFeedback(prev !== undefined)
+  }, [localAnswers])
+
+  // Intro screen
+  if (phase === 'intro') {
     return (
-      <>
-        <Head><title>모의고사 | SQLD Quest</title></Head>
-        <div className="p-4 md:p-6 max-w-lg mx-auto">
-          <div className="q-card p-8">
-            {/* 헤더 */}
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-primary-50">
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              </div>
-              <h1 className="font-display font-bold text-2xl mb-1" style={{ color: 'var(--q-ink)' }}>SQLD 모의고사</h1>
-              <p className="text-sm" style={{ color: 'var(--q-ink-2)' }}>1과목 10문항 + 2과목 40문항 · 90분</p>
-            </div>
-
-            {/* 출제 방식 선택 */}
-            <div className="mb-5">
-              <p className="text-xs font-semibold mb-2" style={{ color: 'var(--q-ink-3)' }}>출제 방식 선택</p>
-              <div className="space-y-2">
-                {SOURCE_OPTIONS.map((opt) => (
-                  <button
-                    key={opt.value}
-                    onClick={() => setSelectedSource(opt.value)}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border-2 text-left transition-colors ${
-                      selectedSource === opt.value
-                        ? 'border-primary-500 bg-primary-50'
-                        : 'border-transparent hover:border-primary-200'
-                    }`}
-                    style={selectedSource !== opt.value ? { backgroundColor: 'var(--q-surface-soft)' } : undefined}
-                  >
-                    <span className={`w-4 h-4 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${
-                      selectedSource === opt.value ? 'border-primary-600' : 'border-gray-300'
-                    }`}>
-                      {selectedSource === opt.value && (
-                        <span className="w-2 h-2 rounded-full bg-primary-600" />
-                      )}
-                    </span>
-                    <span>
-                      <span className="text-sm font-semibold block" style={{ color: 'var(--q-ink)' }}>{opt.label}</span>
-                      <span className="text-xs" style={{ color: 'var(--q-ink-3)' }}>{opt.desc}</span>
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* 합격 기준 */}
-            <div className="rounded-2xl p-4 mb-5 text-left bg-primary-50">
-              <h2 className="font-semibold text-primary-800 mb-2 text-sm">합격 기준</h2>
-              <ul className="text-sm text-primary-700 space-y-1">
-                <li>• 총점 60점 이상</li>
-                <li>• 1과목 40점 이상 (과락 없어야 함)</li>
-                <li>• 2과목 40점 이상 (과락 없어야 함)</li>
-              </ul>
-            </div>
-
-            <button
-              onClick={handleStart}
-              className="w-full py-3 rounded-2xl bg-primary-600 hover:bg-primary-700 text-white font-bold text-base transition-colors"
-            >
-              시험 시작
-            </button>
-            <Link href="/quiz" className="block mt-3 text-sm text-center hover:underline" style={{ color: 'var(--q-ink-3)' }}>
-              돌아가기
-            </Link>
+      <div className="max-w-2xl mx-auto px-4 py-12 space-y-8">
+        <div className="q-card text-center space-y-6">
+          <div className="text-5xl">📝</div>
+          <div>
+            <h1 className="text-2xl font-display font-bold text-ink">DAsP 모의고사</h1>
+            <p className="text-ink-muted text-sm mt-2">실전과 동일한 조건으로 실력을 확인해보세요.</p>
           </div>
-        </div>
-      </>
-    )
-  }
 
-  /* ── 결과 화면 ── */
-  if (phase === 'result' && examResult) {
-    const passed = examResult.score >= 60 && examResult.part1Score >= 40 && examResult.part2Score >= 40
-    const mins   = Math.floor(examResult.totalTime / 60)
-    const secs   = examResult.totalTime % 60
-    const correctCount  = sessionAnswers.filter((a) => a === 'correct').length
-    const wrongCount    = sessionAnswers.filter((a) => a === 'wrong').length
-    const skippedCount  = sessionAnswers.filter((a) => a === 'skipped').length
+          <div className="grid grid-cols-3 gap-4 py-4">
+            <div className="q-card bg-surface-soft text-center py-4">
+              <div className="text-2xl font-bold text-primary-600">100</div>
+              <div className="text-xs text-ink-muted mt-1">문항</div>
+            </div>
+            <div className="q-card bg-surface-soft text-center py-4">
+              <div className="text-2xl font-bold text-primary-600">120</div>
+              <div className="text-xs text-ink-muted mt-1">분</div>
+            </div>
+            <div className="q-card bg-surface-soft text-center py-4">
+              <div className="text-2xl font-bold text-primary-600">5</div>
+              <div className="text-xs text-ink-muted mt-1">과목</div>
+            </div>
+          </div>
 
-    return (
-      <>
-        <Head><title>모의고사 결과 | SQLD Quest</title></Head>
-        <div className="p-4 md:p-6 max-w-2xl mx-auto space-y-4">
-          {/* 합격/불합격 헤더 */}
-          <div
-            className="q-card p-8 text-center border-2"
-            style={{
-              borderColor: passed ? '#12B76A' : '#FF6B6B',
-              background:  passed ? '#ECFDF3'  : '#FFF1F2',
-            }}
+          <div className="text-left bg-primary-50 border border-primary-200 rounded-xl px-4 py-3 text-sm space-y-1">
+            <div className="font-semibold text-primary-800 mb-2">합격 기준</div>
+            <div className="text-primary-700">• 전체 평균 60점 이상</div>
+            <div className="text-primary-700">• 각 과목별 40점 이상</div>
+            <div className="text-primary-700">• 과목당 20문항 (5과목)</div>
+          </div>
+
+          <button
+            onClick={startExam}
+            className="w-full py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-bold text-base transition-colors shadow-q-md"
           >
-            <p className="font-display font-black text-4xl mb-1" style={{ color: passed ? '#039855' : '#BE123C' }}>
-              {passed ? '합격 🎉' : '불합격'}
-            </p>
-            <p className="font-bold text-5xl mb-2" style={{ color: 'var(--q-ink)' }}>{examResult.score}점</p>
-            <p className="text-sm" style={{ color: 'var(--q-ink-3)' }}>소요 시간: {mins}분 {secs}초</p>
-          </div>
-
-          {/* 과목별 점수 */}
-          <div className="q-card">
-            <h2 className="text-sm font-semibold mb-4" style={{ color: 'var(--q-ink)' }}>과목별 점수</h2>
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                { label: '1과목 (데이터 모델링)', score: examResult.part1Score },
-                { label: '2과목 (SQL 기본·활용)',  score: examResult.part2Score },
-              ].map(({ label, score }) => (
-                <div key={label} className="text-center p-4 rounded-2xl" style={{ backgroundColor: 'var(--q-surface-soft)' }}>
-                  <p className="text-xs mb-2" style={{ color: 'var(--q-ink-3)' }}>{label}</p>
-                  <p className={`text-3xl font-bold ${score >= 40 ? 'text-mint-500' : 'text-coral'}`}>{score}점</p>
-                  <p className="text-xs mt-1" style={{ color: 'var(--q-ink-3)' }}>
-                    {score >= 40 ? '✓ 과락 없음' : '✗ 과락'}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* 풀이 통계 */}
-          <div className="q-card">
-            <h2 className="text-sm font-semibold mb-4" style={{ color: 'var(--q-ink)' }}>풀이 통계</h2>
-            <div className="flex justify-around text-center">
-              <div><p className="text-2xl font-bold text-mint-500">{correctCount}</p><p className="text-xs" style={{ color: 'var(--q-ink-3)' }}>정답</p></div>
-              <div><p className="text-2xl font-bold text-coral">{wrongCount}</p><p className="text-xs" style={{ color: 'var(--q-ink-3)' }}>오답</p></div>
-              <div><p className="text-2xl font-bold" style={{ color: 'var(--q-ink-3)' }}>{skippedCount}</p><p className="text-xs" style={{ color: 'var(--q-ink-3)' }}>미응답</p></div>
-            </div>
-          </div>
-
-          {/* 문제별 결과 */}
-          <div className="q-card">
-            <h2 className="text-sm font-semibold mb-4" style={{ color: 'var(--q-ink)' }}>문제별 결과</h2>
-            <div className="grid grid-cols-10 gap-1.5">
-              {questions.map((q, i) => {
-                const res = sessionAnswers[i]
-                const bg  = res === 'correct' ? '#ECFDF3' : res === 'wrong' ? '#FFF1F2' : undefined
-                const fg  = res === 'correct' ? '#039855'  : res === 'wrong' ? '#BE123C'  : undefined
-                return (
-                  <div
-                    key={q.id}
-                    className="h-8 w-full rounded-lg text-xs font-bold flex items-center justify-center"
-                    style={{ backgroundColor: bg ?? 'var(--q-surface-soft)', color: fg ?? 'var(--q-ink-3)' }}
-                    title={`Q${i + 1}: ${res ?? '미응답'}`}
-                  >
-                    {i + 1}
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-
-          <div className="flex gap-3 justify-center pt-1">
-            <button
-              onClick={() => { setPhase('ready'); setQuestions([]); setCurrentIndex(0); setSelectedOptions([]); setSessionAnswers([]); setExamResult(null); timedOutRef.current = false }}
-              className="px-6 py-2.5 rounded-xl border font-medium text-sm transition-colors hover:bg-surface-soft"
-              style={{ borderColor: 'var(--q-border)', color: 'var(--q-ink-2)' }}
-            >
-              다시 보기
-            </button>
-            <Link href="/quiz" className="px-6 py-2.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-medium text-sm transition-colors">
-              문제 목록으로
-            </Link>
-          </div>
+            시험 시작
+          </button>
         </div>
-      </>
-    )
-  }
-
-  /* ── 로딩 ── */
-  if (questions.length === 0) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <p style={{ color: 'var(--q-ink-3)' }}>문제를 불러오는 중...</p>
       </div>
     )
   }
 
-  /* ── 시험 진행 ── */
-  const currentQuestion  = questions[currentIndex]
-  const currentSelected  = selectedOptions[currentIndex] ?? 0
-  const answeredCount    = selectedOptions.filter((s) => s > 0).length
+  // Result screen
+  if (phase === 'result' && examResult) {
+    const passed =
+      examResult.score >= 60 &&
+      examResult.part1Score >= 40 &&
+      examResult.part2Score >= 40 &&
+      examResult.part3Score >= 40 &&
+      examResult.part4Score >= 40 &&
+      examResult.part5Score >= 40
 
-  return (
-    <>
-      <Head><title>모의고사 진행 중 | SQLD Quest</title></Head>
-      <div className="p-4 md:p-6 max-w-4xl mx-auto">
-        {/* 헤더 */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="font-display font-bold text-xl" style={{ color: 'var(--q-ink)' }}>SQLD 모의고사</h1>
-            <p className="text-xs mt-0.5" style={{ color: 'var(--q-ink-3)' }}>
-              {answeredCount}/{questions.length} 문항 응답 완료
-            </p>
+    const partScores = [
+      examResult.part1Score,
+      examResult.part2Score,
+      examResult.part3Score,
+      examResult.part4Score,
+      examResult.part5Score,
+    ]
+
+    const stars = examResult.score >= 80 ? 3 : examResult.score >= 60 ? 2 : 1
+
+    const mins = Math.floor(timeUsed / 60)
+    const secs = timeUsed % 60
+
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
+        {/* Result card */}
+        <div className="q-card text-center space-y-4">
+          <div className="text-5xl">{passed ? '🎉' : '😔'}</div>
+          <h1 className="text-xl font-display font-bold text-ink">
+            {passed ? '합격!' : '불합격'}
+          </h1>
+          <div className="flex justify-center gap-1 text-3xl">
+            {Array.from({ length: 3 }, (_, i) => (
+              <span key={i}>{i < stars ? '★' : '☆'}</span>
+            ))}
           </div>
-          <ExamTimer totalSeconds={EXAM_DURATION} onTimeUp={handleTimeUp} />
+
+          <div className="text-5xl font-display font-bold text-primary-600">
+            {examResult.score}점
+          </div>
+
+          <div className={`inline-block px-4 py-1 rounded-full text-sm font-bold ${
+            passed ? 'bg-mint-50 text-mint-700 border border-mint-300' : 'bg-red-50 text-red-700 border border-red-300'
+          }`}>
+            {passed ? '합격' : '불합격'} (기준: 60점 이상 + 각 과목 40점 이상)
+          </div>
+
+          <div className="text-xs text-ink-muted">
+            소요 시간: {mins}분 {secs}초
+          </div>
         </div>
 
-        <div className="flex gap-5">
-          {/* 문제 영역 */}
-          <div className="flex-1 min-w-0">
-            <QuestionCard
-              question={currentQuestion}
-              questionNumber={currentIndex + 1}
-              totalQuestions={questions.length}
-              selectedOption={currentSelected > 0 ? currentSelected : null}
-              showResult={false}
-              onAnswer={handleAnswer}
-              isBookmarked={isBookmarked(currentQuestion.id)}
-              onToggleBookmark={() => toggleBookmark(currentQuestion.id)}
-            />
-
-            {/* 이전/다음 */}
-            <div className="flex justify-between mt-4">
-              <button
-                onClick={() => setCurrentIndex((p) => Math.max(0, p - 1))}
-                disabled={currentIndex === 0}
-                className="px-5 py-2 rounded-xl border font-medium text-sm transition-colors disabled:opacity-40 hover:bg-surface-soft"
-                style={{ borderColor: 'var(--q-border)', color: 'var(--q-ink-2)' }}
-              >
-                이전 문제
-              </button>
-              {currentIndex < questions.length - 1 ? (
-                <button
-                  onClick={() => setCurrentIndex((p) => p + 1)}
-                  className="px-5 py-2 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-medium text-sm transition-colors"
-                >
-                  다음 문제
-                </button>
-              ) : (
-                <button
-                  onClick={handleSubmit}
-                  className="px-5 py-2 rounded-xl bg-primary-700 hover:bg-primary-800 text-white font-bold text-sm transition-colors"
-                >
-                  답안 제출
-                </button>
-              )}
-            </div>
-
-            {currentIndex < questions.length - 1 && (
-              <div className="mt-3 text-right">
-                <button onClick={handleSubmit} className="text-sm text-primary-600 hover:text-primary-800 underline">
-                  지금 바로 제출하기
-                </button>
+        {/* Part scores */}
+        <div className="q-card space-y-3">
+          <h2 className="font-semibold text-ink">과목별 점수</h2>
+          {partScores.map((score, i) => {
+            const partNum = i + 1
+            const passed40 = score >= 40
+            return (
+              <div key={partNum} className="space-y-1">
+                <div className="flex justify-between text-sm">
+                  <span className="text-ink-muted">{partNum}과목 {PART_TITLES[partNum]}</span>
+                  <span className={`font-bold ${passed40 ? 'text-mint-600' : 'text-red-500'}`}>
+                    {score}점 {passed40 ? '✓' : '✗'}
+                  </span>
+                </div>
+                <div className="h-2 bg-surface-soft rounded-full overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all ${passed40 ? 'bg-mint-500' : 'bg-coral'}`}
+                    style={{ width: `${score}%` }}
+                  />
+                </div>
               </div>
-            )}
-          </div>
+            )
+          })}
+        </div>
 
-          {/* 네비게이터 */}
-          <div className="hidden lg:block w-52 flex-shrink-0">
+        {/* Actions */}
+        <div className="flex gap-3">
+          <button
+            onClick={() => {
+              setPhase('intro')
+              setExamResult(null)
+              setLocalAnswers({})
+            }}
+            className="flex-1 py-2.5 border-2 border-primary-600 text-primary-600 rounded-xl font-semibold text-sm hover:bg-primary-50 transition-colors"
+          >
+            다시 도전
+          </button>
+          <Link href="/quiz/wrong" className="flex-1 py-2.5 bg-primary-600 text-white rounded-xl font-semibold text-sm hover:bg-primary-700 transition-colors text-center">
+            오답 노트
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
+  // Exam screen
+  const currentQuestion = questions[currentIndex]
+  const navigatorAnswers: Record<number, AnswerResult | null> = Object.fromEntries(
+    Object.entries(localAnswers).map(([k, v]) => [Number(k), v.result])
+  )
+  const bookmarkIndices = new Set(
+    questions
+      .map((q, i) => (isBookmarked(q.id) ? i : -1))
+      .filter(i => i >= 0)
+  )
+
+  return (
+    <div className="max-w-5xl mx-auto px-4 py-6">
+      {/* Exam header */}
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h1 className="text-lg font-bold text-ink">DAsP 모의고사</h1>
+          <p className="text-xs text-ink-muted">
+            {currentIndex + 1} / {questions.length}문항 · {currentQuestion?.part}과목
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <ExamTimer totalSeconds={EXAM_SECONDS} onTimeUp={handleTimeUp} />
+          <button
+            onClick={() => finishExam(localAnswers)}
+            className="px-4 py-2 bg-primary-600 text-white text-sm rounded-xl font-semibold hover:bg-primary-700 transition-colors"
+          >
+            제출하기
+          </button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Main */}
+        <div className="lg:col-span-2 space-y-4">
+          {currentQuestion && (
+            <>
+              <QuestionCard
+                question={currentQuestion}
+                questionNumber={currentIndex + 1}
+                totalQuestions={questions.length}
+                selectedOption={selectedOption}
+                showResult={showFeedback}
+                onAnswer={handleAnswer}
+                isBookmarked={isBookmarked(currentQuestion.id)}
+                onToggleBookmark={() => toggleBookmark(currentQuestion.id)}
+              />
+              {showFeedback && (
+                <AnswerFeedback
+                  question={currentQuestion}
+                  selectedIndex={selectedOption}
+                  onNext={handleNext}
+                  isLast={currentIndex === questions.length - 1}
+                />
+              )}
+            </>
+          )}
+        </div>
+
+        {/* Navigator */}
+        <div className="lg:col-span-1">
+          <div className="sticky top-20">
             <QuizNavigator
               total={questions.length}
               current={currentIndex}
-              answers={selectedOptions.map((s) => s > 0 ? ('skipped' as AnswerResult) : null)}
-              bookmarked={questions.map((q) => isBookmarked(q.id))}
-              onJump={setCurrentIndex}
+              answers={navigatorAnswers}
+              onNavigate={handleNavigate}
+              bookmarks={bookmarkIndices}
             />
           </div>
         </div>
       </div>
-    </>
+    </div>
   )
 }

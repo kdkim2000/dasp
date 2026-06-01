@@ -1,186 +1,126 @@
+import React from 'react'
 import Link from 'next/link'
-import { CHAPTERS } from '@/lib/chapters'
+import { CHAPTERS, CHAPTERS_BY_PART, PART_TITLES } from '@/lib/chapters'
+import { useProgress } from '@/context/ProgressContext'
 
-type ChapterStatMap = Record<string, { attempted: number; correct: number }>
-
-interface LearningPathProps {
-  chapterStats: ChapterStatMap
+const PART_COLORS: Record<number, { bubble: string; text: string; boss: string }> = {
+  1: { bubble: 'bg-indigo-500', text: 'text-indigo-700', boss: 'bg-indigo-700' },
+  2: { bubble: 'bg-blue-500', text: 'text-blue-700', boss: 'bg-blue-700' },
+  3: { bubble: 'bg-green-500', text: 'text-green-700', boss: 'bg-green-700' },
+  4: { bubble: 'bg-purple-500', text: 'text-purple-700', boss: 'bg-purple-700' },
+  5: { bubble: 'bg-teal-500', text: 'text-teal-700', boss: 'bg-teal-700' },
 }
 
-interface PathNode {
-  id: string
-  label: string
-  shortLabel: string
-  href: string
-  status: 'done' | 'current' | 'locked' | 'boss'
-}
-
-export default function LearningPath({ chapterStats }: LearningPathProps) {
-  // Determine node status for each chapter
-  const nodes: PathNode[] = CHAPTERS.map((ch, idx) => {
-    const s = chapterStats[ch.id] ?? { attempted: 0, correct: 0 }
-    // A chapter is "done" if answered >= 80% of total (using attempted as proxy since questionCount may be 0)
-    // We treat "done" as: has attempted some questions AND correctPct >= 60
-    const correctPct = s.attempted > 0 ? (s.correct / s.attempted) * 100 : 0
-    const isDone = s.attempted >= 5 && correctPct >= 60
-
-    // Determine which is the current node: first non-done chapter
-    let status: PathNode['status'] = 'locked'
-    if (isDone) {
-      status = 'done'
-    } else {
-      // Check if all previous chapters are done
-      const allPrevDone = CHAPTERS.slice(0, idx).every((prevCh) => {
-        const ps = chapterStats[prevCh.id] ?? { attempted: 0, correct: 0 }
-        const pPct = ps.attempted > 0 ? (ps.correct / ps.attempted) * 100 : 0
-        return ps.attempted >= 5 && pPct >= 60
-      })
-      if (allPrevDone) {
-        // If this node has been attempted at all, it's current (in progress)
-        status = s.attempted > 0 ? 'current' : idx === 0 ? 'current' : 'locked'
-      }
-    }
-
-    return {
-      id: ch.id,
-      label: ch.title,
-      shortLabel: ch.title.length > 8 ? ch.title.slice(0, 7) + '…' : ch.title,
-      href: `/quiz/chapter/${ch.id}`,
-      status,
-    }
-  })
-
-  // Boss node
-  const allDone = nodes.every((n) => n.status === 'done')
-  const bossNode: PathNode = {
-    id: 'boss',
-    label: '최종 모의고사',
-    shortLabel: 'BOSS',
-    href: '/quiz/exam',
-    status: allDone ? 'current' : 'boss',
+function getFirstIncompleteChapter(chapterIds: string[], answers: Record<string, string>): string | null {
+  for (const id of chapterIds) {
+    // A chapter is "completed" if it has at least some answers
+    // (simplified check — in real app would compare against question counts)
+    const hasAttempted = Object.keys(answers).some(qid => qid.startsWith(id.replace('part', 'p').replace('_ch', 'c') + '_'))
+    if (!hasAttempted) return id
   }
-  const allNodes = [...nodes, bossNode]
+  return null
+}
 
-  // If no attempts at all, first node is current
-  const hasAnyAttempt = nodes.some((n) => n.status !== 'locked' && n.status !== 'boss')
-  if (!hasAnyAttempt) {
-    allNodes[0].status = 'current'
+export default function LearningPath() {
+  const { stats, progress, isHydrated } = useProgress()
+
+  const getChapterStatus = (chapterId: string): 'done' | 'current' | 'locked' => {
+    if (!isHydrated) return 'locked'
+    const chStats = stats.byChapter[chapterId]
+    if (!chStats) return 'locked'
+    if (chStats.attempted >= 3 && chStats.correct / Math.max(chStats.attempted, 1) >= 0.6) return 'done'
+
+    // Find the first non-done chapter as current
+    const allChapters = CHAPTERS.map(c => c.id)
+    const firstIncomplete = getFirstIncompleteChapter(allChapters, progress.answers)
+    if (firstIncomplete === chapterId) return 'current'
+
+    return chStats.attempted > 0 ? 'current' : 'locked'
   }
 
   return (
-    <div className="q-card">
-      <h2 className="text-sm font-bold mb-5" style={{ color: 'var(--q-ink-2)' }}>
-        학습 경로
-      </h2>
+    <div className="q-card space-y-6">
+      <h2 className="text-base font-semibold text-ink">학습 경로</h2>
 
-      {/* Path: horizontal scroll on mobile */}
-      <div className="overflow-x-auto pb-2">
-        <div className="flex items-center gap-0 min-w-max mx-auto justify-center">
-          {allNodes.map((node, idx) => (
-            <div key={node.id} className="flex items-center">
-              {/* Node */}
-              <NodeBubble node={node} />
+      <div className="space-y-6 overflow-x-auto">
+        {[1, 2, 3, 4, 5].map(part => {
+          const colors = PART_COLORS[part]
+          const chapters = CHAPTERS_BY_PART[part] ?? []
 
-              {/* Connector line (not after last) */}
-              {idx < allNodes.length - 1 && (
-                <div
-                  className="h-0.5 w-8 sm:w-12 shrink-0"
-                  style={{
-                    background:
-                      allNodes[idx + 1].status !== 'locked' && allNodes[idx + 1].status !== 'boss'
-                        ? '#12B76A'
-                        : 'var(--q-border)',
-                  }}
-                />
-              )}
+          return (
+            <div key={part} className="space-y-2">
+              {/* Part label */}
+              <div className={`text-xs font-bold ${colors.text}`}>
+                {part}과목 {PART_TITLES[part]}
+              </div>
+
+              {/* Bubbles row */}
+              <div className="flex items-center gap-2 flex-wrap">
+                {chapters.map((ch, idx) => {
+                  const status = getChapterStatus(ch.id)
+
+                  if (status === 'done') {
+                    return (
+                      <Link
+                        key={ch.id}
+                        href={`/quiz/chapter/${ch.id}`}
+                        className={`relative flex flex-col items-center gap-1 group`}
+                        title={ch.title}
+                      >
+                        <div className={`w-12 h-12 rounded-full ${colors.bubble} flex items-center justify-center text-white font-bold text-sm shadow-q-sm`}>
+                          ✓
+                        </div>
+                        <span className="text-xs text-ink-faint text-center w-14 leading-tight hidden sm:block">{ch.chapter}장</span>
+                        {idx < chapters.length - 1 && (
+                          <span className="absolute left-12 top-5 w-6 h-0.5 bg-green-300" />
+                        )}
+                      </Link>
+                    )
+                  }
+
+                  if (status === 'current') {
+                    return (
+                      <Link
+                        key={ch.id}
+                        href={`/quiz/chapter/${ch.id}`}
+                        className="relative flex flex-col items-center gap-1 group"
+                        title={ch.title}
+                      >
+                        <div className={`w-12 h-12 rounded-full ${colors.bubble} flex items-center justify-center text-white font-bold text-sm shadow-q-md ring-4 ring-primary-200 animate-q-bounce`}>
+                          ▶
+                        </div>
+                        <span className="text-xs text-primary-600 font-semibold text-center w-14 leading-tight hidden sm:block">{ch.chapter}장</span>
+                      </Link>
+                    )
+                  }
+
+                  // locked
+                  return (
+                    <div
+                      key={ch.id}
+                      className="relative flex flex-col items-center gap-1"
+                      title={`${ch.title} (잠김)`}
+                    >
+                      <div className="w-12 h-12 rounded-full bg-surface-soft border-2 border-[var(--q-border)] flex items-center justify-center text-ink-faint text-lg shadow-q-xs">
+                        🔒
+                      </div>
+                      <span className="text-xs text-ink-faint text-center w-14 leading-tight hidden sm:block">{ch.chapter}장</span>
+                    </div>
+                  )
+                })}
+
+                {/* BOSS bubble at end of each part */}
+                <div className="flex flex-col items-center gap-1" title={`${part}과목 보스전`}>
+                  <div className={`w-14 h-14 rounded-full ${colors.boss} flex items-center justify-center text-white text-xl shadow-q-md`}>
+                    👑
+                  </div>
+                  <span className="text-xs text-ink-faint text-center w-16 leading-tight hidden sm:block">BOSS</span>
+                </div>
+              </div>
             </div>
-          ))}
-        </div>
+          )
+        })}
       </div>
     </div>
-  )
-}
-
-function NodeBubble({ node }: { node: PathNode }) {
-  const isDone = node.status === 'done'
-  const isCurrent = node.status === 'current'
-  const isLocked = node.status === 'locked'
-  const isBoss = node.status === 'boss'
-
-  // Sizing
-  const size = isBoss ? 64 : 52
-  const fontSize = isBoss ? '1.25rem' : '1rem'
-
-  // Colors
-  let bubbleBg: string
-  let bubbleBorder: string
-  let iconContent: string
-
-  if (isDone) {
-    bubbleBg = '#12B76A'
-    bubbleBorder = '#039855'
-    iconContent = '✓'
-  } else if (isCurrent) {
-    bubbleBg = '#7F56D9'
-    bubbleBorder = '#6941C6'
-    iconContent = node.id === 'boss' ? '👑' : '▶'
-  } else if (isBoss) {
-    bubbleBg = 'linear-gradient(135deg, #FF6B6B, #FFB627)'
-    bubbleBorder = '#FF6B6B'
-    iconContent = '👑'
-  } else {
-    // locked
-    bubbleBg = 'var(--q-surface-soft)'
-    bubbleBorder = 'var(--q-border)'
-    iconContent = '🔒'
-  }
-
-  const inner = (
-    <div className="flex flex-col items-center gap-1">
-      <div
-        className={isCurrent ? 'q-bounce' : ''}
-        style={{
-          width: size,
-          height: size,
-          borderRadius: '50%',
-          background: bubbleBg,
-          border: `2.5px solid ${bubbleBorder}`,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize,
-          color: isLocked ? 'var(--q-ink-3)' : '#ffffff',
-          fontWeight: 700,
-          boxShadow: isCurrent ? '0 0 0 6px rgba(127,86,217,0.15)' : undefined,
-          transition: 'box-shadow 0.2s',
-          cursor: isLocked ? 'not-allowed' : 'pointer',
-        }}
-      >
-        {iconContent}
-      </div>
-      <span
-        className="text-center"
-        style={{
-          fontSize: '0.65rem',
-          maxWidth: size + 16,
-          color: isLocked ? 'var(--q-ink-3)' : isCurrent ? '#7F56D9' : 'var(--q-ink-2)',
-          fontWeight: isCurrent ? 700 : 500,
-          lineHeight: 1.3,
-          textAlign: 'center',
-        }}
-      >
-        {node.shortLabel}
-      </span>
-    </div>
-  )
-
-  if (isLocked) {
-    return <div className="flex flex-col items-center px-1">{inner}</div>
-  }
-
-  return (
-    <Link href={node.href} className="flex flex-col items-center px-1 hover:opacity-80 transition-opacity">
-      {inner}
-    </Link>
   )
 }

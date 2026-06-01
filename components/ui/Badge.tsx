@@ -1,68 +1,31 @@
+import React from 'react'
+
+type BadgeType = 'streak' | 'gems' | 'hearts' | 'xp'
+type BadgeSize = 'sm' | 'md'
+
 interface BadgeProps {
-  type: 'streak' | 'gem' | 'heart' | 'xp'
+  type: BadgeType
   value: number
-  size?: 'sm' | 'md'
+  size?: BadgeSize
 }
 
-const CONFIG = {
-  streak: {
-    icon: '🔥',
-    label: '연속',
-    bg: '#FFF7ED',
-    text: '#C2410C',
-    border: '#FED7AA',
-  },
-  gem: {
-    icon: '💎',
-    label: '젬',
-    bg: '#F4F3FF',
-    text: '#53389E',
-    border: '#DDD6FE',
-  },
-  heart: {
-    icon: '❤️',
-    label: '하트',
-    bg: '#FFF1F2',
-    text: '#BE123C',
-    border: '#FECDD3',
-  },
-  xp: {
-    icon: '⚡',
-    label: 'XP',
-    bg: '#FFF7ED',
-    text: '#92400E',
-    border: '#FED7AA',
-  },
-} as const
+const BADGE_CONFIG: Record<BadgeType, { icon: string; label: string; color: string }> = {
+  streak: { icon: '🔥', label: '스트릭', color: 'text-orange-500' },
+  gems:   { icon: '💎', label: '보석',   color: 'text-primary-500' },
+  hearts: { icon: '❤️', label: '하트',   color: 'text-red-500' },
+  xp:     { icon: '⚡', label: 'XP',     color: 'text-sun' },
+}
 
 export default function Badge({ type, value, size = 'md' }: BadgeProps) {
-  const cfg = CONFIG[type]
-  const padding = size === 'sm' ? '2px 8px' : '4px 12px'
-  const fontSize = size === 'sm' ? '0.75rem' : '0.875rem'
-  const iconSize = size === 'sm' ? '0.85rem' : '1rem'
-
+  const cfg = BADGE_CONFIG[type]
+  const sizeClass = size === 'sm' ? 'text-xs px-2 py-0.5' : 'text-sm px-3 py-1'
   return (
     <span
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: '4px',
-        backgroundColor: cfg.bg,
-        color: cfg.text,
-        border: `1px solid ${cfg.border}`,
-        borderRadius: '9999px',
-        padding,
-        fontSize,
-        fontWeight: 700,
-        lineHeight: 1.4,
-        whiteSpace: 'nowrap',
-      }}
+      className={`inline-flex items-center gap-1 rounded-full bg-surface font-semibold ${sizeClass} ${cfg.color} border border-current/20`}
+      title={cfg.label}
     >
-      <span style={{ fontSize: iconSize, lineHeight: 1 }}>{cfg.icon}</span>
+      <span>{cfg.icon}</span>
       <span>{value}</span>
-      {size === 'md' && (
-        <span style={{ fontWeight: 400, opacity: 0.75, fontSize: '0.75rem' }}>{cfg.label}</span>
-      )}
     </span>
   )
 }

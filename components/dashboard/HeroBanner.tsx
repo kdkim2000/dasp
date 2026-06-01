@@ -1,111 +1,99 @@
+import React from 'react'
 import Link from 'next/link'
 import Mascot from '@/components/ui/Mascot'
+import { useProgress } from '@/context/ProgressContext'
 
-interface HeroBannerProps {
-  correctPct: number
-  currentChapterHref: string
-  theoryHref: string
-}
+export default function HeroBanner() {
+  const { stats, progress, isHydrated } = useProgress()
 
-export default function HeroBanner({ correctPct, currentChapterHref, theoryHref }: HeroBannerProps) {
-  const expression = correctPct >= 70 ? 'excited' : correctPct > 0 ? 'happy' : 'thinking'
+  const overallRate = stats.attempted > 0
+    ? Math.round((stats.correct / stats.attempted) * 100)
+    : 0
+
+  const lastVisited = progress.lastVisited
 
   return (
-    <div
-      className="rounded-4xl overflow-hidden relative"
-      style={{
-        background: 'linear-gradient(135deg, #7F56D9 0%, #6941C6 60%, #53389E 100%)',
-        padding: '28px 32px',
-      }}
-    >
-      {/* Background decoration circles */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '-40px',
-          right: '-40px',
-          width: '180px',
-          height: '180px',
-          borderRadius: '50%',
-          background: 'rgba(255,255,255,0.05)',
-          pointerEvents: 'none',
-        }}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          bottom: '-30px',
-          left: '30%',
-          width: '120px',
-          height: '120px',
-          borderRadius: '50%',
-          background: 'rgba(255,255,255,0.04)',
-          pointerEvents: 'none',
-        }}
-      />
+    <div className="relative overflow-hidden bg-gradient-to-br from-indigo-600 via-primary-600 to-purple-600 text-white rounded-q-lg p-6 sm:p-8">
+      {/* Background decoration */}
+      <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+      <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
 
-      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 relative z-10">
+      <div className="relative flex flex-col sm:flex-row items-center gap-6">
         {/* Mascot */}
         <div className="shrink-0">
-          <Mascot size={96} expression={expression} />
+          <Mascot expression="excited" size={80} className="drop-shadow-lg" />
         </div>
 
-        {/* Content */}
-        <div className="flex-1 min-w-0 text-center sm:text-left">
-          <p className="text-sm font-semibold text-purple-200 mb-1">오늘의 퀘스트</p>
-          <h1 className="text-xl sm:text-2xl font-bold text-white mb-4 leading-tight">
-            {correctPct === 0
-              ? 'SQLD 정복을 시작하세요!'
-              : correctPct >= 80
-              ? '훌륭해요! 마스터에 가까워지고 있어요'
-              : 'SQL 실력을 계속 키워나가요'}
+        {/* Text */}
+        <div className="flex-1 text-center sm:text-left">
+          <h1 className="text-2xl sm:text-3xl font-display font-bold mb-1">
+            DAsP Master
           </h1>
+          <p className="text-indigo-200 text-sm mb-4">
+            데이터아키텍처 준전문가 자격증을 향해 함께 나아가요!
+          </p>
 
-          {/* Progress bar */}
-          <div className="mb-5">
-            <div className="flex items-center justify-between mb-1.5">
-              <span className="text-xs text-purple-200">전체 정답률</span>
-              <span className="text-sm font-bold text-white">{correctPct}%</span>
+          {isHydrated && stats.attempted > 0 && (
+            <div className="mb-4">
+              <div className="flex items-center gap-2 justify-center sm:justify-start mb-2">
+                <span className="text-indigo-200 text-sm">전체 정답률</span>
+                <span className="text-2xl font-bold">{overallRate}%</span>
+              </div>
+              <div className="w-full max-w-xs bg-white/20 rounded-full h-2 overflow-hidden">
+                <div
+                  className="h-full bg-white rounded-full transition-all duration-500"
+                  style={{ width: `${overallRate}%` }}
+                />
+              </div>
+              <div className="text-xs text-indigo-200 mt-1">
+                {stats.correct} / {stats.attempted} 정답
+              </div>
             </div>
-            <div
-              className="h-3 rounded-full overflow-hidden"
-              style={{ background: 'rgba(255,255,255,0.2)' }}
-            >
-              <div
-                className="h-full rounded-full transition-all duration-700"
-                style={{
-                  width: `${correctPct}%`,
-                  background: 'linear-gradient(90deg, #DDD6FE, #ffffff)',
-                }}
-              />
-            </div>
-          </div>
+          )}
 
           {/* CTA buttons */}
-          <div className="flex flex-wrap gap-3 justify-center sm:justify-start">
+          <div className="flex gap-3 justify-center sm:justify-start flex-wrap">
+            {lastVisited ? (
+              <Link
+                href={`/${lastVisited.type}/${lastVisited.id}`}
+                className="px-5 py-2.5 bg-white text-primary-700 font-bold rounded-xl text-sm hover:bg-indigo-50 transition-colors shadow-q-sm"
+              >
+                이어서 풀기 →
+              </Link>
+            ) : (
+              <Link
+                href="/quiz"
+                className="px-5 py-2.5 bg-white text-primary-700 font-bold rounded-xl text-sm hover:bg-indigo-50 transition-colors shadow-q-sm"
+              >
+                문제 풀기 시작
+              </Link>
+            )}
             <Link
-              href={currentChapterHref}
-              className="inline-flex items-center gap-2 text-sm font-bold px-5 py-2.5 rounded-2xl transition-all"
-              style={{
-                background: 'rgba(255,255,255,1)',
-                color: '#6941C6',
-              }}
+              href="/theory"
+              className="px-5 py-2.5 bg-white/20 text-white font-semibold rounded-xl text-sm hover:bg-white/30 transition-colors border border-white/30"
             >
-              이어서 풀기 →
-            </Link>
-            <Link
-              href={theoryHref}
-              className="inline-flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-2xl transition-all"
-              style={{
-                background: 'rgba(255,255,255,0.15)',
-                color: '#ffffff',
-                border: '1px solid rgba(255,255,255,0.3)',
-              }}
-            >
-              이론 복습
+              이론 보기
             </Link>
           </div>
         </div>
+
+        {/* Stats chips */}
+        {isHydrated && (
+          <div className="shrink-0 flex sm:flex-col gap-2">
+            <div className="bg-white/20 rounded-xl px-3 py-2 text-center border border-white/20">
+              <div className="text-xl font-bold">{stats.attempted}</div>
+              <div className="text-xs text-indigo-200">풀이 완료</div>
+            </div>
+            <div className="bg-white/20 rounded-xl px-3 py-2 text-center border border-white/20">
+              <div className="text-xl font-bold">{progress.bookmarks.length}</div>
+              <div className="text-xs text-indigo-200">북마크</div>
+            </div>
+            <div className="bg-white/20 rounded-xl px-3 py-2 text-center border border-white/20">
+              <div className="text-xl font-bold">{progress.examHistory.length}</div>
+              <div className="text-xs text-indigo-200">모의고사</div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

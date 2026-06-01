@@ -1,13 +1,14 @@
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react'
-import type { ProgressStore, AnswerResult, Stats } from '@/types'
+import React, { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react'
+import type { ProgressStore, AnswerResult, ExamResult, Stats } from '@/types'
 import {
   loadProgress,
-  saveProgress,
-  markAnswer as markAnswerUtil,
-  toggleBookmark as toggleBookmarkUtil,
+  markAnswer as libMarkAnswer,
+  toggleBookmark as libToggleBookmark,
+  saveExamResult as libSaveExamResult,
+  resetProgress as libResetProgress,
   getStats,
-  resetProgress as resetProgressUtil,
 } from '@/lib/progress'
+import { getAllQuestionsIdMap } from '@/lib/questions'
 
 interface ProgressContextValue {
   progress: ProgressStore
@@ -15,6 +16,7 @@ interface ProgressContextValue {
   isHydrated: boolean
   markAnswer: (id: string, result: AnswerResult) => void
   toggleBookmark: (id: string) => void
+  saveExamResult: (result: ExamResult) => void
   resetProgress: () => void
   isBookmarked: (id: string) => boolean
   getStreak: () => number
@@ -23,67 +25,65 @@ interface ProgressContextValue {
   getHearts: () => number
 }
 
+const defaultStats: Stats = {
+  total: 0, attempted: 0, correct: 0,
+  byChapter: {}, byPart: {},
+}
+
 const ProgressContext = createContext<ProgressContextValue | null>(null)
 
-export function ProgressProvider({ children }: { children: React.ReactNode }) {
+export function ProgressProvider({ children }: { children: ReactNode }) {
   const [progress, setProgress] = useState<ProgressStore>({
-    answers: {},
-    bookmarks: [],
-    lastVisited: null,
-    examHistory: [],
+    answers: {}, bookmarks: [], lastVisited: null, examHistory: [],
   })
-  const [stats, setStats] = useState<Stats>({
-    total: 0,
-    attempted: 0,
-    correct: 0,
-    byChapter: {},
-    byPart: { 1: { total: 0, correct: 0, attempted: 0 }, 2: { total: 0, correct: 0, attempted: 0 } },
-  })
+  const [stats, setStats] = useState<Stats>(defaultStats)
   const [isHydrated, setIsHydrated] = useState(false)
+  const [idMap, setIdMap] = useState<Record<string, string>>({})
 
   useEffect(() => {
-    const stored = loadProgress()
-    setProgress(stored)
-    setStats(getStats())
+    const loaded = loadProgress()
+    const map = getAllQuestionsIdMap()
+    setIdMap(map)
+    setProgress(loaded)
+    setStats(getStats(loaded, map))
     setIsHydrated(true)
   }, [])
 
-  const refresh = useCallback(() => {
-    setProgress(loadProgress())
-    setStats(getStats())
-  }, [])
+  const refresh = useCallback((store: ProgressStore) => {
+    setProgress(store)
+    setStats(getStats(store, idMap))
+  }, [idMap])
 
   const markAnswer = useCallback((id: string, result: AnswerResult) => {
-    markAnswerUtil(id, result)
-    refresh()
+    refresh(libMarkAnswer(id, result))
   }, [refresh])
 
   const toggleBookmark = useCallback((id: string) => {
-    toggleBookmarkUtil(id)
-    refresh()
+    refresh(libToggleBookmark(id))
   }, [refresh])
 
-  const resetProgress = useCallback(() => {
-    resetProgressUtil()
-    refresh()
+  const saveExamResultFn = useCallback((result: ExamResult) => {
+    refresh(libSaveExamResult(result))
   }, [refresh])
 
-  const isBookmarked = useCallback(
-    (id: string) => progress.bookmarks.includes(id),
-    [progress.bookmarks]
-  )
+  const resetProgressFn = useCallback(() => {
+    refresh(libResetProgress())
+  }, [refresh])
 
-  // UI-only 게이미피케이션 계산값
-  const getStreak = useCallback(
-    () => Math.max(progress.examHistory.length, stats.attempted > 0 ? 1 : 0),
-    [progress.examHistory.length, stats.attempted]
-  )
-  const getXP = useCallback(() => stats.correct * 10, [stats.correct])
-  const getGems = useCallback(() => progress.examHistory.length * 50, [progress.examHistory.length])
+  const isBookmarked = useCallback((id: string) => progress.bookmarks.includes(id), [progress.bookmarks])
+  const getStreak = useCallback(() => progress.examHistory.length, [progress.examHistory])
+  const getXP = useCallback(() => Object.values(progress.answers).filter(v => v === 'correct').length * 10, [progress.answers])
+  const getGems = useCallback(() => progress.examHistory.length * 50, [progress.examHistory])
   const getHearts = useCallback(() => 3, [])
 
   return (
-    <ProgressContext.Provider value={{ progress, stats, isHydrated, markAnswer, toggleBookmark, resetProgress, isBookmarked, getStreak, getXP, getGems, getHearts }}>
+    <ProgressContext.Provider value={{
+      progress, stats, isHydrated,
+      markAnswer, toggleBookmark,
+      saveExamResult: saveExamResultFn,
+      resetProgress: resetProgressFn,
+      isBookmarked, getStreak, getXP, getGems, getHearts,
+    }}>
       {children}
     </ProgressContext.Provider>
   )

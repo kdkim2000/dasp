@@ -1,19 +1,16 @@
 export type QuestionType = 'concept' | 'result' | 'completion' | 'error'
 
-export type QuestionSource = 'chapter' | 'mockexam1' | 'mockexam2'
-
 export interface Question {
-  id: string
-  part: 1 | 2
-  chapter: string
+  id: string            // "p1c1_001" 형식 (p{과목}c{챕터}_{3자리})
+  part: 1 | 2 | 3 | 4 | 5
+  chapter: string       // "part1_ch1" 등
   content: string
-  options: string[]
-  answer: number
+  options: string[]     // 4지선다
+  answer: number        // 0-3
   explanation: string
   tags?: string[]
   difficulty?: '하' | '중' | '상'
   questionType?: QuestionType
-  source?: QuestionSource
 }
 
 export type AnswerResult = 'correct' | 'wrong' | 'skipped'
@@ -32,14 +29,17 @@ export interface ExamResult {
   score: number
   part1Score: number
   part2Score: number
+  part3Score: number
+  part4Score: number
+  part5Score: number
   totalTime: number
   answers: Record<string, number>
 }
 
 export interface ChapterMeta {
-  id: string
-  part: 1 | 2
-  chapter: number
+  id: string            // "part1_ch1"
+  part: 1 | 2 | 3 | 4 | 5
+  chapter: number       // 1 | 2 | 3
   title: string
   questionCount: number
 }

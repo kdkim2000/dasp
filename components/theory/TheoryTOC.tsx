@@ -1,91 +1,73 @@
-import { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 
-interface Heading {
-  level: 2 | 3
-  text: string
+interface TOCItem {
   id: string
+  text: string
+  level: 2 | 3
 }
 
 interface TheoryTOCProps {
   content: string
-  className?: string
 }
 
 function slugify(text: string): string {
   return text
+    .replace(/[^\w\s가-힣]/g, '')
     .trim()
-    .toLowerCase()
     .replace(/\s+/g, '-')
-    .replace(/[^\wㄱ-힣가-힣-]/g, '')
+    .toLowerCase()
 }
 
-function parseHeadings(content: string): Heading[] {
+function parseHeadings(content: string): TOCItem[] {
   const lines = content.split('\n')
-  const headings: Heading[] = []
-  const idCount: Record<string, number> = {}
+  const items: TOCItem[] = []
 
   for (const line of lines) {
-    const h2Match = line.match(/^##\s+(.+)$/)
-    const h3Match = line.match(/^###\s+(.+)$/)
+    const h2 = line.match(/^##\s+(.+)/)
+    const h3 = line.match(/^###\s+(.+)/)
 
-    if (h2Match && !line.startsWith('###')) {
-      const text = h2Match[1].trim()
-      let id = slugify(text)
-      if (idCount[id] !== undefined) {
-        idCount[id] += 1
-        id = `${id}-${idCount[id]}`
-      } else {
-        idCount[id] = 0
-      }
-      headings.push({ level: 2, text, id })
-    } else if (h3Match) {
-      const text = h3Match[1].trim()
-      let id = slugify(text)
-      if (idCount[id] !== undefined) {
-        idCount[id] += 1
-        id = `${id}-${idCount[id]}`
-      } else {
-        idCount[id] = 0
-      }
-      headings.push({ level: 3, text, id })
+    if (h2) {
+      const text = h2[1].trim()
+      items.push({ id: slugify(text), text, level: 2 })
+    } else if (h3) {
+      const text = h3[1].trim()
+      items.push({ id: slugify(text), text, level: 3 })
     }
   }
 
-  return headings
+  return items
 }
 
-export default function TheoryTOC({ content, className = '' }: TheoryTOCProps) {
-  const [headings] = useState<Heading[]>(() => parseHeadings(content))
+export default function TheoryTOC({ content }: TheoryTOCProps) {
+  const items = parseHeadings(content)
   const [activeId, setActiveId] = useState<string>('')
   const observerRef = useRef<IntersectionObserver | null>(null)
 
   useEffect(() => {
-    if (headings.length === 0) return
+    if (items.length === 0) return
 
-    const handleIntersect = (entries: IntersectionObserverEntry[]) => {
-      for (const entry of entries) {
-        if (entry.isIntersecting) {
-          setActiveId(entry.target.id)
+    const ids = items.map(i => i.id)
+
+    observerRef.current = new IntersectionObserver(
+      entries => {
+        const visible = entries.filter(e => e.isIntersecting)
+        if (visible.length > 0) {
+          // Pick the topmost visible heading
+          visible.sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
+          setActiveId(visible[0].target.id)
         }
-      }
-    }
+      },
+      { rootMargin: '-70px 0px -60% 0px', threshold: 0 }
+    )
 
-    observerRef.current = new IntersectionObserver(handleIntersect, {
-      rootMargin: '-80px 0px -60% 0px',
-      threshold: 0,
-    })
-
-    headings.forEach(({ id }) => {
+    ids.forEach(id => {
       const el = document.getElementById(id)
       if (el) observerRef.current?.observe(el)
     })
 
-    return () => {
-      observerRef.current?.disconnect()
-    }
-  }, [headings])
-
-  if (headings.length === 0) return null
+    return () => observerRef.current?.disconnect()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [content])
 
   const handleClick = (id: string) => {
     const el = document.getElementById(id)
@@ -95,38 +77,27 @@ export default function TheoryTOC({ content, className = '' }: TheoryTOCProps) {
     }
   }
 
+  if (items.length === 0) return null
+
   return (
-    <nav className={`text-sm ${className}`} aria-label="목차">
-      <p
-        className="font-semibold text-xs uppercase tracking-wider mb-3"
-        style={{ color: 'var(--q-ink-3)' }}
-      >
-        목차
-      </p>
-      <ul className="space-y-1">
-        {headings.map((heading) => {
-          const isActive = activeId === heading.id
-          return (
-            <li key={heading.id}>
-              <button
-                type="button"
-                onClick={() => handleClick(heading.id)}
-                className={`w-full text-left rounded-lg px-2 py-1 transition-colors leading-snug
-                  ${heading.level === 3 ? 'pl-5' : ''}
-                  ${
-                    isActive
-                      ? 'bg-primary-50 text-primary-600 font-medium'
-                      : 'hover:bg-surface-soft'
-                  }
-                `}
-                style={isActive ? {} : { color: 'var(--q-ink-2)' }}
-              >
-                {heading.text}
-              </button>
-            </li>
-          )
-        })}
-      </ul>
+    <nav className="space-y-1" aria-label="목차">
+      <h3 className="text-xs font-bold text-ink-faint uppercase tracking-wider mb-3 px-2">목차</h3>
+      {items.map(item => (
+        <button
+          key={item.id}
+          onClick={() => handleClick(item.id)}
+          className={`w-full text-left text-sm py-1.5 px-2 rounded-lg transition-all duration-150 leading-snug ${
+            item.level === 3 ? 'ml-3 text-xs' : ''
+          } ${
+            activeId === item.id
+              ? 'bg-primary-100 text-primary-700 font-semibold'
+              : 'text-ink-muted hover:text-ink hover:bg-surface-soft'
+          }`}
+        >
+          {item.level === 3 && <span className="mr-1 text-ink-faint">└</span>}
+          {item.text}
+        </button>
+      ))}
     </nav>
   )
 }

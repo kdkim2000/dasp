@@ -1,79 +1,110 @@
-import Head from 'next/head'
+import React from 'react'
 import Link from 'next/link'
-import type { GetStaticProps } from 'next'
-import type { ChapterMeta } from '@/types'
-import { getAllChapters } from '@/lib/theory'
+import { CHAPTERS_BY_PART, PART_TITLES } from '@/lib/chapters'
+import { useProgress } from '@/context/ProgressContext'
 
-interface TheoryIndexProps {
-  chapters: ChapterMeta[]
+const PART_COLORS: Record<number, { bg: string; border: string; badge: string; bar: string; icon: string }> = {
+  1: { bg: 'bg-indigo-50', border: 'border-indigo-200', badge: 'bg-indigo-100 text-indigo-700', bar: 'bg-indigo-500', icon: '🏛️' },
+  2: { bg: 'bg-blue-50', border: 'border-blue-200', badge: 'bg-blue-100 text-blue-700', bar: 'bg-blue-500', icon: '📋' },
+  3: { bg: 'bg-green-50', border: 'border-green-200', badge: 'bg-green-100 text-green-700', bar: 'bg-green-500', icon: '📐' },
+  4: { bg: 'bg-purple-50', border: 'border-purple-200', badge: 'bg-purple-100 text-purple-700', bar: 'bg-purple-500', icon: '🗂️' },
+  5: { bg: 'bg-teal-50', border: 'border-teal-200', badge: 'bg-teal-100 text-teal-700', bar: 'bg-teal-500', icon: '🗄️' },
 }
 
-const PART_META: Record<number, { label: string; icon: string; color: string }> = {
-  1: { label: '1과목 데이터 모델링의 이해', icon: '🗂️', color: 'text-primary-600' },
-  2: { label: '2과목 SQL 기본 및 활용',    icon: '🛢️', color: 'text-mint-500' },
-}
-
-export default function TheoryIndex({ chapters }: TheoryIndexProps) {
-  const part1 = chapters.filter((c) => c.part === 1)
-  const part2 = chapters.filter((c) => c.part === 2)
+export default function TheoryIndexPage() {
+  const { stats, isHydrated } = useProgress()
 
   return (
-    <>
-      <Head>
-        <title>이론 학습 | SQLD Quest</title>
-      </Head>
-
-      <div className="p-4 md:p-6 max-w-4xl mx-auto">
-        {/* 페이지 헤더 */}
-        <div className="mb-8">
-          <h1 className="font-display font-bold text-2xl md:text-3xl mb-1" style={{ color: 'var(--q-ink)' }}>
-            이론 학습
-          </h1>
-          <p className="text-sm" style={{ color: 'var(--q-ink-3)' }}>
-            챕터를 선택해 개념을 학습하세요
-          </p>
-        </div>
-
-        {/* 과목별 섹션 */}
-        {[{ part: 1, items: part1 }, { part: 2, items: part2 }].map(({ part, items }) => {
-          const meta = PART_META[part]
-          return (
-            <section key={part} className="mb-10">
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-xl">{meta.icon}</span>
-                <h2 className="font-display font-bold text-base md:text-lg" style={{ color: 'var(--q-ink)' }}>
-                  {meta.label}
-                </h2>
-              </div>
-
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {items.map((chapter) => (
-                  <Link
-                    key={chapter.id}
-                    href={`/theory/${chapter.id}`}
-                    className="group q-card hover:border-primary-300 hover:shadow-q-md transition-all"
-                  >
-                    <p className={`text-xs font-semibold mb-1.5 ${meta.color}`}>
-                      {part}과목 · {chapter.chapter}장
-                    </p>
-                    <p className="font-medium text-sm group-hover:text-primary-700 transition-colors" style={{ color: 'var(--q-ink)' }}>
-                      {chapter.title}
-                    </p>
-                    <p className="text-xs mt-2" style={{ color: 'var(--q-ink-3)' }}>
-                      문제 {chapter.questionCount}개 →
-                    </p>
-                  </Link>
-                ))}
-              </div>
-            </section>
-          )
-        })}
+    <div className="max-w-5xl mx-auto px-4 py-8 space-y-10">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-display font-bold text-ink">이론 학습</h1>
+        <p className="text-ink-muted mt-1 text-sm">
+          DAsP 시험 5과목의 핵심 이론을 단계별로 학습하세요.
+        </p>
       </div>
-    </>
-  )
-}
 
-export const getStaticProps: GetStaticProps<TheoryIndexProps> = async () => {
-  const chapters = getAllChapters()
-  return { props: { chapters } }
+      {/* Part sections */}
+      {[1, 2, 3, 4, 5].map(part => {
+        const colors = PART_COLORS[part]
+        const chapters = CHAPTERS_BY_PART[part] ?? []
+        const partStats = stats.byPart[part]
+        const partRate = partStats && partStats.attempted > 0
+          ? Math.round((partStats.correct / partStats.attempted) * 100)
+          : null
+
+        return (
+          <section key={part}>
+            {/* Part header */}
+            <div className={`flex items-center justify-between p-4 rounded-xl mb-4 ${colors.bg} border ${colors.border}`}>
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">{colors.icon}</span>
+                <div>
+                  <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${colors.badge}`}>
+                    {part}과목
+                  </span>
+                  <h2 className="text-lg font-bold text-ink mt-1">{PART_TITLES[part]}</h2>
+                </div>
+              </div>
+              {isHydrated && partRate !== null && (
+                <div className="text-right">
+                  <div className="text-sm font-bold text-ink">{partRate}%</div>
+                  <div className="text-xs text-ink-muted">문제 정답률</div>
+                </div>
+              )}
+            </div>
+
+            {/* Chapter cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {chapters.map(ch => {
+                const chStats = stats.byChapter[ch.id]
+                const chRate = chStats && chStats.attempted > 0
+                  ? Math.round((chStats.correct / chStats.attempted) * 100)
+                  : null
+
+                return (
+                  <Link
+                    key={ch.id}
+                    href={`/theory/${ch.id}`}
+                    className="q-card hover:shadow-q-md transition-all group hover:border-primary-200"
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <div className="text-xs text-ink-faint mb-1">
+                          {part}과목 {ch.chapter}장
+                        </div>
+                        <div className="font-semibold text-ink text-sm group-hover:text-primary-700 transition-colors leading-snug">
+                          {ch.title}
+                        </div>
+                      </div>
+                      <span className="text-xl shrink-0">📖</span>
+                    </div>
+
+                    <div className="flex items-center gap-2 mt-3">
+                      {isHydrated && chRate !== null ? (
+                        <div className="flex-1">
+                          <div className="flex justify-between text-xs text-ink-muted mb-1">
+                            <span>문제 정답률</span>
+                            <span className="font-semibold text-ink">{chRate}%</span>
+                          </div>
+                          <div className="h-1.5 bg-surface-soft rounded-full overflow-hidden">
+                            <div
+                              className={`h-full ${colors.bar} rounded-full`}
+                              style={{ width: `${chRate}%` }}
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-ink-faint">이론 보기 →</span>
+                      )}
+                    </div>
+                  </Link>
+                )
+              })}
+            </div>
+          </section>
+        )
+      })}
+    </div>
+  )
 }

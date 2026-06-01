@@ -1,80 +1,62 @@
 import type { Question } from '@/types'
-import { CHAPTER_IDS } from '@/lib/chapters'
-import part1ch1 from '@/data/questions/part1_ch1.json'
-import part1ch2 from '@/data/questions/part1_ch2.json'
-import part2ch1 from '@/data/questions/part2_ch1.json'
-import part2ch2 from '@/data/questions/part2_ch2.json'
-import part2ch3 from '@/data/questions/part2_ch3.json'
-import exam1 from '@/data/mockexam/exam1.json'
-import exam2 from '@/data/mockexam/exam2.json'
+import { CHAPTERS } from './chapters'
 
-const CHAPTER_DATA: Record<string, Question[]> = {
-  part1_ch1: part1ch1 as Question[],
-  part1_ch2: part1ch2 as Question[],
-  part2_ch1: part2ch1 as Question[],
-  part2_ch2: part2ch2 as Question[],
-  part2_ch3: part2ch3 as Question[],
+function loadChapterQuestions(chapterId: string): Question[] {
+  try {
+    // eslint-disable-next-line global-require
+    return require(`@/data/questions/${chapterId}.json`) as Question[]
+  } catch {
+    return []
+  }
+}
+
+function loadMockExamQuestions(examNum: 1 | 2): Question[] {
+  try {
+    // eslint-disable-next-line global-require
+    return require(`@/data/questions/mockexam/exam${examNum}.json`) as Question[]
+  } catch {
+    return []
+  }
 }
 
 export function getAllQuestions(): Question[] {
-  return CHAPTER_IDS.flatMap((id) => CHAPTER_DATA[id] ?? [])
+  return CHAPTERS.flatMap(ch => loadChapterQuestions(ch.id))
 }
 
 export function getQuestionsByChapter(chapterId: string): Question[] {
-  return CHAPTER_DATA[chapterId] ?? []
+  return loadChapterQuestions(chapterId)
 }
 
 export function getQuestionsByIds(ids: string[]): Question[] {
   const all = getAllQuestions()
-  const idSet = new Set(ids)
-  return all.filter((q) => idSet.has(q.id))
+  const map = new Map(all.map(q => [q.id, q]))
+  return ids.flatMap(id => {
+    const q = map.get(id)
+    return q ? [q] : []
+  })
 }
 
 export function sampleExamQuestions(): Question[] {
-  const part1 = getAllQuestions().filter((q) => q.part === 1)
-  const part2 = getAllQuestions().filter((q) => q.part === 2)
-
-  const shuffle = <T>(arr: T[]): T[] =>
-    [...arr].sort(() => Math.random() - 0.5)
-
-  return [
-    ...shuffle(part1).slice(0, 10),
-    ...shuffle(part2).slice(0, 40),
-  ]
+  const result: Question[] = []
+  for (let part = 1; part <= 5; part++) {
+    const partChapters = CHAPTERS.filter(c => c.part === part)
+    const partQuestions = partChapters.flatMap(ch => loadChapterQuestions(ch.id))
+    const shuffled = [...partQuestions].sort(() => Math.random() - 0.5)
+    result.push(...shuffled.slice(0, 20))
+  }
+  return result
 }
 
 export function getMockExamQuestions(examNum: 1 | 2): Question[] {
-  return (examNum === 1 ? exam1 : exam2) as Question[]
+  return loadMockExamQuestions(examNum)
 }
 
-export function getAllQuestionsFromAllSources(): Question[] {
-  return [
-    ...getAllQuestions(),
-    ...(exam1 as Question[]),
-    ...(exam2 as Question[]),
-  ]
+export function getAllQuestionsIdMap(): Record<string, string> {
+  const map: Record<string, string> = {}
+  for (const ch of CHAPTERS) {
+    for (const q of loadChapterQuestions(ch.id)) {
+      map[q.id] = ch.id
+    }
+  }
+  return map
 }
-
-export function sampleMixedExam(): Question[] {
-  const all = getAllQuestionsFromAllSources()
-  const shuffle = <T>(arr: T[]): T[] => [...arr].sort(() => Math.random() - 0.5)
-
-  const part1Pool = all.filter((q) => q.part === 1)
-  const p2c1 = all.filter((q) => q.part === 2 && q.chapter === '1')
-  const p2c2 = all.filter((q) => q.part === 2 && q.chapter === '2')
-  const p2c3 = all.filter((q) => q.part === 2 && q.chapter === '3')
-
-  const part2Sampled = [
-    ...shuffle(p2c1).slice(0, 15),
-    ...shuffle(p2c2).slice(0, 15),
-    ...shuffle(p2c3).slice(0, 10),
-  ]
-
-  return [
-    ...shuffle(part1Pool).slice(0, 10),
-    ...shuffle(part2Sampled),
-  ]
-}
-
-export { CHAPTER_IDS }
-
