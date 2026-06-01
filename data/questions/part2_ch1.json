@@ -1,0 +1,512 @@
+[
+  {
+    "id": "p2c1_001",
+    "part": 2,
+    "chapter": "1",
+    "questionType": "concept",
+    "content": "다음 SQL 명령어 중 DML(Data Manipulation Language)에 해당하지 않는 것은?",
+    "options": [
+      "INSERT",
+      "UPDATE",
+      "RENAME",
+      "DELETE"
+    ],
+    "answer": 3,
+    "explanation": "RENAME은 테이블·뷰·시퀀스·동의어의 이름을 변경하는 DDL(Data Definition Language)에 해당한다. DML은 데이터 조작 명령으로 SELECT, INSERT, UPDATE, DELETE가 있다. DDL에는 CREATE, ALTER, DROP, TRUNCATE, RENAME이 포함된다.",
+    "tags": ["DML", "DDL", "SQL분류"],
+    "difficulty": "하"
+  },
+  {
+    "id": "p2c1_002",
+    "part": 2,
+    "chapter": "1",
+    "questionType": "completion",
+    "content": "다음 SQL의 빈칸에 들어갈 내용으로 올바른 것은?\n\n```sql\nCREATE TABLE EMP_COPY\n______\nSELECT EMPNO, ENAME, SAL\n  FROM EMP\n WHERE DEPTNO = 10;\n```",
+    "options": [
+      "VALUES",
+      "AS",
+      "FROM",
+      "LIKE"
+    ],
+    "answer": 2,
+    "explanation": "CREATE TABLE ... AS SELECT 구문은 SELECT 결과를 기반으로 새 테이블을 생성한다. AS 키워드 이후에 SELECT 문을 작성하면 조회 결과의 구조와 데이터를 복사하여 테이블을 만든다. 테이블 구조만 복사할 때는 WHERE 1=2 조건을 사용한다.",
+    "tags": ["DDL", "CREATE TABLE AS SELECT"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c1_003",
+    "part": 2,
+    "chapter": "1",
+    "questionType": "result",
+    "content": "아래 테이블에서 SQL을 실행한 결과로 올바른 것은?\n\n| EMPNO | ENAME  | DEPTNO |\n|-------|--------|--------|\n| 1001  | 홍길동 | 10     |\n| 1002  | 이순신 | 20     |\n| 1003  | 장보고 | 10     |\n| 1004  | 강감찬 | 20     |\n\n```sql\nSELECT COUNT(*), COUNT(DEPTNO), COUNT(DISTINCT DEPTNO)\n  FROM EMP;\n```",
+    "options": [
+      "3, 3, 2",
+      "4, 4, 2",
+      "4, 4, 3",
+      "4, 4, 4"
+    ],
+    "answer": 2,
+    "explanation": "COUNT(*)는 NULL 포함 전체 행 수를 반환하므로 4, COUNT(DEPTNO)는 NULL이 아닌 DEPTNO 값의 수이므로 4(NULL 없음), COUNT(DISTINCT DEPTNO)는 중복 제거한 DEPTNO 값의 수로 10과 20 두 가지이므로 2이다. 따라서 결과는 4, 4, 2이다.",
+    "tags": ["집계함수", "COUNT", "DISTINCT"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c1_004",
+    "part": 2,
+    "chapter": "1",
+    "questionType": "concept",
+    "content": "트랜잭션의 특성 중 다음 설명에 해당하는 것은?\n\n\"트랜잭션이 실행되는 도중에 다른 트랜잭션의 영향을 받지 않고 독립적으로 실행되어야 한다.\"",
+    "options": [
+      "원자성 (Atomicity)",
+      "일관성 (Consistency)",
+      "격리성 (Isolation)",
+      "지속성 (Durability)"
+    ],
+    "answer": 3,
+    "explanation": "트랜잭션의 ACID 특성 중 격리성(Isolation)은 트랜잭션 실행 중 다른 트랜잭션의 영향을 받지 않고 독립적으로 실행되어야 함을 의미한다. 원자성은 전부 실행 또는 전부 미실행, 일관성은 데이터 무결성 유지, 지속성은 완료된 결과의 영구 반영을 의미한다.",
+    "tags": ["트랜잭션", "ACID", "격리성"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c1_005",
+    "part": 2,
+    "chapter": "1",
+    "questionType": "concept",
+    "content": "다음 중 WHERE 절에서 AND와 OR 연산자에 대한 설명으로 올바르지 않은 것은?",
+    "options": [
+      "AND는 OR보다 우선순위가 높다",
+      "WHERE A=1 OR B=2 AND C=3은 WHERE A=1 OR (B=2 AND C=3)과 동일하다",
+      "NOT 연산자의 우선순위는 AND보다 낮다",
+      "괄호를 사용하면 연산자 우선순위를 변경할 수 있다"
+    ],
+    "answer": 3,
+    "explanation": "논리 연산자의 우선순위는 NOT > AND > OR 순이다. NOT이 가장 높고, 그 다음이 AND, 마지막이 OR이다. NOT은 AND보다 높은 우선순위를 가지므로 '③ NOT 연산자의 우선순위는 AND보다 낮다'는 설명이 틀렸다.",
+    "tags": ["WHERE", "연산자우선순위", "NOT"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c1_006",
+    "part": 2,
+    "chapter": "1",
+    "questionType": "result",
+    "content": "아래 테이블에서 SQL을 실행한 결과로 올바른 것은?\n\n| NAME | GRADE |\n|------|-------|\n| 'AB' | 'AB'  |\n| 'AB' | 'ab'  |\n\n```sql\nSELECT COUNT(*)\n  FROM TEST\n WHERE NAME = GRADE;\n```\n\n(단, NAME은 CHAR(5), GRADE는 VARCHAR2(5) 타입)",
+    "options": [
+      "2",
+      "1",
+      "0",
+      "오류 발생"
+    ],
+    "answer": 2,
+    "explanation": "CHAR 타입은 고정 길이이므로 'AB'를 CHAR(5)에 저장하면 'AB   '(공백 채움)가 된다. VARCHAR2의 'AB'와 비교할 때 CHAR의 공백이 트리밍되어 비교되므로 'AB' = 'AB'는 1건이 해당한다. 'AB' ≠ 'ab'(대소문자 구분)이므로 COUNT(*)는 1이 반환된다.",
+    "tags": ["CHAR", "VARCHAR2", "문자비교"],
+    "difficulty": "상"
+  },
+  {
+    "id": "p2c1_007",
+    "part": 2,
+    "chapter": "1",
+    "questionType": "result",
+    "content": "다음 SQL의 실행 결과는?\n\n```sql\nSELECT ABS(CEIL(-1.5) + FLOOR(1.5) * SIGN(-1))\n  FROM DUAL;\n```",
+    "options": [
+      "0",
+      "1",
+      "2",
+      "3"
+    ],
+    "answer": 2,
+    "explanation": "단계별 계산: CEIL(-1.5) = -1 (올림: -1.5 이상의 정수 중 가장 작은 값), FLOOR(1.5) = 1 (내림: 1.5 이하의 정수 중 가장 큰 값), SIGN(-1) = -1 (음수이므로 -1). 따라서 ABS(-1 + 1 * (-1)) = ABS(-1 + (-1)) = ABS(-2) = 2. CEIL은 올림, FLOOR는 내림, SIGN은 양수면 1, 음수면 -1, 0이면 0을 반환한다.",
+    "tags": ["숫자함수", "ABS", "CEIL", "FLOOR", "SIGN"],
+    "difficulty": "상"
+  },
+  {
+    "id": "p2c1_008",
+    "part": 2,
+    "chapter": "1",
+    "questionType": "result",
+    "content": "다음 SQL의 실행 결과는?\n\n```sql\nSELECT NVL(MAX(DUMMY), 'DUMMY') AS RESULT\n  FROM DUAL\n WHERE 1 = 0;\n```",
+    "options": [
+      "NULL",
+      "DUMMY",
+      "오류 발생",
+      "빈 결과 반환"
+    ],
+    "answer": 2,
+    "explanation": "WHERE 1=0은 항상 FALSE이므로 아무 행도 선택되지 않는다. 그러나 MAX()와 같은 집계 함수는 대상 행이 없으면 NULL을 반환한다(GROUP BY 없이 단독 집계 함수 사용 시 빈 집합에서도 한 행 반환). NVL(NULL, 'DUMMY')는 NULL이므로 'DUMMY'를 반환한다.",
+    "tags": ["집계함수", "MAX", "NVL", "NULL"],
+    "difficulty": "상"
+  },
+  {
+    "id": "p2c1_009",
+    "part": 2,
+    "chapter": "1",
+    "questionType": "result",
+    "content": "아래 테이블에서 SQL을 실행한 결과로 올바른 것은?\n\n| EMPNO | DEPTNO | SAL  |\n|-------|--------|------|\n| 1001  | 10     | 3000 |\n| 1002  | 10     | 4000 |\n| 1003  | 20     | 3000 |\n| 1004  | 20     | NULL |\n| 1005  | 20     | 3000 |\n| 1006  | 30     | 5000 |\n| 1007  | 30     | 4000 |\n| 1008  | 30     | NULL |\n| 1009  | 40     | 3000 |\n| 1010  | 40     | 3000 |\n\n```sql\nSELECT COUNT(SAL), COUNT(*), COUNT(DISTINCT SAL)\n  FROM EMP;\n```",
+    "options": [
+      "10, 10, 3",
+      "8, 8, 4",
+      "8, 10, 4",
+      "8, 10, 3"
+    ],
+    "answer": 4,
+    "explanation": "COUNT(SAL)은 NULL이 아닌 SAL 값의 수 = 8(NULL 2개 제외), COUNT(*)는 NULL 포함 전체 행 수 = 10, COUNT(DISTINCT SAL)는 중복 제거된 SAL 값의 수 = 3000, 4000, 5000 세 가지이므로 3이다. 따라서 결과는 8, 10, 3으로 보기 ④가 정답이다. COUNT(*)와 COUNT(컬럼)의 차이, 그리고 DISTINCT의 NULL 처리를 함께 이해해야 한다.",
+    "tags": ["집계함수", "COUNT", "DISTINCT", "NULL"],
+    "difficulty": "상"
+  },
+  {
+    "id": "p2c1_010",
+    "part": 2,
+    "chapter": "1",
+    "questionType": "result",
+    "content": "아래 테이블에서 SQL 실행 후 결과 행 수로 올바른 것은?\n\n| TEAM_ID | PLAYER_NAME | HEIGHT |\n|---------|-------------|--------|\n| K01     | 선수A       | 180    |\n| K01     | 선수B       | 185    |\n| K01     | 선수C       | 172    |\n| K02     | 선수D       | 188    |\n| K02     | 선수E       | 185    |\n| K03     | 선수F       | 190    |\n\n```sql\nSELECT TEAM_ID, MAX(HEIGHT)\n  FROM PLAYERS\n GROUP BY TEAM_ID\nHAVING MAX(HEIGHT) >= 185\n ORDER BY MAX(HEIGHT) DESC;\n```",
+    "options": [
+      "1행",
+      "2행",
+      "3행",
+      "4행"
+    ],
+    "answer": 3,
+    "explanation": "GROUP BY TEAM_ID로 그룹화하면 K01(MAX=185), K02(MAX=188), K03(MAX=190) 3개 그룹이 된다. HAVING MAX(HEIGHT) >= 185 조건을 적용하면 K01(185 >= 185, 포함), K02(188 >= 185, 포함), K03(190 >= 185, 포함) 모두 3개 그룹이 선택된다. 따라서 결과는 3행이다.",
+    "tags": ["GROUP BY", "HAVING", "집계함수"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c1_011",
+    "part": 2,
+    "chapter": "1",
+    "questionType": "completion",
+    "content": "다음 SQL의 빈칸에 들어갈 내용으로 올바른 것은?\n\n```sql\nSELECT TEAM_ID, ______(HEIGHT) AS MAX_HEIGHT\n  FROM PLAYERS\n GROUP BY TEAM_ID\nHAVING ______(HEIGHT) >= 185;\n```\n\n(단, 팀별 최대 키가 185 이상인 팀만 조회)",
+    "options": [
+      "COUNT, COUNT",
+      "MAX, MAX",
+      "SUM, SUM",
+      "AVG, AVG"
+    ],
+    "answer": 2,
+    "explanation": "팀별 최대 키를 구하고 그 최대값이 185 이상인 팀만 조회하려면 MAX 집계 함수를 사용해야 한다. SELECT 절의 MAX(HEIGHT)는 팀별 최대 키를 반환하고, HAVING 절의 MAX(HEIGHT) >= 185는 그 최대값이 185 이상인 그룹만 필터링한다. HAVING 절에서 집계 함수를 사용하는 것이 핵심이다.",
+    "tags": ["집계함수", "MAX", "HAVING"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c1_012",
+    "part": 2,
+    "chapter": "1",
+    "questionType": "concept",
+    "content": "다음 중 ORDER BY 절에서 NULL 값의 정렬 순서에 대한 설명으로 올바른 것은?",
+    "options": [
+      "Oracle에서 NULL은 오름차순 정렬 시 가장 앞에 위치한다",
+      "Oracle에서 NULL은 오름차순 정렬 시 가장 뒤에 위치한다",
+      "모든 DBMS에서 NULL은 오름차순 정렬 시 0으로 취급된다",
+      "NULL은 정렬에 포함되지 않고 항상 제외된다"
+    ],
+    "answer": 2,
+    "explanation": "Oracle에서 NULL은 가장 큰 값으로 취급되어 오름차순(ASC) 정렬 시 가장 마지막에 위치하고, 내림차순(DESC) 정렬 시 가장 먼저 위치한다. SQL Server에서는 반대로 오름차순 정렬 시 NULL이 가장 앞에 위치한다. NULLS FIRST / NULLS LAST 옵션으로 명시적으로 NULL 위치를 제어할 수 있다.",
+    "tags": ["ORDER BY", "NULL", "정렬"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c1_013",
+    "part": 2,
+    "chapter": "1",
+    "questionType": "result",
+    "content": "아래 테이블에서 SQL을 실행한 결과로 올바른 것은?\n\n| DEPTNO | ENAME | SAL  |\n|--------|-------|------|\n| 10     | 홍길동 | 3000 |\n| 10     | 이순신 | NULL |\n| 20     | 장보고 | 2000 |\n| 20     | 강감찬 | 3000 |\n| 30     | 을지문덕 | 4000 |\n\n```sql\nSELECT DEPTNO\n  FROM EMP\n GROUP BY DEPTNO\nHAVING COUNT(SAL) >= 2;\n```",
+    "options": [
+      "10, 30",
+      "20, 30",
+      "10, 20, 30",
+      "20"
+    ],
+    "answer": 2,
+    "explanation": "COUNT(SAL)은 NULL이 아닌 SAL 값의 수를 세므로: DEPTNO 10 → COUNT(SAL)=1(NULL 1개 제외), DEPTNO 20 → COUNT(SAL)=2, DEPTNO 30 → COUNT(SAL)=1. HAVING COUNT(SAL) >= 2 조건을 만족하는 것은 DEPTNO 20뿐이다. 따라서 결과는 20 한 행이다.",
+    "tags": ["HAVING", "COUNT", "NULL", "GROUP BY"],
+    "difficulty": "상"
+  },
+  {
+    "id": "p2c1_014",
+    "part": 2,
+    "chapter": "1",
+    "questionType": "concept",
+    "content": "DELETE, TRUNCATE, DROP 명령어에 대한 설명으로 올바른 것은?",
+    "options": [
+      "DELETE는 DDL, TRUNCATE는 DML, DROP은 DDL이다",
+      "TRUNCATE는 WHERE 절을 사용하여 특정 행만 삭제할 수 있다",
+      "DELETE는 롤백이 가능하고, TRUNCATE와 DROP은 롤백이 불가능하다",
+      "DROP은 테이블의 데이터만 삭제하고 구조는 유지한다"
+    ],
+    "answer": 3,
+    "explanation": "DELETE는 DML로 트랜잭션 내에서 실행되어 ROLLBACK이 가능하다. TRUNCATE와 DROP은 DDL로 자동 COMMIT되어 ROLLBACK이 불가능하다. TRUNCATE는 테이블 데이터 전체를 삭제하지만 구조는 유지하며, DROP은 테이블 데이터와 구조 모두 삭제한다. TRUNCATE는 WHERE 절 사용이 불가능하다.",
+    "tags": ["DML", "DDL", "DELETE", "TRUNCATE", "DROP"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c1_015",
+    "part": 2,
+    "chapter": "1",
+    "questionType": "error",
+    "content": "다음 SQL 중 실행 시 오류가 발생하는 것은?",
+    "options": [
+      "SELECT EMPNO FROM EMP WHERE ENAME = '홍길동';",
+      "SELECT EMPNO FROM EMP A WHERE ENAME = '홍길동';",
+      "SELECT EMPNO FROM EMP AS A WHERE ENAME = '홍길동';",
+      "SELECT EMPNO FROM EMP WHERE ENAME LIKE '홍%';"
+    ],
+    "answer": 3,
+    "explanation": "Oracle에서는 FROM 절의 테이블 별칭(Alias)에 AS 키워드를 사용할 수 없다. 'FROM EMP AS A'는 Oracle에서 오류가 발생한다. 컬럼 별칭에는 AS를 사용할 수 있으나, 테이블 별칭에는 사용하지 않거나 공백으로 구분한다. SQL Server 등 일부 DBMS에서는 FROM절 테이블 별칭에 AS를 허용한다.",
+    "tags": ["테이블별칭", "Oracle", "AS"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c1_016",
+    "part": 2,
+    "chapter": "1",
+    "questionType": "concept",
+    "content": "COMMIT과 ROLLBACK 이전 상태에서 가능한 작업으로 올바른 것은?\n\n(DML 실행 후 아직 COMMIT/ROLLBACK 전 상태)",
+    "options": [
+      "변경 내용을 다른 세션에서도 조회할 수 있다",
+      "현재 세션에서만 변경 내용을 조회할 수 있으며 다른 세션은 이전 데이터를 본다",
+      "변경 내용은 즉시 다른 사용자에게 공유된다",
+      "ROLLBACK을 실행하면 DDL 명령도 함께 취소된다"
+    ],
+    "answer": 2,
+    "explanation": "DML 실행 후 COMMIT 전 상태에서는 변경 내용이 현재 세션에서만 보이고(Read Uncommitted 격리 수준 제외), 다른 세션은 변경 이전의 데이터를 조회한다. 이는 트랜잭션의 격리성 때문이다. COMMIT 후에 변경 내용이 영구 반영되어 다른 세션에서도 확인 가능하다. DDL은 AUTO COMMIT되므로 ROLLBACK으로 취소할 수 없다.",
+    "tags": ["TCL", "COMMIT", "ROLLBACK", "트랜잭션"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c1_017",
+    "part": 2,
+    "chapter": "1",
+    "questionType": "error",
+    "content": "다음 SQL 중 LIKE 연산자 사용 시 의도한 결과와 다르게 동작하는 것은?\n\n(이름이 정확히 세 글자인 직원을 조회하려는 의도)",
+    "options": [
+      "WHERE 이름 LIKE '___'",
+      "WHERE LENGTH(이름) = 3",
+      "WHERE 이름 LIKE '___%'",
+      "WHERE 이름 BETWEEN '가' AND '힣힣힣'"
+    ],
+    "answer": 3,
+    "explanation": "LIKE '___'(언더스코어 3개)는 정확히 3글자인 이름을 조회한다. LIKE '___%'(언더스코어 3개 + %)는 3글자 이상인 이름을 조회하므로 4글자, 5글자 이름도 포함된다. 이는 '정확히 3글자'라는 의도와 다르게 동작한다. LENGTH(이름) = 3도 정확히 3글자를 조회한다.",
+    "tags": ["LIKE", "와일드카드", "언더스코어"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c1_018",
+    "part": 2,
+    "chapter": "1",
+    "questionType": "completion",
+    "content": "다음 SQL의 빈칸에 들어갈 내용으로 올바른 것은?\n\n```sql\nSELECT EMPNO, ENAME, SAL,\n       CASE\n           WHEN SAL > 5000 THEN '고액'\n           WHEN SAL > 3000 THEN '중간'\n           ______\n           ELSE '기타'\n       ______ AS SAL_GRADE\n  FROM EMP;\n```\n\n(단, SAL이 1000 초과 3000 이하인 경우 '일반'으로 표시)",
+    "options": [
+      "IF SAL > 1000 THEN '일반', END",
+      "WHEN SAL > 1000 THEN '일반', END",
+      "WHEN SAL >= 1000 THEN '일반', FINISH",
+      "ELIF SAL > 1000 THEN '일반', END"
+    ],
+    "answer": 2,
+    "explanation": "CASE WHEN 구문에서 조건은 WHEN ... THEN 형식을 사용하고, 전체 CASE 표현식의 끝은 END 키워드로 마무리한다. ELSE는 모든 WHEN 조건에 해당하지 않는 경우의 기본값을 지정한다. IF, ELIF, FINISH 등은 SQL의 CASE 표현식에서 사용할 수 없는 키워드이다.",
+    "tags": ["CASE", "WHEN", "THEN", "END"],
+    "difficulty": "하"
+  },
+  {
+    "id": "p2c1_019",
+    "part": 2,
+    "chapter": "1",
+    "questionType": "completion",
+    "content": "다음 SQL에서 현재 날짜로부터 정확히 1분 후의 시간을 구하는 빈칸에 들어갈 내용으로 올바른 것은?\n\n```sql\nSELECT SYSDATE + ______ AS ONE_MINUTE_LATER\n  FROM DUAL;\n```",
+    "options": [
+      "1",
+      "1/24",
+      "1/24/60",
+      "60"
+    ],
+    "answer": 3,
+    "explanation": "Oracle에서 날짜 연산 시 정수 1은 1일(24시간)을 의미한다. 따라서 1시간은 1/24, 1분은 1/24/60, 1초는 1/24/60/60이다. SYSDATE + 1/24/60은 현재 시간에 1분을 더한다. 날짜 연산의 단위는 일(day) 기준이므로 이를 이해하는 것이 중요하다.",
+    "tags": ["날짜함수", "SYSDATE", "날짜연산"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c1_020",
+    "part": 2,
+    "chapter": "1",
+    "questionType": "result",
+    "content": "아래 테이블에서 SQL을 실행한 결과 행 수로 올바른 것은?\n\n| DEPTNO | SAL  |\n|--------|------|\n| 10     | 1000 |\n| 10     | NULL |\n| 20     | 2000 |\n| NULL   | 3000 |\n| NULL   | 4000 |\n\n```sql\nSELECT DEPTNO, COUNT(*)\n  FROM TEST\n GROUP BY DEPTNO;\n```",
+    "options": [
+      "2행",
+      "3행",
+      "4행",
+      "5행"
+    ],
+    "answer": 2,
+    "explanation": "GROUP BY DEPTNO 실행 시 DEPTNO 값이 10인 그룹, 20인 그룹, NULL인 그룹 이렇게 3개 그룹이 생성된다. Oracle에서 GROUP BY는 NULL 값도 하나의 그룹으로 처리한다. 따라서 결과는 3행이 된다.",
+    "tags": ["GROUP BY", "NULL"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c1_021",
+    "part": 2,
+    "chapter": "1",
+    "questionType": "error",
+    "content": "다음 SQL 중 실행 시 오류가 발생하는 것은?",
+    "options": [
+      "SELECT DEPTNO, COUNT(*) FROM EMP GROUP BY DEPTNO HAVING COUNT(*) >= 2;",
+      "SELECT DEPTNO, COUNT(*) FROM EMP GROUP BY DEPTNO ORDER BY COUNT(*) DESC;",
+      "SELECT DEPTNO, MAX(SAL) FROM EMP GROUP BY DEPTNO WHERE MAX(SAL) > 3000;",
+      "SELECT DEPTNO, AVG(SAL) FROM EMP GROUP BY DEPTNO HAVING AVG(SAL) > 2000;"
+    ],
+    "answer": 3,
+    "explanation": "WHERE 절에서는 집계 함수를 사용할 수 없다. 'WHERE MAX(SAL) > 3000'은 그룹 집계 결과를 조건으로 사용하는 것으로 오류가 발생한다. 집계 함수를 조건으로 사용하려면 HAVING 절을 사용해야 한다. WHERE는 GROUP BY 이전에 행 단위로 필터링하고, HAVING은 GROUP BY 이후에 그룹 단위로 필터링한다.",
+    "tags": ["WHERE", "HAVING", "집계함수", "오류"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c1_022",
+    "part": 2,
+    "chapter": "1",
+    "questionType": "concept",
+    "content": "다음 중 SELECT 문의 실행 순서로 올바른 것은?",
+    "options": [
+      "SELECT → FROM → WHERE → GROUP BY → HAVING → ORDER BY",
+      "FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY",
+      "FROM → GROUP BY → WHERE → HAVING → SELECT → ORDER BY",
+      "WHERE → FROM → GROUP BY → SELECT → HAVING → ORDER BY"
+    ],
+    "answer": 2,
+    "explanation": "SELECT 문의 논리적 실행 순서는 FROM(테이블 결정) → WHERE(행 필터링) → GROUP BY(그룹화) → HAVING(그룹 필터링) → SELECT(컬럼 선택 및 표현식 계산) → ORDER BY(정렬) 순서이다. 작성 순서(SELECT → FROM → WHERE → ...)와 실행 순서는 다르다. SELECT 별칭은 ORDER BY에서만 참조 가능하며, WHERE와 HAVING에서는 참조할 수 없다.",
+    "tags": ["SELECT", "실행순서"],
+    "difficulty": "하"
+  },
+  {
+    "id": "p2c1_023",
+    "part": 2,
+    "chapter": "1",
+    "questionType": "completion",
+    "content": "다음 SQL의 빈칸에 들어갈 내용으로 올바른 것은?\n\n```sql\nSELECT EMPNO, ENAME, SAL,\n       DECODE(DEPTNO, 10, 'ACCOUNTING',\n                      20, 'RESEARCH',\n                      30, 'SALES',\n                      ______) AS DEPT_NAME\n  FROM EMP;\n```\n\n(단, DEPTNO가 10, 20, 30이 아닌 경우 'UNKNOWN'으로 표시)",
+    "options": [
+      "'UNKNOWN'",
+      "ELSE 'UNKNOWN'",
+      "DEFAULT 'UNKNOWN'",
+      "NULL"
+    ],
+    "answer": 1,
+    "explanation": "DECODE 함수에서 마지막 인수(기본값)는 어느 비교값과도 일치하지 않을 때 반환할 값이다. CASE WHEN의 ELSE와 유사하게 마지막에 기본값을 직접 작성한다. 형식: DECODE(컬럼, 비교1, 결과1, 비교2, 결과2, ..., 기본값). 기본값 없이 일치하지 않으면 NULL이 반환된다.",
+    "tags": ["DECODE", "조건표현식"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c1_024",
+    "part": 2,
+    "chapter": "1",
+    "questionType": "concept",
+    "content": "다음 중 NOT IN과 NOT EXISTS의 차이에 대한 설명으로 올바른 것은?",
+    "options": [
+      "NOT IN과 NOT EXISTS는 항상 동일한 결과를 반환한다",
+      "서브쿼리 결과에 NULL이 포함되면 NOT IN은 아무 행도 반환하지 않지만, NOT EXISTS는 정상적으로 작동한다",
+      "NOT EXISTS는 서브쿼리 결과에 NULL이 포함되면 오류를 발생시킨다",
+      "NULL 처리 방식은 NOT IN과 NOT EXISTS 모두 동일하게 무시한다"
+    ],
+    "answer": 2,
+    "explanation": "NOT IN에서 서브쿼리 결과에 NULL이 포함되면 모든 비교가 UNKNOWN이 되어 아무 행도 반환되지 않는다. 반면 NOT EXISTS는 서브쿼리 결과의 존재 여부만 확인하므로 NULL이 포함되어도 정상 동작한다. 따라서 NULL이 포함될 가능성이 있는 컬럼을 서브쿼리에서 사용할 때는 NOT EXISTS를 사용하는 것이 안전하다.",
+    "tags": ["NOT IN", "NOT EXISTS", "NULL", "서브쿼리"],
+    "difficulty": "상"
+  },
+  {
+    "id": "p2c1_025",
+    "part": 2,
+    "chapter": "1",
+    "questionType": "completion",
+    "content": "다음 SQL의 빈칸에 들어갈 내용으로 올바른 것은?\n\n```sql\nUPDATE EMP\n   SET SAL = SAL * 1.1,\n       COMM = ______(COMM, 0)\n WHERE DEPTNO = 20;\n```\n\n(단, COMM이 NULL인 직원의 경우 0으로 변경하고, NULL이 아니면 기존 값을 유지)",
+    "options": [
+      "NVL",
+      "COALESCE",
+      "NULLIF",
+      "DECODE"
+    ],
+    "answer": 1,
+    "explanation": "NVL(expr, replace_value) 함수는 첫 번째 인수가 NULL이면 두 번째 인수를 반환하고, NULL이 아니면 첫 번째 인수를 반환한다. COMM이 NULL인 경우 0으로, NULL이 아닌 경우 기존 COMM 값을 유지하므로 NVL(COMM, 0)이 적합하다. COALESCE도 비슷한 기능이지만 인수가 여러 개일 수 있다. NULLIF는 두 값이 같으면 NULL 반환이다.",
+    "tags": ["NVL", "NULL함수", "UPDATE"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c1_026",
+    "part": 2,
+    "chapter": "1",
+    "questionType": "result",
+    "content": "다음 SQL의 실행 결과는?\n\n```sql\nSELECT TRUNC(456.789, -2) FROM DUAL;\n```",
+    "options": [
+      "456",
+      "400",
+      "456.78",
+      "500"
+    ],
+    "answer": 2,
+    "explanation": "TRUNC(숫자, 자릿수) 함수에서 자릿수가 음수이면 정수 부분의 지정한 자릿수에서 절삭한다. TRUNC(456.789, -2)는 백의 자리 이하를 절삭하므로 400이 된다. TRUNC(456.789, -1)이면 450, TRUNC(456.789, 0)이면 456이 된다. ROUND(-2)이면 500이 된다(반올림).",
+    "tags": ["숫자함수", "TRUNC"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c1_027",
+    "part": 2,
+    "chapter": "1",
+    "questionType": "completion",
+    "content": "다음 SQL의 빈칸에 들어갈 내용으로 올바른 것은?\n\n```sql\nSELECT EMPNO, ENAME, SAL,\n       ______(SAL, 0) AS ADJUSTED_SAL\n  FROM EMP;\n```\n\n(단, SAL이 0이면 NULL을 반환하고, 그렇지 않으면 SAL 값을 반환)",
+    "options": [
+      "NVL",
+      "NVL2",
+      "NULLIF",
+      "COALESCE"
+    ],
+    "answer": 3,
+    "explanation": "NULLIF(expr1, expr2)는 두 인수가 같으면 NULL을 반환하고, 다르면 첫 번째 인수를 반환한다. NULLIF(SAL, 0)은 SAL이 0이면 NULL을, 0이 아니면 SAL 값을 반환한다. 이는 0으로 나누는 연산을 방지하거나 0을 NULL로 변환할 때 유용하다. NVL은 NULL을 다른 값으로 대체한다.",
+    "tags": ["NULLIF", "NULL함수"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c1_028",
+    "part": 2,
+    "chapter": "1",
+    "questionType": "result",
+    "content": "다음 SQL의 실행 결과는?\n\n```sql\nSELECT SUBSTR('SQLD_EXAM_2025', 6, 4) FROM DUAL;\n```",
+    "options": [
+      "SQLD",
+      "EXAM",
+      "_EXA",
+      "2025"
+    ],
+    "answer": 2,
+    "explanation": "SUBSTR(문자열, 시작위치, 길이) 함수는 지정한 시작 위치부터 지정한 길이만큼 문자열을 추출한다. Oracle의 SUBSTR은 1부터 시작하므로 'SQLD_EXAM_2025'에서 6번째 문자는 'E'이다(S=1, Q=2, L=3, D=4, _=5, E=6). SUBSTR('SQLD_EXAM_2025', 6, 4)는 6번째 'E'부터 4글자 'EXAM'을 반환한다.",
+    "tags": ["문자함수", "SUBSTR"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c1_029",
+    "part": 2,
+    "chapter": "1",
+    "questionType": "concept",
+    "content": "다음 중 DDL 명령 실행 시 트랜잭션에 미치는 영향으로 올바른 것은?",
+    "options": [
+      "DDL 명령은 이전 DML 작업에 영향을 주지 않고 독립적으로 실행된다",
+      "DDL 명령 실행 전 미확정 DML 작업이 자동 COMMIT된다",
+      "DDL 명령 실행 후 명시적으로 COMMIT을 실행해야 변경이 반영된다",
+      "DDL 명령 실행 시 진행 중인 트랜잭션이 자동 ROLLBACK된다"
+    ],
+    "answer": 2,
+    "explanation": "DDL(CREATE, ALTER, DROP, TRUNCATE) 명령은 AUTO COMMIT이 적용된다. DDL 실행 전에 커밋되지 않은 DML 작업이 있으면 DDL 실행 시 자동으로 COMMIT되어 영구 반영된다. 이후 DDL 자체도 AUTO COMMIT된다. 이 특성으로 인해 의도치 않은 DML 작업이 함께 커밋될 수 있으므로 주의가 필요하다.",
+    "tags": ["DDL", "AUTO COMMIT", "TCL"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c1_030",
+    "part": 2,
+    "chapter": "1",
+    "questionType": "concept",
+    "content": "다음 중 인라인 뷰(Inline View)에 대한 설명으로 올바른 것은?",
+    "options": [
+      "인라인 뷰는 CREATE VIEW로 영구적으로 저장된다",
+      "인라인 뷰는 FROM 절에 작성된 서브쿼리로 가상의 테이블처럼 사용된다",
+      "인라인 뷰의 컬럼은 외부 쿼리의 WHERE 절에서 참조할 수 없다",
+      "인라인 뷰는 SELECT 절에만 사용할 수 있다"
+    ],
+    "answer": 2,
+    "explanation": "인라인 뷰는 FROM 절에 작성된 서브쿼리로, 쿼리 실행 중에만 존재하는 가상의 테이블이다. 영구적으로 저장되지 않고 해당 쿼리에서만 사용된다. 인라인 뷰에 별칭을 붙여 외부 쿼리의 WHERE, SELECT 등에서 컬럼을 참조할 수 있다. SELECT 절에 위치한 서브쿼리는 스칼라 서브쿼리이다.",
+    "tags": ["인라인뷰", "서브쿼리", "FROM절"],
+    "difficulty": "하"
+  }
+]

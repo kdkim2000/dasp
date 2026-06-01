@@ -1,0 +1,342 @@
+[
+  {
+    "id": "p2c3_001",
+    "part": 2,
+    "chapter": "3",
+    "questionType": "concept",
+    "content": "다음 중 옵티마이저(Optimizer)에 대한 설명으로 올바르지 않은 것은?",
+    "options": [
+      "옵티마이저는 SQL을 실행하기 전 가장 효율적인 실행 계획을 결정한다",
+      "CBO(비용기반 옵티마이저)는 통계 정보를 기반으로 비용을 계산한다",
+      "RBO(규칙기반 옵티마이저)는 현재 데이터 건수와 관계없이 규칙만으로 실행 계획을 결정한다",
+      "옵티마이저는 SQL 실행 결과를 확인한 후 최적의 실행 계획을 선택한다"
+    ],
+    "answer": 4,
+    "explanation": "옵티마이저는 SQL을 실제로 실행하기 전에 최적의 실행 계획을 결정한다. SQL 실행 결과를 확인한 후 계획을 선택하는 것이 아니다. CBO는 통계 정보를 기반으로 비용을 추산하여 최저 비용 경로를 선택하고, RBO는 미리 정의된 우선순위 규칙(인덱스 유무, 연산자 종류 등)에 따라 실행 계획을 결정한다.",
+    "tags": ["옵티마이저", "CBO", "RBO"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c3_002",
+    "part": 2,
+    "chapter": "3",
+    "questionType": "concept",
+    "content": "다음 중 실행 계획(Execution Plan)의 구성 요소가 아닌 것은?",
+    "options": [
+      "오퍼레이션(Operation)",
+      "옵션(Options)",
+      "오브젝트명(Object Name)",
+      "수행 속도(Execution Speed)"
+    ],
+    "answer": 4,
+    "explanation": "실행 계획의 주요 구성 요소: 오퍼레이션(TABLE ACCESS, INDEX SCAN 등의 작업 유형), 옵션(FULL, RANGE SCAN, UNIQUE SCAN 등), 오브젝트명(접근 테이블·인덱스명), 카디널리티(예상 행 수), 바이트(예상 데이터량), 비용(Cost), CPU 비용 등이 포함된다. '수행 속도'는 실행 계획의 구성 요소가 아니다. 실행 계획은 예상 비용과 방법을 나타내며 실제 수행 속도는 별도 측정이 필요하다.",
+    "tags": ["실행계획", "옵티마이저"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c3_003",
+    "part": 2,
+    "chapter": "3",
+    "questionType": "concept",
+    "content": "다음 중 B-TREE 인덱스의 구성 요소가 아닌 것은?",
+    "options": [
+      "루트 블록(Root Block)",
+      "브랜치 블록(Branch Block)",
+      "리프 블록(Leaf Block)",
+      "루트 레벨 블록(Root Level Block)"
+    ],
+    "answer": 4,
+    "explanation": "B-TREE 인덱스의 구성은 루트 블록(Root Block: 최상위 노드), 브랜치 블록(Branch Block: 중간 노드, 인덱스 값 범위와 하위 블록 포인터 저장), 리프 블록(Leaf Block: 최하위 노드, 실제 인덱스 키 값과 ROWID 저장)의 세 가지이다. '루트 레벨 블록'은 B-TREE 인덱스의 공식 구성 요소 명칭이 아니다.",
+    "tags": ["인덱스", "B-TREE인덱스"],
+    "difficulty": "하"
+  },
+  {
+    "id": "p2c3_004",
+    "part": 2,
+    "chapter": "3",
+    "questionType": "concept",
+    "content": "다음 중 Full Table Scan이 적합한 상황으로 올바르지 않은 것은?",
+    "options": [
+      "테이블의 대부분의 행이 조회 대상일 때",
+      "인덱스가 없는 컬럼으로 조회할 때",
+      "병렬 처리로 대용량 데이터를 처리할 때",
+      "인덱스가 있음에도 소량의 특정 데이터를 조회할 때"
+    ],
+    "answer": 4,
+    "explanation": "인덱스가 있고 조회 결과가 소량인 경우에는 Index Scan이 Full Table Scan보다 효율적이다. Full Table Scan이 적합한 경우: 테이블 전체 또는 대부분을 조회할 때, 소량 테이블(항상 Full Scan이 빠름), 인덱스 없는 컬럼 조회, 병렬 처리 환경 등이다. 인덱스가 있는 컬럼으로 소량 데이터를 조회할 때는 Index Scan이 유리하다.",
+    "tags": ["Full Table Scan", "인덱스스캔"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c3_005",
+    "part": 2,
+    "chapter": "3",
+    "questionType": "concept",
+    "content": "다음 중 Nested Loop Join에서 연산 순서가 올바른 것은?",
+    "options": [
+      "내부 테이블 전체 스캔 → 외부 테이블 인덱스 탐색 → 조인",
+      "외부 테이블 스캔 → 각 행에 대해 내부 테이블 인덱스 탐색 → 조인 결과 반환",
+      "두 테이블 동시 정렬 → 정렬된 결과 병합 → 조인 결과 반환",
+      "작은 테이블로 해시 테이블 생성 → 큰 테이블 스캔 → 해시 매칭"
+    ],
+    "answer": 2,
+    "explanation": "Nested Loop Join의 연산 순서: ①외부 테이블(Driving Table)을 스캔하여 각 행을 읽는다 → ②각 행에 대해 내부 테이블(Inner Table)을 인덱스로 탐색한다 → ③조건이 맞으면 결과에 포함 → ④외부 테이블의 모든 행을 처리할 때까지 반복. 내부 테이블에 인덱스가 없으면 매번 Full Table Scan이 발생하여 성능이 저하된다.",
+    "tags": ["조인수행원리", "Nested Loop Join"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c3_006",
+    "part": 2,
+    "chapter": "3",
+    "questionType": "concept",
+    "content": "다음 중 CBO(비용기반 옵티마이저)에서 옵티마이저 모드 'ALL_ROWS'에 대한 설명으로 올바른 것은?",
+    "options": [
+      "첫 번째 행을 가장 빠르게 반환하도록 최적화한다",
+      "전체 결과 집합을 처리하는 총 비용을 최소화하도록 최적화한다",
+      "항상 Full Table Scan을 사용하도록 강제한다",
+      "CBO가 아닌 RBO 방식으로 처리하도록 설정한다"
+    ],
+    "answer": 2,
+    "explanation": "옵티마이저 모드에는 FIRST_ROWS(첫 번째 행을 가능한 빨리 반환, OLTP 환경에 적합)와 ALL_ROWS(전체 결과를 처리하는 총 비용 최소화, OLAP·배치 환경에 적합)가 있다. ALL_ROWS는 전체 처리량(Throughput) 최적화 모드로 결과 집합 전체를 처리할 때의 총 비용을 최소화한다. Full Table Scan을 강제하지 않으며 통계 정보를 기반으로 판단한다.",
+    "tags": ["옵티마이저", "ALL_ROWS", "CBO"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c3_007",
+    "part": 2,
+    "chapter": "3",
+    "questionType": "concept",
+    "content": "다음 중 인덱스를 가장 효율적으로 활용할 수 있는 컬럼 구성으로 올바른 것은?\n\n(조회 조건: DEPT_CD = 'A10' AND JOB_CD = 'MG' AND BIRTH_DT BETWEEN '19900101' AND '19991231')",
+    "options": [
+      "BIRTH_DT + DEPT_CD + JOB_CD 순 복합 인덱스",
+      "JOB_CD + BIRTH_DT + DEPT_CD 순 복합 인덱스",
+      "DEPT_CD + JOB_CD + BIRTH_DT 순 복합 인덱스",
+      "단일 컬럼 인덱스 3개를 각각 생성"
+    ],
+    "answer": 3,
+    "explanation": "복합 인덱스에서 '=' 조건인 컬럼을 앞에, 범위(BETWEEN, >, < 등) 조건인 컬럼을 뒤에 배치하는 것이 효율적이다. DEPT_CD(=)와 JOB_CD(=)가 앞에, BIRTH_DT(BETWEEN)가 뒤에 오는 DEPT_CD + JOB_CD + BIRTH_DT 순이 최적이다. 범위 조건 컬럼 이후의 컬럼은 인덱스를 통해 access 조건으로 활용되기 어렵다.",
+    "tags": ["인덱스", "복합인덱스", "인덱스설계"],
+    "difficulty": "상"
+  },
+  {
+    "id": "p2c3_008",
+    "part": 2,
+    "chapter": "3",
+    "questionType": "result",
+    "content": "아래 인덱스와 SQL에서 인덱스를 access 조건으로 사용하는 컬럼으로 올바른 것은?\n\n**인덱스**: IDX_EMP (DEPT_CD, JOB_CD, BIRTH_DT)\n\n```sql\nSELECT *\n  FROM EMP\n WHERE DEPT_CD = 'A10'\n   AND JOB_CD = 'MG'\n   AND BIRTH_DT BETWEEN '19900101' AND '19991231';\n```",
+    "options": [
+      "DEPT_CD만 access 조건",
+      "DEPT_CD, JOB_CD만 access 조건",
+      "DEPT_CD, JOB_CD, BIRTH_DT 모두 access 조건",
+      "BIRTH_DT만 access 조건"
+    ],
+    "answer": 3,
+    "explanation": "복합 인덱스(DEPT_CD, JOB_CD, BIRTH_DT)에서 '=' 조건인 DEPT_CD와 JOB_CD는 인덱스를 정확하게 access하는 조건이다. BIRTH_DT의 BETWEEN도 범위 내에서 인덱스 Range Scan을 수행하므로 access 조건으로 활용된다. 인덱스 선두 컬럼부터 연속으로 조건이 충족되고, 범위 조건도 인덱스를 사용할 수 있다. 따라서 세 컬럼 모두 access 조건이다.",
+    "tags": ["인덱스", "access조건", "filter조건"],
+    "difficulty": "상"
+  },
+  {
+    "id": "p2c3_009",
+    "part": 2,
+    "chapter": "3",
+    "questionType": "concept",
+    "content": "다음 중 Hash Join에 대한 설명으로 올바른 것은?",
+    "options": [
+      "Hash Join은 등호(=) 조인이 아닌 범위 조인에도 사용 가능하다",
+      "Hash Join은 작은 테이블(Build Input)로 해시 테이블을 만들고 큰 테이블(Probe Input)로 탐색한다",
+      "Hash Join은 내부 테이블에 인덱스가 있어야만 사용 가능하다",
+      "Hash Join은 OLTP 환경의 소량 데이터 조회에 가장 적합하다"
+    ],
+    "answer": 2,
+    "explanation": "Hash Join 수행 원리: ①작은 테이블(Build Input)을 읽어 조인 컬럼으로 해시 테이블을 메모리에 생성 → ②큰 테이블(Probe Input)을 읽으면서 해시 테이블을 탐색하여 매칭 행을 찾는다. 등호(=) 조인에서만 사용 가능하고, 인덱스가 없어도 사용할 수 있으며, 대용량 데이터와 OLAP 환경에 적합하다.",
+    "tags": ["조인수행원리", "Hash Join"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c3_010",
+    "part": 2,
+    "chapter": "3",
+    "questionType": "concept",
+    "content": "다음 중 Nested Loop Join의 연산 순서를 수도코드(pseudo code)로 표현한 것으로 올바른 것은?\n\n```\n(1) 선행 테이블에서 조건에 맞는 첫 번째 행 추출\n(2) 선행 테이블에서 조건에 맞는 다음 행 추출\n(3) 선행 테이블의 조인 컬럼으로 후행 테이블 인덱스 탐색\n(4) 인덱스로 후행 테이블 데이터 블록 접근\n(5) 결과를 조합하여 반환\n```",
+    "options": [
+      "(1)→(2)→(3)→(4)→(5)",
+      "(1)→(3)→(4)→(5)→(2)→(3)→(4)→(5)→... 반복",
+      "(3)→(4)→(1)→(2)→(5)",
+      "(4)→(3)→(1)→(2)→(5)"
+    ],
+    "answer": 2,
+    "explanation": "Nested Loop Join의 실행 순서: (1) 선행 테이블(Driving Table)에서 조건에 맞는 첫 행 추출 → (3) 선행 테이블의 조인 컬럼으로 후행 테이블 인덱스 탐색 → (4) 인덱스로 후행 테이블 데이터 블록 접근 → (5) 조건 만족 시 결과 반환 → (2) 선행 테이블의 다음 행 추출 → (3)~(5) 반복. 선행 테이블의 각 행에 대해 후행 테이블 인덱스 탐색이 반복된다.",
+    "tags": ["조인수행원리", "Nested Loop Join", "연산순서"],
+    "difficulty": "상"
+  },
+  {
+    "id": "p2c3_011",
+    "part": 2,
+    "chapter": "3",
+    "questionType": "concept",
+    "content": "다음 중 Nested Loop Join의 후행 테이블에 반드시 인덱스가 필요한지에 대한 설명으로 올바른 것은?",
+    "options": [
+      "후행 테이블에는 반드시 인덱스가 있어야 NL조인이 실행된다",
+      "후행 테이블에 인덱스가 없어도 NL조인은 가능하나 선행 테이블 행 수만큼 Full Table Scan이 반복되어 성능이 매우 나빠진다",
+      "후행 테이블에 인덱스가 없으면 자동으로 Hash Join으로 변환된다",
+      "후행 테이블의 인덱스 유무는 NL조인 성능에 영향을 주지 않는다"
+    ],
+    "answer": 2,
+    "explanation": "NL Join에서 후행 테이블(Inner Table)에 인덱스가 없어도 실행은 가능하지만, 선행 테이블의 각 행에 대해 후행 테이블 전체를 스캔(Full Table Scan)해야 하므로 성능이 매우 나빠진다. 예를 들어 선행 테이블이 1000행이면 후행 테이블을 1000번 Full Scan한다. 따라서 NL Join 성능 향상을 위해서는 후행 테이블의 조인 컬럼에 인덱스가 필수적이다.",
+    "tags": ["조인수행원리", "Nested Loop Join", "인덱스"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c3_012",
+    "part": 2,
+    "chapter": "3",
+    "questionType": "concept",
+    "content": "다음 중 CBO(비용기반 옵티마이저) 모드 선택에 대한 설명으로 올바르지 않은 것은?",
+    "options": [
+      "CBO는 현재 대부분의 DBMS에서 기본 옵티마이저로 사용된다",
+      "CBO에서 ALL_ROWS 모드는 전체 결과 집합 처리 비용을 최소화한다",
+      "CBO에서 FIRST_ROWS 모드는 첫 번째 행을 빠르게 반환하는 것을 목표로 한다",
+      "CBO에서 통계 정보가 없으면 반드시 RBO 방식으로 전환된다"
+    ],
+    "answer": 4,
+    "explanation": "CBO는 통계 정보가 없는 경우에도 기본 추정값(Default Estimation)을 사용하여 비용을 계산한다. 반드시 RBO로 전환되지는 않는다. 다만 통계 정보가 부정확하거나 없으면 잘못된 실행 계획이 선택될 수 있다. 대량 데이터 변경 후에는 DBMS_STATS 등으로 통계 정보를 갱신하는 것이 중요하다.",
+    "tags": ["옵티마이저", "CBO", "통계정보"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c3_013",
+    "part": 2,
+    "chapter": "3",
+    "questionType": "completion",
+    "content": "다음 Oracle SQL에서 특정 인덱스를 강제로 사용하도록 힌트를 작성할 때, 빈칸에 들어갈 내용으로 올바른 것은?\n\n```sql\nSELECT /*+ ______(EMP IDX_EMP_DEPTNO) */ *\n  FROM EMP\n WHERE DEPTNO = 10;\n```",
+    "options": [
+      "FULL",
+      "INDEX",
+      "USE_NL",
+      "LEADING"
+    ],
+    "answer": 2,
+    "explanation": "INDEX 힌트는 특정 테이블에 특정 인덱스를 강제로 사용하도록 지시한다. 형식: /*+ INDEX(테이블명 인덱스명) */. FULL은 Full Table Scan 강제, USE_NL은 Nested Loop Join 강제, LEADING은 특정 테이블을 Driving 테이블로 지정한다. 힌트는 옵티마이저의 판단을 무시하고 강제로 실행 계획을 지정할 때 사용한다.",
+    "tags": ["힌트", "INDEX힌트", "옵티마이저"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c3_014",
+    "part": 2,
+    "chapter": "3",
+    "questionType": "concept",
+    "content": "다음 중 인덱스를 사용할 수 없게 만드는 경우로 올바른 것은?",
+    "options": [
+      "WHERE 이름 = '홍길동'",
+      "WHERE 이름 LIKE '홍%'",
+      "WHERE SUBSTR(이름, 1, 1) = '홍'",
+      "WHERE 이름 BETWEEN '가' AND '나'"
+    ],
+    "answer": 3,
+    "explanation": "인덱스가 설정된 컬럼에 함수를 적용하면(SUBSTR, TO_CHAR, UPPER, LOWER, NVL 등) 인덱스를 사용할 수 없다. SUBSTR(이름, 1, 1) = '홍'은 이름 컬럼을 변형하므로 Index Scan이 불가능하고 Full Table Scan이 발생한다. '이름 = 값', 'LIKE 홍%'(앞부분 고정), BETWEEN은 인덱스 사용이 가능하다.",
+    "tags": ["인덱스", "인덱스스캔", "함수변형"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c3_015",
+    "part": 2,
+    "chapter": "3",
+    "questionType": "error",
+    "content": "다음 중 Index Range Scan이 발생하지 않는(인덱스를 사용할 수 없는) 조건으로 올바른 것은?",
+    "options": [
+      "WHERE 이름 BETWEEN '가나다' AND '마바사'",
+      "WHERE 이름 LIKE '홍%'",
+      "WHERE 이름 > '나'",
+      "WHERE 이름 LIKE '%동'"
+    ],
+    "answer": 4,
+    "explanation": "LIKE '%동'(후방 일치)은 인덱스 앞부분부터 스캔할 수 없으므로 Index Range Scan이 불가능하고 Full Table Scan이 발생한다. BETWEEN, LIKE '홍%'(전방 일치), > 등의 조건은 인덱스 선두 부분부터 탐색이 가능하여 Index Range Scan을 사용할 수 있다. 후방 일치나 중간 일치(LIKE '%동%')는 Full Table Scan이 필요하다.",
+    "tags": ["인덱스스캔", "Index Range Scan", "LIKE"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c3_016",
+    "part": 2,
+    "chapter": "3",
+    "questionType": "concept",
+    "content": "다음 중 Hash Join의 연산 순서로 올바른 것은?\n\n```\n(A) 선행 테이블(Build Input)로 해시 테이블 생성\n(B) 후행 테이블(Probe Input) 스캔\n(C) 해시 함수로 해시 버킷 탐색\n(D) 조인 결과 반환\n```",
+    "options": [
+      "A → B → C → D",
+      "B → A → C → D",
+      "C → A → B → D",
+      "A → C → B → D"
+    ],
+    "answer": 1,
+    "explanation": "Hash Join 연산 순서: (A) 작은 테이블(Build Input)을 읽어 조인 키 기반으로 해시 테이블을 메모리에 생성 → (B) 큰 테이블(Probe Input)을 스캔 → (C) 각 행의 조인 키에 해시 함수를 적용하여 해당 해시 버킷을 탐색하고 매칭 행 확인 → (D) 조건 만족 시 결과 반환. Build Input은 가능한 작은 테이블이어야 해시 테이블이 메모리에 올라갈 수 있다.",
+    "tags": ["조인수행원리", "Hash Join", "연산순서"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c3_017",
+    "part": 2,
+    "chapter": "3",
+    "questionType": "error",
+    "content": "다음 중 인덱스를 사용하지 못하게 만드는 SQL 패턴이 아닌 것은?",
+    "options": [
+      "WHERE UPPER(이름) = 'HONG'",
+      "WHERE 급여 + 0 = 3000",
+      "WHERE 급여 = 3000",
+      "WHERE 급여 * 1 != 3000"
+    ],
+    "answer": 3,
+    "explanation": "인덱스 컬럼에 함수나 연산을 적용하지 않고 직접 비교하는 경우에는 인덱스를 사용할 수 있다. WHERE 급여 = 3000은 급여 컬럼에 가공 없이 직접 비교하므로 인덱스 사용이 가능하다. UPPER(이름)는 이름 컬럼에 함수 적용, 급여+0은 급여 컬럼에 산술 연산, 급여*1 != 3000은 부정형 조건이므로 인덱스 사용이 불가하다.",
+    "tags": ["인덱스", "인덱스사용불가", "SQL튜닝"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c3_018",
+    "part": 2,
+    "chapter": "3",
+    "questionType": "result",
+    "content": "아래 인덱스와 SQL에서 인덱스를 통해 access되는 컬럼과 filter 처리되는 컬럼으로 올바른 것은?\n\n**인덱스**: IDX_EMP (DEPT_CD, BIRTH_DT)\n\n```sql\nSELECT *\n  FROM EMP\n WHERE BIRTH_DT BETWEEN '19900101' AND '19991231'\n   AND DEPT_CD = 'A10';\n```",
+    "options": [
+      "access: BIRTH_DT, filter: DEPT_CD",
+      "access: DEPT_CD, BIRTH_DT 모두, filter: 없음",
+      "access: DEPT_CD만, filter: BIRTH_DT",
+      "access: 없음 (Full Table Scan)"
+    ],
+    "answer": 2,
+    "explanation": "인덱스 IDX_EMP(DEPT_CD, BIRTH_DT)에서 SQL 조건이 'DEPT_CD = A10 AND BIRTH_DT BETWEEN ...'일 때: 인덱스의 선두 컬럼 DEPT_CD를 '=' 조건으로 탐색(access), 그 다음 BIRTH_DT를 BETWEEN으로 범위 탐색(access)한다. DEPT_CD가 '='이고 BIRTH_DT가 BETWEEN이므로 두 컬럼 모두 인덱스 access 조건으로 활용된다. WHERE 절 작성 순서와 무관하게 인덱스 컬럼 순서대로 처리된다.",
+    "tags": ["인덱스", "access조건", "filter조건", "복합인덱스"],
+    "difficulty": "상"
+  },
+  {
+    "id": "p2c3_019",
+    "part": 2,
+    "chapter": "3",
+    "questionType": "completion",
+    "content": "다음 Oracle SQL에서 Nested Loop Join을 강제하는 힌트의 빈칸에 들어갈 내용으로 올바른 것은?\n\n```sql\nSELECT /*+ ______(E D) */ E.ENAME, D.DNAME\n  FROM EMP E, DEPT D\n WHERE E.DEPTNO = D.DEPTNO\n   AND E.SAL > 3000;\n```",
+    "options": [
+      "INDEX",
+      "FULL",
+      "USE_NL",
+      "HASH_JOIN"
+    ],
+    "answer": 3,
+    "explanation": "USE_NL(테이블명1 테이블명2) 힌트는 지정한 테이블 간의 조인 방식을 Nested Loop Join으로 강제한다. USE_HASH는 Hash Join, USE_MERGE는 Sort Merge Join을 강제한다. LEADING 힌트와 함께 사용하면 Driving 테이블을 지정하면서 조인 방법도 제어할 수 있다. 조인 힌트는 SQL 튜닝에서 자주 사용된다.",
+    "tags": ["힌트", "USE_NL", "Nested Loop Join"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c3_020",
+    "part": 2,
+    "chapter": "3",
+    "questionType": "concept",
+    "content": "다음 중 바인드 변수(Bind Variable) 사용의 장점으로 올바른 것은?",
+    "options": [
+      "SQL 실행 결과의 정확성이 향상된다",
+      "Hard Parsing을 방지하여 CPU 사용량과 공유 메모리(Library Cache) 부하를 줄인다",
+      "바인드 변수를 사용하면 항상 인덱스가 사용된다",
+      "바인드 변수는 DDL 문에서만 사용 가능하다"
+    ],
+    "answer": 2,
+    "explanation": "바인드 변수를 사용하면 SQL의 텍스트가 동일하게 유지되어 Soft Parsing(Library Cache 재사용)이 가능하다. 리터럴 값을 사용하면 값이 바뀔 때마다 새로운 SQL로 인식되어 Hard Parsing이 발생하고 Parse Tree 생성, 최적화, Library Cache 적재 등의 반복 작업으로 CPU 사용량이 증가한다. 바인드 변수는 DML(SELECT, INSERT, UPDATE, DELETE)에서 주로 사용하며 SQL Injection 방지 효과도 있다.",
+    "tags": ["바인드변수", "Hard Parsing", "Soft Parsing", "성능"],
+    "difficulty": "중"
+  }
+]

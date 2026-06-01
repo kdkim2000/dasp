@@ -1,0 +1,902 @@
+[
+  {
+    "id": "me1_001",
+    "part": 1,
+    "chapter": "1",
+    "content": "다음 중 데이터 독립성 구성요소에 대한 설명으로 가장 부적절한 것은 무엇인가?",
+    "options": [
+      "외부 스키마(External Schema)는 DB의 사용자 및 응용프로그램이 접근하는 스키마를 말한다.",
+      "개념 스키마(Conceptual Schema)는 모든 사용자 관점을 통합한 조직 전체의 DB를 기술하는 것을 말한다.",
+      "내부 스키마(Internal Schema)는 물리적 장치에서 데이터가 실제적으로 저장되는 방법을 표현하는 것을 말한다.",
+      "외부/개념/내부 스키마 모두 상호 독립적의 의미를 가지고 있지만 고유한 기능을 가지고 있지는 않다."
+    ],
+    "answer": 4,
+    "explanation": "데이터베이스 스키마 구조는 외부, 개념, 내부 스키마 3단계로 구분되며, 각각은 상호 독립적인 의미를 가지고 고유한 기능을 가진다. 따라서 보기 4번의 '고유한 기능을 가지고 있지는 않다'는 설명은 틀린 설명이다.",
+    "tags": ["데이터독립성", "스키마", "3단계구조"],
+    "difficulty": "중",
+    "questionType": "concept",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_002",
+    "part": 1,
+    "chapter": "1",
+    "content": "다음 중 유형 엔터티이면서 기본/키 엔터티이기도 한 엔터티는 무엇인가?",
+    "options": [
+      "수강신청",
+      "교수",
+      "학부",
+      "수강신청이력"
+    ],
+    "answer": 2,
+    "explanation": "유형 엔터티는 물리적 형태가 있고 안정적이며 지속적으로 활용되는 엔터티(예: 사원, 물품, 강사, 교수)이다. 기본/키 엔터티는 다른 엔터티와 관계에 의해 생성되지 않고 독립적으로 생성 가능한 엔터티이다. 교수는 이 두 가지 조건을 모두 만족한다. 수강신청은 사건 엔터티이면서 중심엔터티이고, 학부는 개념 엔터티이면서 기본/키 엔터티이며, 수강신청이력은 사건 엔터티이면서 행위 엔터티이다.",
+    "tags": ["엔터티", "유형엔터티", "기본엔터티"],
+    "difficulty": "중",
+    "questionType": "concept",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_003",
+    "part": 1,
+    "chapter": "1",
+    "content": "다음 중 엔터티, 인스턴스, 속성, 속성값에 대한 관계에 대한 설명으로 알맞은 것을 2개 고르시오. (복수 선택 문제로, 대표 정답 선택)",
+    "options": [
+      "한개의 엔터티는 1개 이상의 인스턴스 집합이어야 한다.",
+      "한개의 엔터티는 2개 이상의 인스턴스 집합이어야 한다.",
+      "한개의 속성은 1개의 속성값을 갖는다.",
+      "한개의 속성은 2개의 속성값을 갖는다."
+    ],
+    "answer": 2,
+    "explanation": "복수 정답 중 대표 정답: 한 개의 엔터티는 2개 이상의 인스턴스 집합이어야 한다(보기 2번). 또한 한 개의 속성은 1개의 속성값을 갖는다(보기 3번). 보기 1번은 '1개 이상'이 아닌 '2개 이상'이어야 하므로 틀리고, 보기 4번은 '2개'가 아닌 '1개'의 속성값이 맞다.",
+    "tags": ["엔터티", "인스턴스", "속성", "속성값"],
+    "difficulty": "중",
+    "questionType": "concept",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_004",
+    "part": 1,
+    "chapter": "1",
+    "content": "신규로 구축하는 시스템에서 다음 업무 내용에 부합하는 데이터 모델은 무엇인가?\n\n1. 한 명의 고객은 여러 개의 증권계좌 개설이 가능하고, 하나의 증권계좌에는 여러 번에 걸쳐 입금이 가능하다.\n2. 증권 계좌는 반드시 고객이 있어야 하고, 입금에는 반드시 증권 계좌가 있어야 한다.\n3. 한 명의 고객은 증권계좌를 단 한 개도 개설하지 않을 수 있다.\n4. 한 개의 증권 계좌는 단 한 번도 입금을 하지 않을 수 있다.",
+    "options": [
+      "고객(필수) --1:N--> 증권계좌(필수), 증권계좌(필수) --1:N--> 입금(필수)",
+      "고객(선택) --1:N--> 증권계좌(필수), 증권계좌(필수) --1:N--> 입금(필수)",
+      "고객(선택) --1:N--> 증권계좌(선택), 증권계좌(선택) --1:N--> 입금(선택)",
+      "고객(필수) --1:N--> 증권계좌(선택), 증권계좌(선택) --1:N--> 입금(선택)"
+    ],
+    "answer": 3,
+    "explanation": "관계 선택 사양을 묻는 문제이다. 고객은 증권계좌를 하나도 개설하지 않을 수 있으므로 고객 측은 선택(Optional)이다. 증권계좌는 반드시 고객이 있어야 하므로 고객 입장에서 필수(Mandatory)이다. 증권계좌는 입금이 한 번도 없을 수 있으므로 선택이다. 입금은 반드시 증권계좌가 있어야 하므로 필수이다. 보기 3번이 이 관계의 선택 사양을 정확하게 표현하고 있다.",
+    "tags": ["관계", "선택사양", "필수선택", "ERD"],
+    "difficulty": "상",
+    "questionType": "concept",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_005",
+    "part": 1,
+    "chapter": "1",
+    "content": "다음 중 주 식별자의 4대 특징에 해당하지 않는 것은 무엇인가?",
+    "options": [
+      "유일성",
+      "최소성",
+      "가변성",
+      "존재성"
+    ],
+    "answer": 3,
+    "explanation": "주 식별자의 4대 특징은 유일성, 최소성, 불변성, 존재성이다. '가변성'이라는 특징은 존재하지 않는다. 유일성은 모든 인스턴스를 유일하게 구분, 최소성은 유일성을 만족하는 최소 속성 수, 불변성은 식별자 값이 변하지 않아야 함, 존재성은 반드시 데이터 값이 존재해야 함을 의미한다.",
+    "tags": ["식별자", "주식별자", "4대특징"],
+    "difficulty": "하",
+    "questionType": "concept",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_006",
+    "part": 1,
+    "chapter": "2",
+    "content": "일자별매각물건 엔터티가 다음과 같은 함수적 종속성을 갖는다. 이 경우 해당 엔터티는 몇 정규형이며 몇 정규화 대상인가?\n\n- 매각물건번호 → (최저매각가격, 물건상태코드)\n- 매각일자 → (매각시간, 매각장소)",
+    "options": [
+      "2정규형, 3정규화대상",
+      "1정규형, 2정규화대상",
+      "3정규형, 보이스코드정규화대상",
+      "반정규형, 2정규화대상"
+    ],
+    "answer": 2,
+    "explanation": "일자별매각물건 엔터티는 1정규형을 만족하며 2정규화 대상이다. 매각일자가 PK속성 중 하나이므로 부분 함수 종속이 발생하였다. 부분 함수 종속이란 복합 PK 중 일부 속성에만 종속되는 경우를 말하며, 이를 제거하는 것이 제2정규화이다.",
+    "tags": ["정규화", "함수종속", "부분종속", "2정규형"],
+    "difficulty": "상",
+    "questionType": "concept",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_007",
+    "part": 1,
+    "chapter": "2",
+    "content": "반정규화는 중복성의 원리를 활용하여 데이터 조회 시 성능을 향상시키는 역할을 한다. 다음 중 반정규화의 중복성의 유형이 아닌 것은 무엇인가?",
+    "options": [
+      "속성의 중복성",
+      "테이블의 중복성",
+      "관계의 중복성",
+      "칼럼의 중복성"
+    ],
+    "answer": 1,
+    "explanation": "반정규화의 종류에는 테이블 반정규화(테이블 병합, 분할, 추가), 관계의 반정규화(중복관계 추가), 칼럼 반정규화(중복칼럼 추가, 파생칼럼 추가 등)가 있다. '속성의 중복성'이라는 유형은 반정규화 분류에 존재하지 않는다.",
+    "tags": ["반정규화", "중복성", "테이블반정규화", "칼럼반정규화"],
+    "difficulty": "중",
+    "questionType": "concept",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_008",
+    "part": 1,
+    "chapter": "2",
+    "content": "한 테이블에 칼럼이 과도하게 많은 경우 하나의 행이 디스크에 여러 블록에 데이터가 저장되게 된다. 이러한 경우 과도한 블록 I/O가 발생하여 성능이 저하될 수 있다. 해당 현상에 대해 가장 올바르게 설명한 것은 무엇인가?",
+    "options": [
+      "로우 길이가 너무 길어서 데이터 블록 하나에 모두 저장되지 않고 두 개 이상의 블록에 걸쳐 하나씩 로우가 저장되어 있는 형태가 로우 마이그레이션 현상이다.",
+      "데이터 블록에서 수정이 발생하면 수정된 데이터를 해당 데이터 블록에서 저장하지 못하고 다른 블록의 빈 공간을 찾아가는 방식이 로우 체이닝이라고 한다.",
+      "로우 체이닝 현상이 일어나면 많은 블록에 데이터가 저장되면서 불필요한 BLOCK I/O가 발생한다.",
+      "로우 마이그레이션이 일어나면 많은 블록에 데이터가 저장되지만 공간 효율성은 높아진다."
+    ],
+    "answer": 3,
+    "explanation": "보기 3번이 가장 올바른 설명이다. 보기 1번은 로우 체이닝에 대한 설명이며(문제에서 설명하는 현상), 보기 2번은 로우 마이그레이션에 대한 설명이다. 보기 4번에서 로우 마이그레이션이 일어나면 공간 효율성이 높아지는 것은 아니다. 로우 체이닝은 로우가 너무 길어 여러 블록에 걸쳐 저장되는 현상이다.",
+    "tags": ["로우체이닝", "로우마이그레이션", "블록IO", "성능"],
+    "difficulty": "중",
+    "questionType": "concept",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_009",
+    "part": 1,
+    "chapter": "2",
+    "content": "다음 중 슈퍼/서브타입 데이터 모델의 변환 타입에 대한 설명으로 가장 알맞은 것은 무엇인가?",
+    "options": [
+      "OneToOne 타입은 개별 테이블을 유지하기 때문에 관리용이성이 뛰어나다.",
+      "Plus 타입은 슈퍼+서브타입 테이블로 변환하기 때문에 관리용이성이 뛰어나다.",
+      "Single 타입은 하나의 테이블로 통합하기 때문에 관리용이성이 좋지 않다.",
+      "Single 타입은 하나의 테이블로 통합하기 때문에 향후 확장성이 떨어진다."
+    ],
+    "answer": 4,
+    "explanation": "슈퍼/서브타입 변환 타입 비교: OneToOne 타입은 개별 테이블 유지로 관리용이성이 좋지 않다. Plus 타입은 슈퍼+서브타입 테이블로 관리용이성이 좋지 않다. Single 타입은 하나의 테이블로 관리용이성이 좋지만, 하나의 테이블에 모든 것을 합치므로 향후 확장성이 나쁘다. 보기 4번이 올바른 설명이다.",
+    "tags": ["슈퍼서브타입", "변환타입", "Single", "성능"],
+    "difficulty": "중",
+    "questionType": "concept",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_010",
+    "part": 1,
+    "chapter": "2",
+    "content": "분산 데이터베이스 적용 시 장단점에 대한 설명으로 가장 올바른 것은 무엇인가?",
+    "options": [
+      "여러 곳에 데이터가 분산되므로 응답속도가 느려지고 통신 비용이 증가한다.",
+      "분산 적용되어 데이터의 가용성과 신뢰성이 감소한다.",
+      "분산 데이터베이스의 특성으로 데이터 무결성을 확실하게 보장한다.",
+      "분산 환경에 따라 불규칙한 응답속도가 단점이다."
+    ],
+    "answer": 4,
+    "explanation": "분산 데이터베이스는 빠른 응답속도와 통신 비용 절감이 장점이므로 보기 1번은 틀리다. 분산 적용 시 신뢰성과 가용성이 증대되므로 보기 2번은 틀리다. 분산 데이터베이스에서 데이터 무결성은 위협을 받을 수 있으므로 보기 3번은 틀리다. 분산 환경에 따라 불규칙한 응답속도가 발생하는 것은 실제 단점에 해당한다.",
+    "tags": ["분산데이터베이스", "장단점", "가용성", "무결성"],
+    "difficulty": "중",
+    "questionType": "concept",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_011",
+    "part": 2,
+    "chapter": "1",
+    "content": "다음 중 DML(Data Manipulation Language)의 종류가 아닌 것은 무엇인가?",
+    "options": [
+      "INSERT",
+      "UPDATE",
+      "SELECT",
+      "RENAME"
+    ],
+    "answer": 4,
+    "explanation": "RENAME은 DDL(Data Definition Language)의 한 종류이다. DML은 데이터 조작어로 INSERT, UPDATE, DELETE, SELECT가 포함된다. DDL은 데이터 정의어로 CREATE, ALTER, DROP, RENAME, TRUNCATE 등이 포함된다.",
+    "tags": ["DML", "DDL", "SQL분류"],
+    "difficulty": "하",
+    "questionType": "concept",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_012",
+    "part": 2,
+    "chapter": "1",
+    "content": "CREATE문과 SELECT문을 조합하여 기존 테이블을 복제할 수 있다. (오라클 기준) 다음 SQL문의 ㉠안에 들어갈 알맞은 키워드는 무엇인가?\n\n```sql\nCREATE TABLE TEAM_TEMP ㉠\nSELECT * FROM TEAM;\n```",
+    "options": [
+      "IS",
+      "AS",
+      "OF",
+      "IN"
+    ],
+    "answer": 2,
+    "explanation": "CREATE TABLE AS SELECT 구문으로 기존 테이블을 복제할 수 있으며, 줄여서 CTAS라고도 한다. AS 키워드를 사용하여 SELECT 결과를 새로운 테이블로 생성한다. 이 구문은 테이블의 구조와 데이터를 동시에 복사하는 데 유용하다.",
+    "tags": ["CTAS", "CREATE TABLE AS SELECT", "DDL"],
+    "difficulty": "하",
+    "questionType": "completion",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_013",
+    "part": 2,
+    "chapter": "1",
+    "content": "다음 테이블 데이터에서 SQL1, SQL2, SQL3 각각의 결과 집합의 건수를 순서대로 기재한 것은 무엇인가?\n\n| PLAYER_ID | PLAYER_NM | BIRTH_DE |\n|-----------|-----------|----------|\n| 100001 | 박찬호 | 19730629 |\n| 100002 | 박찬호 | 19950605 |\n| 100003 | 박지성 | 19810225 |\n| 100004 | 이승우 | 19980106 |\n\n```sql\n-- SQL1\nSELECT * FROM TB_PLAYER_3;\n-- SQL2\nSELECT ALL PLAYER_NM FROM TB_PLAYER_3;\n-- SQL3\nSELECT DISTINCT PLAYER_NM FROM TB_PLAYER_3;\n```",
+    "options": [
+      "4, 3, 3",
+      "4, 4, 4",
+      "4, 3, 4",
+      "4, 4, 3"
+    ],
+    "answer": 4,
+    "explanation": "SQL1은 전체 행을 조회하므로 4건이다. SQL2는 ALL을 명시했으므로 중복 포함 전체를 출력하여 4건이다(아무것도 기재하지 않으면 ALL을 생략한 것과 같다). SQL3는 DISTINCT로 유일 값만 출력하므로 박찬호, 박지성, 이승우 총 3건이다. 따라서 4, 4, 3이 정답이다.",
+    "tags": ["SELECT", "DISTINCT", "ALL", "결과건수"],
+    "difficulty": "중",
+    "questionType": "result",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_014",
+    "part": 2,
+    "chapter": "1",
+    "content": "다음 중 트랜잭션의 특성에 대한 설명으로 가장 부적절한 것은 무엇인가?",
+    "options": [
+      "원자성(Atomicity)은 트랜잭션에서 정의된 연산들은 모두 성공적으로 실행되던지 아니면 전혀 실행되지 않은 상태로 남아 있어야 한다.",
+      "일관성(Consistency)은 트랜잭션이 실행되기 전의 데이터베이스 내용이 잘못되어 있지 않다면 트랜잭션이 실행된 이후에도 데이터베이스 내용에 잘못이 있으면 안된다.",
+      "고립성(Isolation)은 트랜잭션이 실행되는 도중에 다른 트랜잭션의 영향을 받으면 즉시 작업을 중지하여 잘못된 결과를 만들지 않는다.",
+      "지속성(Durability)은 트랜잭션이 성공적으로 수행되면 그 트랜잭션이 갱신한 데이터베이스의 내용은 영구적으로 저장된다."
+    ],
+    "answer": 3,
+    "explanation": "고립성(Isolation)은 트랜잭션이 실행되는 도중에 다른 트랜잭션의 영향을 받아 잘못된 결과를 만들어서는 안 된다는 특성이다. 즉 영향을 받으면 즉시 작업을 중지하는 것이 아니라, 처음부터 다른 트랜잭션의 영향을 받지 않아야 한다. 트랜잭션의 ACID 특성: 원자성, 일관성, 고립성, 지속성.",
+    "tags": ["트랜잭션", "ACID", "고립성", "TCL"],
+    "difficulty": "중",
+    "questionType": "concept",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_015",
+    "part": 2,
+    "chapter": "1",
+    "content": "다음 테이블에서 MAJOR(전공)가 '데이터사이언스학'이면서 DEPT_CD(부서코드)가 '101'인 직원 혹은 MAJOR(전공)가 '컴퓨터공학'이면서 DEPT_CD(부서코드)가 '102'인 직원을 추출하는 SQL문으로 올바르지 않은 것을 2개 고르시오. (복수 정답 중 대표 정답)\n\n| EMP_NO | EMP_NM | MAJOR | DEPT_CD |\n|--------|--------|-------|--------|\n| 100002 | 이수지 | 데이터사이언스학 | 101 |\n| 100004 | 김성민 | 컴퓨터공학 | 102 |",
+    "options": [
+      "WHERE (A.MAJOR = '데이터사이언스학' AND A.DEPT_CD = '101') OR (A.MAJOR = '컴퓨터공학' AND A.DEPT_CD = '102')",
+      "WHERE A.MAJOR IN ('데이터사이언스학', '컴퓨터공학') AND A.DEPT_CD IN ('101', '102')",
+      "WHERE (A.MAJOR, A.DEPT_CD) IN (('데이터사이언스학', '101'), ('컴퓨터공학', '102'))",
+      "WHERE (A.MAJOR, A.DEPT_CD) NOT IN (('컴퓨터소프트웨어학', '101'), ('컴퓨터소프트웨어학', '102'))"
+    ],
+    "answer": 2,
+    "explanation": "복수 정답(2번, 4번) 중 대표 정답. 보기 2번은 전공이 '데이터사이언스학' 혹은 '컴퓨터공학'이면서 부서코드가 '101' 혹은 '102'이면 모두 출력되어 원하는 조건과 다른 결과가 나온다. 보기 4번은 '컴퓨터소프트웨어학'이면서 부서코드가 '101' 혹은 '102'인 직원만 제외하므로 원하는 조건과 다른 결과이다. 보기 3번은 다중 리스트 IN 연산자 활용으로 올바른 SQL이다.",
+    "tags": ["WHERE", "IN", "다중조건", "SELECT"],
+    "difficulty": "상",
+    "questionType": "result",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_016",
+    "part": 2,
+    "chapter": "1",
+    "content": "다음과 같이 TB_CHAR_VARCHAR_6 테이블에 5개의 행을 입력하였다. 아래 SQL문의 실행 결과는 무엇인가?\n\n```sql\nSELECT COUNT(*) CNT\nFROM TB_CHAR_VARCHAR_6 A\nWHERE A.CHAR_VAL = A.VARCHAR_VAL;\n```\n\n입력 데이터: 'ABC'/'ABC'(공백없음), 'ABCDE'/'ABCDE'(공백없음), 'ABCDEFGHIJ'/'ABCDEFGHIJ'(공백없음), 'ABC '/'ABC '(공백2칸씩), 'ABCDE '/'ABCDE '(공백5칸씩)",
+    "options": [
+      "2",
+      "3",
+      "4",
+      "5"
+    ],
+    "answer": 1,
+    "explanation": "CHAR와 VARCHAR 비교 시 길이가 다르면 다른 값으로 판단한다. 즉 두 문자열의 길이가 동일하고 문자열도 같아야 같다고 판단한다. 'ABCDEFGHIJ'(10자)/'ABCDEFGHIJ'(10자)와 'ABCDE '(10자)/'ABCDE '(10자, 공백5칸 포함)는 길이가 같으므로 같은 값으로 판단한다. 따라서 COUNT 결과는 2이다.",
+    "tags": ["CHAR", "VARCHAR", "문자열비교", "함수"],
+    "difficulty": "상",
+    "questionType": "result",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_017",
+    "part": 2,
+    "chapter": "1",
+    "content": "다음 SQL문이 출력하는 결과는 무엇인가?\n\n```sql\nSELECT ABS(CEIL(3.14) + FLOOR(3.14) * SIGN(-3.14)) AS RESULT_VAL\nFROM DUAL;\n```",
+    "options": [
+      "-1",
+      "1",
+      "7",
+      "-7"
+    ],
+    "answer": 2,
+    "explanation": "CEIL(3.14) = 4 (올림), FLOOR(3.14) = 3 (내림), SIGN(-3.14) = -1 (음수이므로 -1). 연산자 우선순위에 의해 3 * -1 = -3이 먼저 계산되고, 그 후 4 + (-3) = 1이 된다. ABS(1) = 1이므로 최종 결과는 1이다.",
+    "tags": ["CEIL", "FLOOR", "SIGN", "ABS", "내장함수"],
+    "difficulty": "중",
+    "questionType": "result",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_018",
+    "part": 2,
+    "chapter": "1",
+    "content": "다음 SQL문의 실행 결과값으로 가장 적절한 것은 무엇인가?\n\n```sql\nSELECT NVL(MAX(DUMMY), 'DUMMY') AS RESULT_VAL\nFROM DUAL\nWHERE 1=0;\n```",
+    "options": [
+      "공집합",
+      "DUMMY",
+      "X",
+      "NULL리턴"
+    ],
+    "answer": 2,
+    "explanation": "WHERE절의 1=0 조건으로 인해 공집합이 리턴되는 상황에서 MAX(DUMMY)의 값은 NULL이 리턴된다. NVL함수로 인해 NULL이면 'DUMMY'라는 값을 리턴하게 된다. 집계함수는 공집합에서도 한 행을 반환하며, 그 값은 NULL이다.",
+    "tags": ["NVL", "MAX", "NULL", "공집합", "집계함수"],
+    "difficulty": "중",
+    "questionType": "result",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_019",
+    "part": 2,
+    "chapter": "1",
+    "content": "다음 테이블에서 SQL문의 실행 결과를 순서대로 올바르게 기재한 것은 무엇인가?\n\n| EMP_NO | EMP_NM | DEPT_CD |\n|--------|--------|--------|\n| 100001~100008 | 각 직원 | 101,101,102,102,103,103,104,104 |\n| 100009 | 최태경 | NULL |\n| 100010 | 김승리 | NULL |\n\n```sql\nSELECT COUNT(DEPT_CD), COUNT(*), COUNT(DISTINCT DEPT_CD)\nFROM TB_EMP_9;\n```",
+    "options": [
+      "10, 10, 5",
+      "10, 10, 4",
+      "8, 10, 4",
+      "8, 10, 5"
+    ],
+    "answer": 3,
+    "explanation": "COUNT(DEPT_CD)는 NULL이 아닌 모든 건수를 리턴하므로 NULL인 2건을 제외한 8이다. COUNT(*)는 모든 행의 건수를 리턴하므로 10이다. COUNT(DISTINCT DEPT_CD)는 DEPT_CD의 유일 값의 개수를 리턴하며 NULL은 제외되므로 101, 102, 103, 104 총 4개이다.",
+    "tags": ["COUNT", "NULL", "DISTINCT", "집계함수"],
+    "difficulty": "중",
+    "questionType": "result",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_020",
+    "part": 2,
+    "chapter": "1",
+    "content": "다음 중 포지션(POS_NM)별 평균 신장이 180 이상인 포지션의 정보를 추출하고 평균신장값을 기준으로 역순 정렬하는 SQL문 중 결과 집합이 다른 하나를 고르시오.\n\n```sql\n-- 보기1: GROUP BY A.POS_NM HAVING AVG(A.HEIGHT) >= 180 ORDER BY AVG(A.HEIGHT) DESC\n-- 보기2: HAVING AVG(A.HEIGHT) >= 180 GROUP BY A.POS_NM ORDER BY AVG(A.HEIGHT) DESC\n-- 보기3: 인라인뷰로 HEIGHT_AVG >= 180 필터 후 ORDER BY 2 DESC\n-- 보기4: 인라인뷰로 HEIGHT_AVG >= 180 필터 후 ORDER BY 1 DESC\n```",
+    "options": [
+      "GROUP BY → HAVING → ORDER BY AVG 순서 SQL",
+      "HAVING → GROUP BY → ORDER BY AVG 순서 SQL (절 순서 변경)",
+      "인라인뷰에서 AVG 계산 후 WHERE로 필터, ORDER BY 2 DESC",
+      "인라인뷰에서 AVG 계산 후 WHERE로 필터, ORDER BY 1 DESC"
+    ],
+    "answer": 4,
+    "explanation": "보기 4번은 가장 마지막에 'ORDER BY 1 DESC'를 사용하여 POS_NM(첫 번째 칼럼) 기준으로 역순 정렬을 하게 된다. 나머지 보기들은 평균신장(HEIGHT_AVG) 기준으로 역순 정렬하므로 서로 같은 결과를 도출한다. 또한 HAVING절이 GROUP BY절보다 먼저 나와도 실행 결과는 동일하다.",
+    "tags": ["GROUP BY", "HAVING", "ORDER BY", "인라인뷰"],
+    "difficulty": "중",
+    "questionType": "result",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_021",
+    "part": 2,
+    "chapter": "1",
+    "content": "다음 SQL문에서 ㉠에 들어갈 알맞은 키워드를 고르시오.\n\n```sql\nSELECT A.POS_NM AS 포지션\n     , AVG(HEIGHT) AS 평균키\nFROM TB_PLAYER_11 A\nGROUP BY A.POS_NM\nHAVING ㉠(A.HEIGHT) >= 185;\n```\n\n각 포지션에서 키가 185CM 이상인 선수를 보유한 포지션 및 평균키를 추출하려고 한다.",
+    "options": [
+      "MAX",
+      "MIN",
+      "AVG",
+      "SUM"
+    ],
+    "answer": 1,
+    "explanation": "각 포지션에서 최대 키가 185 이상이 존재하는 포지션을 구하기 위해 MAX 함수를 사용한다. HAVING MAX(A.HEIGHT) >= 185는 각 포지션 그룹에서 가장 큰 키 값이 185 이상인 포지션만 필터링한다. MIN을 사용하면 모든 선수가 185 이상인 포지션만 나오게 된다.",
+    "tags": ["HAVING", "MAX", "GROUP BY", "집계함수"],
+    "difficulty": "중",
+    "questionType": "completion",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_022",
+    "part": 2,
+    "chapter": "1",
+    "content": "SAL 칼럼에 NULL 값이 존재하는 TB_EMP_SAL_12 테이블에서 2019년도 기준 연봉이 높은 순서로 조회하는 SQL문으로 가장 적절한 것은? (오라클 기준, 오라클은 NULL을 가장 큰 값으로 처리)",
+    "options": [
+      "WHERE A.STD_YYYY = '2019' ORDER BY A.SAL DESC",
+      "WHERE A.STD_YYYY = '2019' ORDER BY A.STD_YYYY, A.SAL DESC",
+      "WHERE A.STD_YYYY = '2019' ORDER BY NVL(A.SAL, 0) DESC",
+      "WHERE A.STD_YYYY = '2019' ORDER BY NVL(A.SAL, 0) ASC"
+    ],
+    "answer": 3,
+    "explanation": "오라클은 NULL을 가장 큰 값으로 취급하므로, ORDER BY SAL DESC 시 NULL이 가장 먼저 나온다. NVL(A.SAL, 0)으로 NULL을 0으로 치환한 후 역순 정렬하면 실제 가장 높은 연봉이 먼저 나온다. 보기 3번이 NULL 처리를 올바르게 하면서 연봉 내림차순 정렬을 수행한다.",
+    "tags": ["NULL", "NVL", "ORDER BY", "오라클"],
+    "difficulty": "중",
+    "questionType": "concept",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_023",
+    "part": 2,
+    "chapter": "1",
+    "content": "다음 SQL문들 중 결과 집합이 다른 하나는 무엇인가? (GROUP BY STD_YYYY, SAL 기준)\n\n```sql\n-- 보기1: HAVING SAL IS NOT NULL\n-- 보기2: HAVING COUNT(SAL) >= 1\n-- 보기3: HAVING COUNT(SAL) >= 2\n-- 보기4: HAVING SAL > 0\n```",
+    "options": [
+      "HAVING SAL IS NOT NULL",
+      "HAVING COUNT(SAL) >= 1",
+      "HAVING COUNT(SAL) >= 2",
+      "HAVING SAL > 0"
+    ],
+    "answer": 3,
+    "explanation": "그룹핑 기준이 'GROUP BY STD_YYYY, SAL'이므로 COUNT(SAL)의 값은 1 혹은 0이 나온다. 보기 3번은 COUNT(SAL)이 2이상인 집합을 구하므로 아무런 집합도 출력되지 않는다. 보기 4번은 SAL > 0 조건으로 자연스럽게 SAL이 NULL인 행이 제외되어 보기 1번, 2번과 같은 결과가 나온다.",
+    "tags": ["HAVING", "COUNT", "GROUP BY", "NULL"],
+    "difficulty": "상",
+    "questionType": "result",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_024",
+    "part": 2,
+    "chapter": "1",
+    "content": "다음 중 조인에 대한 설명으로 가장 부적절한 것을 2개 고르시오. (복수 정답 중 대표 정답)",
+    "options": [
+      "3개 이상의 집합을 조인 시 3개 이상의 집합에 대하여 동시에 조인 연산을 수행하여 결과 집합을 출력한다.",
+      "3개 이상의 집합을 조인 시 특정 시점에는 반드시 2개의 집합에 대해서만 조인 연산을 수행하여 결과 집합을 출력한다.",
+      "2개 이상의 집합을 결합하여 데이터를 출력하는 것을 조인이라고 한다.",
+      "조인은 PK, FK의 연관관계에 의해서만 이루어지며 PK, FK가 아니면 조인이 성립되지 않는다."
+    ],
+    "answer": 1,
+    "explanation": "복수 정답(1번, 4번) 중 대표 정답. 조인은 특정 시점에 단 2개의 집합끼리 조인 연산이 이루어진다(보기 1번은 틀림). 또한 일반 칼럼이라도 논리적으로 성립되면 조인 연산이 가능하므로, PK/FK 연관관계가 없어도 조인이 가능하다(보기 4번은 틀림).",
+    "tags": ["JOIN", "조인", "PK", "FK"],
+    "difficulty": "중",
+    "questionType": "concept",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_025",
+    "part": 2,
+    "chapter": "1",
+    "content": "다음 3개의 테이블(TB_EMP_15, TB_EMP_SAL_15, TB_SAL_GRADE_15)을 조인하는 SQL문의 결과는 무엇인가?\n\n```sql\nSELECT COUNT(DISTINCT C.SAL_GRADE) AS CNT_SAL_GRADE\nFROM TB_EMP_15 A, TB_EMP_SAL_15 B, TB_SAL_GRADE_15 C\nWHERE A.EMP_NO = B.EMP_NO\nAND B.SAL BETWEEN C.LOW_SAL AND C.HIGH_SAL;\n```\n\n사원 2명, 각각 3개년도 연봉 보유. 연봉 등급: S(1억~), A(8천만~), B(6천만~), C(4천만~), D(3천만~), E(2천만~), F(0~)",
+    "options": [
+      "4",
+      "6",
+      "42",
+      "0"
+    ],
+    "answer": 1,
+    "explanation": "매칭되는 연봉등급(SAL_GRADE)은 B(75M), B(65M), C(55M), C(35M), D(35M), E(25M)가 출력된다. 이 중 유일 값(DISTINCT)의 개수는 B, C, D, E 총 4개이다. 따라서 COUNT(DISTINCT C.SAL_GRADE) = 4이다.",
+    "tags": ["JOIN", "BETWEEN", "COUNT DISTINCT", "다중테이블"],
+    "difficulty": "상",
+    "questionType": "result",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_026",
+    "part": 2,
+    "chapter": "2",
+    "content": "다음 중 E.F.CODD 박사의 논문에서 언급된 일반 집합 연산자와 현재 SQL언어의 기능을 매핑한 것으로 가장 적절한 것은 무엇인가?",
+    "options": [
+      "UNION 연산 → JOIN 기능으로",
+      "INTERSECION 연산 → JOIN 기능으로",
+      "DIFFERNCE 연산 → NOT EXISTS 기능으로",
+      "PRODUCT 연산 → CROSS JOIN 기능으로"
+    ],
+    "answer": 4,
+    "explanation": "일반 집합 연산자와 SQL 매핑: UNION 연산 → UNION 기능, INTERSECTION 연산 → INTERSECT 기능, DIFFERENCE 연산 → EXCEPT/MINUS 기능, PRODUCT 연산 → CROSS JOIN 기능. 따라서 보기 4번만 올바른 매핑이다.",
+    "tags": ["집합연산자", "UNION", "CROSS JOIN", "PRODUCT"],
+    "difficulty": "중",
+    "questionType": "concept",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_027",
+    "part": 2,
+    "chapter": "2",
+    "content": "다음 SQL1, SQL2, SQL3에 대한 설명으로 가장 적절한 것은 무엇인가?\n\n```sql\n-- SQL1: FROM EMP, DEPT WHERE EMP.DEPTNO = DEPT.DEPTNO\n-- SQL2: FROM EMP INNER JOIN DEPT ON EMP.DEPTNO = DEPT.DEPTNO\n-- SQL3: FROM EMP JOIN DEPT ON EMP.DEPTNO = DEPT.DEPTNO\n```",
+    "options": [
+      "SQL1, SQL2, SQL3의 결과 집합은 데이터 상황에 따라 모두 같거나 다를 수 있다.",
+      "SQL2는 'INNER JOIN'을 기재했기 때문에 EMP 테이블 먼저 읽은 후 DEPT 테이블과 조인을 수행한다.",
+      "SQL2는 'JOIN'을 기재했기 때문에 EMP 테이블 먼저 읽은 후 DEPT 테이블과 조인을 수행한다.",
+      "SQL3는 'INNER JOIN'에서 'INNER'를 생략한 상황이며 두 개의 테이블 중 어떤 테이블을 먼저 읽을지는 알 수 없다."
+    ],
+    "answer": 4,
+    "explanation": "SQL3는 INNER JOIN에서 INNER를 생략한 SQL문이다. 세 SQL문의 결과는 동일하다. 조인 순서는 SQL 문법에 의해 결정되는 것이 아니라 옵티마이저의 선택에 따르게 되므로, 어떤 테이블을 먼저 읽을지는 알 수 없다.",
+    "tags": ["INNER JOIN", "JOIN", "옵티마이저", "조인"],
+    "difficulty": "중",
+    "questionType": "concept",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_028",
+    "part": 2,
+    "chapter": "2",
+    "content": "다음 중 집합연산자에 대한 설명으로 가장 적절한 것은 무엇인가?",
+    "options": [
+      "여러 개의 질의 결과를 연결하여 하나로 결합하는 방식이므로 대용량 결과 질의에 적합하다.",
+      "집합연산자를 사용하는 상황은 반드시 서로 다른 테이블끼리의 연산이 이루어져야 한다.",
+      "SQL 튜닝 관점에서 실행계획을 분리하고자 하는 목적으로도 사용한다.",
+      "SELECT절의 칼럼 수가 동일하지 않아도 각 결과의 사이즈가 동일하면 된다."
+    ],
+    "answer": 3,
+    "explanation": "집합연산자는 SQL 튜닝 관점에서 실행계획을 분리하고자 하는 목적으로도 사용한다(보기 3번 정답). 보기 1번은 대용량 결과 질의와 상관없이 모두 사용 가능하다. 보기 2번은 같은 테이블끼리의 연산도 가능하다. 보기 4번은 SELECT절의 칼럼 수가 반드시 동일해야 한다.",
+    "tags": ["집합연산자", "UNION", "INTERSECT", "MINUS"],
+    "difficulty": "중",
+    "questionType": "concept",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_029",
+    "part": 2,
+    "chapter": "2",
+    "content": "다음 SQL문의 결과집합으로 가장 올바른 것은 무엇인가?\n\n```sql\nSELECT DISTINCT A.DEPT_NO\nFROM TB_EMP_19 A\nWHERE A.DEPT_NO = 'D00002'\nUNION ALL\nSELECT A.DEPT_NO\nFROM TB_EMP_19 A\nWHERE A.DEPT_NO = 'D00001'\nORDER BY DEPT_NO;\n```\n\n사원 데이터: E00001(D00001), E00002(D00001), E00003(D00002), E00004(D00003)",
+    "options": [
+      "D00001, D00002",
+      "D00001, D00001, D00002",
+      "SQL문법 에러",
+      "D00001, D00001"
+    ],
+    "answer": 2,
+    "explanation": "'DISTINCT A.DEPT_NO'의 DISTINCT는 첫번째 SELECT에서만 유효하다. 즉 두번째 SELECT문에서는 DEPT_NO가 'D00001'에 해당하는 직원이 2명이므로 2건이 출력된다. UNION ALL은 중복을 제거하지 않으므로 최종 결과는 D00001, D00001, D00002 총 3건이다.",
+    "tags": ["UNION ALL", "DISTINCT", "집합연산자"],
+    "difficulty": "상",
+    "questionType": "result",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_030",
+    "part": 2,
+    "chapter": "2",
+    "content": "다음 중 계층형 질의의 구문에 관한 설명 중 가장 부적절한 것은 무엇인가?",
+    "options": [
+      "START WITH절은 계층 구조 전개의 시작 위치를 지정하는 구문이다.",
+      "CONNECT BY절은 다음에 전개될 자식 데이터를 지정하는 구문이다.",
+      "ORDER SIBLINGS BY는 계층형 쿼리의 결과 집합에 대한 정렬 순서를 지정하는 구문이다.",
+      "WHERE은 계층형 쿼리의 모든 전개를 수행한 후에 만족하는 데이터를 추출한다."
+    ],
+    "answer": 3,
+    "explanation": "ORDER SIBLINGS BY는 형제 노드(동일 LEVEL) 사이에서 정렬을 수행하는 구문이다. 전체 결과 집합에 대한 정렬 순서를 지정하는 것이 아니라, 같은 부모를 가진 형제 노드들 간의 순서를 정렬한다. 전체 결과에 대한 정렬은 일반 ORDER BY를 사용한다.",
+    "tags": ["계층형쿼리", "CONNECT BY", "ORDER SIBLINGS BY", "START WITH"],
+    "difficulty": "중",
+    "questionType": "concept",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_031",
+    "part": 2,
+    "chapter": "2",
+    "content": "다음 계층형 쿼리 SQL문에서 ㉠에 들어갈 내용을 고르시오.\n\n```sql\nSELECT DEPT_NO\n     , ㉠(DEPT_NM, '/') AS DEPT_NM\n     , UPPER_DEPT_NO\nFROM TB_DEPT_21\nSTART WITH UPPER_DEPT_NO IS NULL\nCONNECT BY PRIOR DEPT_NO = UPPER_DEPT_NO;\n```\n\n실행결과: D00001 /회장실, D00002 /회장실/영업본부 D00001, ...",
+    "options": [
+      "SYS_CONNECT_BY_PATH",
+      "CONNECT_BY_PATH",
+      "LEVEL_PATH",
+      "HIER_PATH"
+    ],
+    "answer": 1,
+    "explanation": "SYS_CONNECT_BY_PATH 함수는 계층형 쿼리에서 루트에서 현재 노드까지의 경로를 지정한 구분자로 연결하여 반환하는 오라클 함수이다. SYS_CONNECT_BY_PATH(DEPT_NM, '/')는 각 부서명을 '/' 구분자로 연결하여 전체 경로를 표시한다.",
+    "tags": ["계층형쿼리", "SYS_CONNECT_BY_PATH", "CONNECT BY"],
+    "difficulty": "중",
+    "questionType": "completion",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_032",
+    "part": 2,
+    "chapter": "2",
+    "content": "다음 중 SQL문 내에서 서브 쿼리가 사용 가능한 위치로 가장 부적절한 것은 무엇인가?",
+    "options": [
+      "SELECT절",
+      "ORDER BY절",
+      "UPDATE문의 SET절",
+      "INSERT문의 INTO절"
+    ],
+    "answer": 4,
+    "explanation": "서브쿼리의 사용 가능 위치: SELECT절, FROM절, WHERE절, HAVING절, ORDER BY절, INSERT문의 VALUES절, UPDATE문의 SET절이다. INSERT문의 INTO절에는 서브쿼리를 사용할 수 없으며, INSERT문의 VALUES절에는 사용 가능하다.",
+    "tags": ["서브쿼리", "사용위치", "SELECT", "INSERT"],
+    "difficulty": "중",
+    "questionType": "concept",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_033",
+    "part": 2,
+    "chapter": "2",
+    "content": "각 부서별 생일이 가장 빠른 사람(나이가 많은 사람)의 사원번호, 사원명, 부서명, 생일을 출력하고 생일 빠른 순으로 정렬하는 SQL문으로 조건에 부합하는 것을 고르시오.\n\n결과: E00003 박경민 Data플랫폼팀 19830414, E00001 이경오 Data시각화팀 19840718, E00005 최철순 Data분석팀 19860112",
+    "options": [
+      "WHERE (A.DEPT_CD, BIRTH_DE) IN (SELECT B.DEPT_CD, MAX(BIRTH_DE) FROM TB_EMP_23 B GROUP BY B.DEPT_CD) ORDER BY A.DEPT_CD, A.BIRTH_DE",
+      "WHERE (A.DEPT_CD, BIRTH_DE) IN (SELECT B.DEPT_CD, MIN(BIRTH_DE) FROM TB_EMP_23 B GROUP BY B.DEPT_CD) ORDER BY A.DEPT_CD, A.BIRTH_DE",
+      "인라인뷰 MIN(BIRTH_DE) 조인 후 외부 조인(+) ORDER BY A.BIRTH_DE",
+      "WHERE (A.DEPT_CD, BIRTH_DE) IN (SELECT B.DEPT_CD, MIN(BIRTH_DE) FROM TB_EMP_23 B GROUP BY B.DEPT_CD) ORDER BY A.BIRTH_DE"
+    ],
+    "answer": 4,
+    "explanation": "보기 4번 SQL문이 DEPT_CD별 MIN(BIRTH_DE) 값을 구해서 부서별 생일이 가장 빠른 ROW를 찾은 후에 BIRTH_DE 기준으로 정렬한 집합을 출력하고 있다. 보기 1번은 MAX를 사용하여 가장 최근 생일을 구하므로 틀리다. 보기 2번은 MIN을 사용하지만 ORDER BY 기준이 A.DEPT_CD, A.BIRTH_DE로 결과 순서가 다르다.",
+    "tags": ["서브쿼리", "MIN", "인서브쿼리", "ORDER BY"],
+    "difficulty": "상",
+    "questionType": "result",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_034",
+    "part": 2,
+    "chapter": "2",
+    "content": "다음 빈칸에 들어갈 알맞은 서브쿼리 유형을 고르시오.\n\n1) 서브 쿼리의 실행 결과로 여러 칼럼을 반환한다. 메인 쿼리의 조건절에 여러 칼럼을 동시에 비교할 수 있다.\n2) 서브 쿼리와 메인쿼리에서 비교하고자하는 칼럼 개수와 칼럼의 위치가 동일해야 한다.",
+    "options": [
+      "다중 칼럼 서브 쿼리(Multi Column 서브 쿼리)",
+      "다중 행 서브 쿼리(Multi Row 서브 쿼리)",
+      "단일 행 서브 쿼리(Single Row 서브 쿼리)",
+      "연관 서브 쿼리(Correlated 서브 쿼리)"
+    ],
+    "answer": 1,
+    "explanation": "다중 칼럼 서브 쿼리(Multi Column 서브 쿼리)는 서브 쿼리의 실행 결과로 여러 칼럼을 반환하며, 메인 쿼리의 조건절에 여러 칼럼을 동시에 비교할 수 있다. 비교하고자 하는 칼럼 개수와 위치가 동일해야 한다는 특징도 있다.",
+    "tags": ["서브쿼리", "다중칼럼서브쿼리", "Multi Column"],
+    "difficulty": "중",
+    "questionType": "concept",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_035",
+    "part": 2,
+    "chapter": "2",
+    "content": "다음 ROLLUP 함수를 사용한 SQL문의 결과 집합의 건수는 몇 건인가?\n\n```sql\nSELECT B.DEPT_NM\n     , AVG(A.CUR_SAL) AS CUR_SAL\nFROM TB_EMP_25 A, TB_DEPT_25 B\nWHERE A.DEPT_CD = B.DEPT_CD\nGROUP BY ROLLUP(B.DEPT_NM);\n```\n\n부서: 5개(D101~D105), 각 부서당 2명씩 총 10명",
+    "options": [
+      "5",
+      "10",
+      "50",
+      "6"
+    ],
+    "answer": 4,
+    "explanation": "DEPT_NM 칼럼만을 ROLLUP했기 때문에 DEPT_NM의 유일 값 5개, 전체 합계를 위한 행 1개 총 6건의 ROW가 출력된다. ROLLUP(A)는 A별 소계 + 전체 합계를 생성하므로 N+1건이 나온다.",
+    "tags": ["ROLLUP", "GROUP BY", "그룹함수", "집계"],
+    "difficulty": "중",
+    "questionType": "result",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_036",
+    "part": 2,
+    "chapter": "2",
+    "content": "두 개의 SQL문의 결과 집합이 동일하다고 가정했을 때 ㉠, ㉡에 들어갈 내용으로 가장 적절한 것은?\n\n```sql\n-- SQL1: GROUP BY ㉠\n-- SQL2: GROUP BY ㉡\n```",
+    "options": [
+      "㉠: ROLLUP(A.JOB_NM, B.DEPT_NM) / ㉡: GROUPING SETS(A.JOB_NM, B.DEPT_NM, ())",
+      "㉠: ROLLUP(A.JOB_NM, B.DEPT_NM) / ㉡: GROUPING SETS((A.JOB_NM, B.DEPT_NM), A.JOB_NM, ())",
+      "㉠: ROLLUP(B.DEPT_NM, A.JOB_NM) / ㉡: GROUPING SETS((A.JOB_NM, B.DEPT_NM), A.JOB_NM, ())",
+      "㉠: ROLLUP(B.DEPT_NM, A.JOB_NM) / ㉡: GROUPING SETS(B.DEPT_NM, A.JOB_NM, ())"
+    ],
+    "answer": 2,
+    "explanation": "ROLLUP(A.JOB_NM, B.DEPT_NM)은 (A.JOB_NM, B.DEPT_NM) 조합별 소계, A.JOB_NM별 소계, 전체 합계 3단계를 생성한다. 이와 동일한 결과를 GROUPING SETS로 표현하면 GROUPING SETS((A.JOB_NM, B.DEPT_NM), A.JOB_NM, ())가 된다. 보기 2번이 올바른 매핑이다.",
+    "tags": ["ROLLUP", "GROUPING SETS", "그룹함수", "집계"],
+    "difficulty": "상",
+    "questionType": "completion",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_037",
+    "part": 2,
+    "chapter": "2",
+    "content": "CUBE에 대한 설명에서 ㉠에 들어갈 숫자를 고르시오.\n\nCUBE는 GROUPING COLUMNS이 가질 수 있는 모든 경우의 수에 대하여 SUBTOTAL을 생성하므로 GROUPING COLUMNS의 수가 N이라고 가정하면 ㉠의 N승 LEVEL의 SUBTOTAL을 생성하게 된다.",
+    "options": [
+      "2",
+      "3",
+      "N",
+      "4"
+    ],
+    "answer": 1,
+    "explanation": "CUBE는 GROUPING COLUMNS의 수가 N일 때 2의 N승 LEVEL의 SUBTOTAL을 생성한다. 예를 들어 GROUPING COLUMNS의 수가 2개이면 2의 2승 = 4 LEVEL의 SUBTOTAL을 생성하게 된다. ROLLUP은 N+1 LEVEL이지만 CUBE는 2^N LEVEL이다.",
+    "tags": ["CUBE", "그룹함수", "SUBTOTAL", "집계"],
+    "difficulty": "중",
+    "questionType": "completion",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_038",
+    "part": 2,
+    "chapter": "2",
+    "content": "다음 SQL문의 결과 집합은 무엇인가?\n\n```sql\nSELECT SUM(DENSE_RANK_CUR_SAL) SUM_DENSE_RANK_CUR_SAL\nFROM (\n  SELECT DISTINCT DENSE_RANK() OVER (ORDER BY CUR_SAL) DENSE_RANK_CUR_SAL\n  FROM TB_EMP_28\n);\n```\n\n연봉 데이터: 45M, 40M, 40M, 35M, 50M, 45M, 65M, 60M, 35M, 30M (총 10명)",
+    "options": [
+      "37",
+      "28",
+      "40",
+      "SQL문법 오류발생"
+    ],
+    "answer": 2,
+    "explanation": "DENSE_RANK는 중복되는 순위를 하나의 순위로 매겨준다. 연봉이 35M 2건, 40M 2건, 45M 2건으로 중복이 있어서 10명 중 7등까지만 등수가 매겨진다. DISTINCT로 중복 등수를 제거하면 1,2,3,4,5,6,7이 나오게 되고, 그 합은 1+2+3+4+5+6+7 = 28이다.",
+    "tags": ["DENSE_RANK", "윈도우함수", "DISTINCT", "SUM"],
+    "difficulty": "상",
+    "questionType": "result",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_039",
+    "part": 2,
+    "chapter": "2",
+    "content": "다음 SQL문의 결과로 올바른 것은 무엇인가?\n\n```sql\nSELECT EMP_NO, EMP_NM, COUNT(DEPT_CD) OVER(PARTITION BY SEX_CD) AS CNT\nFROM TB_EMP_29;\n```\n\n데이터: 남성(SEX_CD='1') 3명(모두 DEPT_CD 있음), 여성(SEX_CD='2') 4명 중 차은영(DEPT_CD=NULL)",
+    "options": [
+      "남성 CNT=3, 여성 모두 CNT=0",
+      "남성 CNT=3, 여성 모두 CNT=4",
+      "남성 CNT=3, 여성 모두 CNT=4 (차은영 포함)",
+      "남성 CNT=3, 여성 모두 CNT=3"
+    ],
+    "answer": 4,
+    "explanation": "COUNT(DEPT_CD) OVER(PARTITION BY SEX_CD)는 성별별로 DEPT_CD가 NULL이 아닌 건수를 계산한다. 여성 4명 중 차은영의 DEPT_CD가 NULL이므로 여성 파티션의 CNT는 3이 된다. 남성 3명은 모두 DEPT_CD가 있으므로 CNT=3이다. 따라서 모든 직원의 CNT는 3이 된다.",
+    "tags": ["윈도우함수", "PARTITION BY", "COUNT", "NULL"],
+    "difficulty": "중",
+    "questionType": "result",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_040",
+    "part": 2,
+    "chapter": "2",
+    "content": "다음 SQL문의 ㉠에 들어갈 알맞은 분석 함수 및 인자를 고르시오. (결과집합: CUR_SAL_SE가 1, 1, 2, 2로 구분)\n\n```sql\nSELECT A.EMP_NO, A.EMP_NM\n     , ㉠ OVER (ORDER BY CUR_SAL DESC) AS CUR_SAL_SE\n     , CUR_SAL\nFROM TB_EMP_30 A;\n```\n\n데이터: 이경오(80M), 이동민(60M), 김철수(40M), 박상진(20M)",
+    "options": [
+      "NTILE(2)",
+      "RANK(2)",
+      "DENSE_RANK(2)",
+      "ROW_NUMBER(2)"
+    ],
+    "answer": 1,
+    "explanation": "NTILE 함수를 이용해 전체 건수를 인자 값으로 N등분한 결과를 구할 수 있다. NTILE(2)는 전체를 2개 그룹으로 나누어 1~2 값을 할당한다. 4건을 2등분하면 상위 2건이 1, 하위 2건이 2가 되어 결과집합과 일치한다.",
+    "tags": ["NTILE", "윈도우함수", "분석함수"],
+    "difficulty": "중",
+    "questionType": "completion",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_041",
+    "part": 2,
+    "chapter": "3",
+    "content": "다음 스크립트를 실행한 경우 최종적으로 어떠한 동작을 하게 되는가?\n\n```sql\nCONN SYSTEM/1234\nCREATE USER DCL IDENTIFIED BY 1234;\nGRANT CONNECT, RESOURCE, DBA TO DCL;\nCONN DCL/1234\nCREATE TABLE DCL_TABLE_31 (DCL_COL1 NUMBER);\nINSERT INTO DCL_TABLE_31 VALUES (1);\nCOMMIT;\nCONN SYSTEM/1234\nDROP USER DCL;\n```",
+    "options": [
+      "신규로 생성한 DCL계정에서 DBA권한을 주려고 했으므로 ⓒ단계에서 스크립트가 실패한다.",
+      "ⓓ단계에서 CREATE SESSION 권한이 없으므로 DCL 사용자로 접속에 실패한다.",
+      "ⓘ단계에서 DCL 계정으로 테이블 및 데이터를 가지고 있으므로 계정 제거에 실패한다.",
+      "ⓘ단계에서 DCL 계정을 제거하고 DCL 계정이 소유한 테이블 또한 제거한다."
+    ],
+    "answer": 3,
+    "explanation": "DROP USER 시 CASCADE 옵션을 주지 않으면 'ORA-01922: DCL(을)를 삭제하려면 CASCADE를 지정하여야 합니다' 에러가 발생하며 계정 제거에 실패한다. DCL 계정이 테이블 및 데이터를 보유하고 있기 때문이다. CASCADE 옵션을 사용해야 관련 객체까지 함께 삭제된다.",
+    "tags": ["DROP USER", "CASCADE", "DCL", "권한"],
+    "difficulty": "중",
+    "questionType": "concept",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_042",
+    "part": 2,
+    "chapter": "3",
+    "content": "다음 빈칸에 들어갈 알맞은 SQL 키워드를 고르시오.\n\n```sql\n-- SYSTEM계정으로 접속\nDROP USER DCL ㉠;\n```\n\n이 SQL문은 DCL 유저가 가지고 있는 모든 오브젝트 및 유저를 제거하는 SQL문이다.",
+    "options": [
+      "CASCADE",
+      "FORCE",
+      "ALL",
+      "PURGE"
+    ],
+    "answer": 1,
+    "explanation": "CASCADE를 사용하면 사용자 이름과 관련된 모든 데이터베이스 스키마가 데이터 사전으로부터 삭제되며 모든 스키마 객체들 또한 물리적으로 삭제된다. DROP USER DCL CASCADE는 DCL 계정과 그 계정이 소유한 모든 객체를 한 번에 제거한다.",
+    "tags": ["DROP USER", "CASCADE", "DCL"],
+    "difficulty": "하",
+    "questionType": "completion",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_043",
+    "part": 2,
+    "chapter": "3",
+    "content": "오라클 PL/SQL의 블록 구조는 DECLARE, BEGIN, EXCEPTION, END로 나누어져 있다. 다음 중 PL/SQL의 블록 구조에 대한 설명으로 가장 부적절한 것은 무엇인가?",
+    "options": [
+      "DECLARE는 선언부로써 사용할 변수나 인수에 대한 정의 및 데이터 타입을 선언한다. 아무런 변수도 사용하지 않을 경우에도 반드시 선언해야 한다.",
+      "BEGIN은 실행부로써 개발자가 처리하고 하는 SQL문과 필요한 로직이 정의되는 실행부이다. 반드시 선언해야 하는 필수항목이다.",
+      "EXCEPTION은 BEGIN~END에서 실행되는 SQL문에 발생된 에러를 처리하는 에러처리부이다. 반드시 선언해야 한다.",
+      "END는 실행부의 종료를 명시해주는 기능을 하며 반드시 선언해야 한다."
+    ],
+    "answer": 3,
+    "explanation": "EXCEPTION은 선택항목으로 생략이 가능하다. 반드시 선언해야 하는 것은 아니다. PL/SQL에서 필수 항목은 BEGIN과 END이며, DECLARE와 EXCEPTION은 선택 항목이다. 변수를 사용하지 않을 경우 DECLARE를 생략할 수 있다.",
+    "tags": ["PL/SQL", "DECLARE", "EXCEPTION", "블록구조"],
+    "difficulty": "중",
+    "questionType": "concept",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_044",
+    "part": 2,
+    "chapter": "3",
+    "content": "다음 사용자 정의 함수 FN_EMP_CNT_BY_EMP_NM_34를 이용한 SQL문의 결과값은 무엇인가? (결과는 숫자)\n\n```sql\nSELECT SUM(FN_EMP_CNT_BY_EMP_NM_34(SUBSTR(A.EMP_NM, 1, 1))\n         - FN_EMP_CNT_BY_EMP_NM_34(A.EMP_NM)) AS CNT_SUM\nFROM TB_EMP_34 A;\n```\n\n데이터: 이경오, 이수진, 권수철, 이지은, 정수라, 김연정",
+    "options": [
+      "3",
+      "6",
+      "9",
+      "0"
+    ],
+    "answer": 2,
+    "explanation": "'이'씨 성을 가진 사람은 3명이다. '권'씨, '정'씨, '김'씨는 각각 1명씩이다. '이'씨 성을 가진 각 사람에 대해 (성씨 기준 COUNT) - (이름 기준 COUNT) = 3 - 1 = 2가 출력되고, 3명이므로 2+2+2=6이다. 그 외 성씨는 1 - 1 = 0이다. 따라서 총합은 6이다.",
+    "tags": ["사용자정의함수", "SUBSTR", "SUM", "PL/SQL"],
+    "difficulty": "상",
+    "questionType": "result",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_045",
+    "part": 2,
+    "chapter": "3",
+    "content": "다음 중 옵티마이저에 대한 설명 중 가장 부적절한 것은 무엇인가?",
+    "options": [
+      "사용자가 질의한 SQL문에 대해 최적의 실행 방법을 결정하는 역할을 수행한다.",
+      "다양한 실행 방법들 중에서 최적의 실행방법을 결정하는 역할을 한다.",
+      "관계형 데이터베이스는 옵티마이저가 결정한 실행방법대로 실행 엔진이 데이터를 처리하여 결과 데이터를 사용자에게 전달한다.",
+      "옵티마이저 내부적으로 실제 SQL문을 처리한 후 실행계획을 수립하고 SQL을 실행하여 사용자에게 결과를 전달한다."
+    ],
+    "answer": 4,
+    "explanation": "옵티마이저는 실제로 SQL문을 처리해보지 않은 상태에서 실행계획을 결정해야 한다. 옵티마이저는 통계 정보, 히스토그램 등 다양한 정보를 바탕으로 실행 전에 최적의 실행계획을 수립한다. 실제로 SQL을 실행해본 후 계획을 세우는 것이 아니다.",
+    "tags": ["옵티마이저", "실행계획", "SQL최적화"],
+    "difficulty": "중",
+    "questionType": "concept",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_046",
+    "part": 2,
+    "chapter": "3",
+    "content": "다음 중 실행계획을 구성하는 요소에 해당하지 않는 것은?",
+    "options": [
+      "조인 순서",
+      "조인 기법",
+      "액세스 기법",
+      "수행 속도"
+    ],
+    "answer": 4,
+    "explanation": "실행계획을 구성하는 요소에는 조인 순서, 조인 기법, 액세스 기법, 최적화 정보, 연산 등이 있다. '수행 속도'는 실행계획의 구성 요소가 아니라 실행계획 실행 결과로 나타나는 성능 지표이다.",
+    "tags": ["실행계획", "옵티마이저", "조인기법", "액세스기법"],
+    "difficulty": "하",
+    "questionType": "concept",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_047",
+    "part": 2,
+    "chapter": "3",
+    "content": "다음 중 B-TREE 인덱스의 구조에서 구성요소로 가장 부적절한 것은 무엇인가?",
+    "options": [
+      "Root Block",
+      "Branch Block",
+      "Root Level",
+      "Leaf Block"
+    ],
+    "answer": 3,
+    "explanation": "B-TREE 인덱스는 Root Block, Branch Block, Leaf Block으로 이루어져 있다. 'Root Level'은 B-TREE 인덱스의 공식 구성요소 명칭이 아니다. Root Block은 인덱스의 최상위, Branch Block은 중간 단계, Leaf Block은 실제 인덱스 키와 ROWID를 저장하는 최하위 블록이다.",
+    "tags": ["B-TREE인덱스", "인덱스구조", "Root Block", "Leaf Block"],
+    "difficulty": "하",
+    "questionType": "concept",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_048",
+    "part": 2,
+    "chapter": "3",
+    "content": "다음 중 옵티마이저가 풀 테이블 스캔 방식을 선택하는 상황 중 가장 부적절한 것은?",
+    "options": [
+      "SQL문의 WHERE절에 조건이 존재하지 않는 경우",
+      "SQL문의 WHERE절에 조건 중 사용 가능한 인덱스가 존재하지 않는 경우",
+      "옵티마이저의 판단 결과 테이블 풀 스캔이 비용상 유리하다고 판단되는 경우",
+      "적절한 인덱스가 있지만 테이블의 데이터가 대용량인 경우"
+    ],
+    "answer": 4,
+    "explanation": "인덱스 스캔을 할지 테이블 풀 스캔을 할지는 옵티마이저가 비용 기반으로 판단한다. 적절한 인덱스가 있더라도 테이블 데이터가 대용량일 경우에는 반드시 풀 테이블 스캔을 선택하는 것은 아니다. 오히려 인덱스를 활용하는 경우도 많으므로 보기 4번은 부적절한 설명이다.",
+    "tags": ["옵티마이저", "풀테이블스캔", "인덱스", "비용기반"],
+    "difficulty": "중",
+    "questionType": "concept",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_049",
+    "part": 2,
+    "chapter": "3",
+    "content": "다음은 NL조인의 연산 과정이다. NL 조인의 연산 순서로 가장 적절한 것은?\n\n(1) INNER 집합을 액세스하고 매칭되는 ROW를 결과 집합에 포함\n(2) OUTER 집합의 조인 키를 가지고 INNER 집합에 조인 키가 존재하는지 찾으러 감\n(3) OUTER 집합에서 조건을 만족하는 첫 번째 ROW를 찾음\n(4) INNER 집합에서 OUTER 집합의 조인 칼럼의 값이 존재하는지 확인\n(5) OUTER 집합의 모든 ROW가 작업을 다 마칠 때까지 해당 과정 반복",
+    "options": [
+      "(2) → (1) → (3) → (4) → (5)",
+      "(3) → (2) → (4) → (1) → (5)",
+      "(3) → (4) → (2) → (1) → (5)",
+      "(2) → (3) → (1) → (4) → (5)"
+    ],
+    "answer": 2,
+    "explanation": "NL 조인 연산 순서: 1) OUTER 집합에서 조건을 만족하는 첫 번째 ROW를 찾음 → 2) OUTER 집합의 조인 키를 가지고 INNER 집합을 찾으러 감 → 3) INNER 집합에서 조인 칼럼 값이 존재하는지 확인 → 4) INNER 집합을 액세스하고 매칭되는 ROW를 결과 집합에 포함 → 5) OUTER 집합의 모든 ROW가 작업을 마칠 때까지 반복",
+    "tags": ["NL조인", "조인기법", "실행순서", "옵티마이저"],
+    "difficulty": "중",
+    "questionType": "concept",
+    "source": "mockexam1"
+  },
+  {
+    "id": "me1_050",
+    "part": 2,
+    "chapter": "3",
+    "content": "다음 중 조인 기법에 대한 설명으로 가장 부적절한 것은?",
+    "options": [
+      "NL조인은 결과 행의 수가 적은 집합을 조인 순서상 선행 집합으로 선택하는 것이 전체 일의 양을 줄인다.",
+      "HASH조인은 결과 행의 수가 적은 집합을 선행 집합으로 사용하는 것이 성능 상 유리하다.",
+      "HASH조인에서 선행 집합을 BUILD INPUT이라고 하며 후행 집합을 PROBE INPUT이라고 한다.",
+      "NL조인은 선행 집합을 스캔 시 반드시 인덱스 스캔을 할 필요는 없지만 후행 집합을 스캔 시에는 반드시 인덱스가 필요하다."
+    ],
+    "answer": 4,
+    "explanation": "NL조인에서 후행 집합을 스캔 시 효율적인 인덱스가 있어야 성능상 훨씬 유리하다고 할 수 있지만, 반드시 필요한 것은 아니다. 인덱스 없이도 NL조인은 수행 가능하나 성능이 저하될 수 있다. HASH조인의 BUILD INPUT(선행 집합)은 결과 행이 적은 집합을 선택하는 것이 메모리 효율 면에서 유리하다.",
+    "tags": ["NL조인", "HASH조인", "조인기법", "인덱스"],
+    "difficulty": "중",
+    "questionType": "concept",
+    "source": "mockexam1"
+  }
+]

@@ -1,0 +1,512 @@
+[
+  {
+    "id": "p2c2_001",
+    "part": 2,
+    "chapter": "2",
+    "questionType": "concept",
+    "content": "다음 중 조인(JOIN)에 대한 설명으로 올바르지 않은 것은?",
+    "options": [
+      "INNER JOIN은 두 테이블에서 조인 조건을 만족하는 행만 반환한다",
+      "FULL OUTER JOIN은 두 테이블의 모든 행을 반환하고 매칭되지 않는 쪽은 NULL로 채운다",
+      "CROSS JOIN의 결과 행 수는 두 테이블 행 수의 합이다",
+      "NATURAL JOIN은 두 테이블에서 이름과 타입이 같은 컬럼으로 자동 조인한다"
+    ],
+    "answer": 3,
+    "explanation": "CROSS JOIN(카테시안 곱)의 결과 행 수는 두 테이블 행 수의 '곱'이다. 예를 들어 A 테이블이 5행, B 테이블이 4행이면 CROSS JOIN 결과는 5×4=20행이 된다. '합'이 아닌 '곱'이라는 점이 중요하다. INNER JOIN은 공통 행만, FULL OUTER JOIN은 양쪽 모두, NATURAL JOIN은 동명 컬럼으로 자동 조인한다.",
+    "tags": ["JOIN", "CROSS JOIN", "조인유형"],
+    "difficulty": "하"
+  },
+  {
+    "id": "p2c2_002",
+    "part": 2,
+    "chapter": "2",
+    "questionType": "result",
+    "content": "아래 테이블에서 SQL을 실행한 결과 행 수로 올바른 것은?\n\n**EMP 테이블**\n\n| EMPNO | ENAME | DEPTNO |\n|-------|-------|--------|\n| 1001  | 홍길동 | 10     |\n| 1002  | 이순신 | 20     |\n| 1003  | 장보고 | 30     |\n| 1004  | 강감찬 | NULL   |\n\n**DEPT 테이블**\n\n| DEPTNO | DNAME    |\n|--------|----------|\n| 10     | 영업팀   |\n| 20     | 개발팀   |\n| 40     | 기획팀   |\n\n```sql\nSELECT E.ENAME, D.DNAME\n  FROM EMP E, DEPT D\n WHERE E.DEPTNO = D.DEPTNO(+);\n```",
+    "options": [
+      "2행",
+      "3행",
+      "4행",
+      "5행"
+    ],
+    "answer": 3,
+    "explanation": "Oracle의 (+)는 LEFT OUTER JOIN을 나타낸다. DEPT 쪽에 (+)가 있으므로 EMP의 모든 행을 기준으로 조인한다. EMP의 4행 중 DEPTNO=10(매칭), DEPTNO=20(매칭), DEPTNO=30(DEPT에 없으므로 NULL), DEPTNO=NULL(매칭 없어 NULL)이 포함되어 총 4행이 반환된다.",
+    "tags": ["OUTER JOIN", "Oracle", "(+)표기법"],
+    "difficulty": "상"
+  },
+  {
+    "id": "p2c2_003",
+    "part": 2,
+    "chapter": "2",
+    "questionType": "concept",
+    "content": "다음 집합 연산자 중 순수 관계 연산자의 PROJECT와 대응되는 SQL 절은?",
+    "options": [
+      "WHERE 절",
+      "SELECT 절",
+      "FROM 절",
+      "HAVING 절"
+    ],
+    "answer": 2,
+    "explanation": "순수 관계 연산자와 SQL 절의 대응 관계: PROJECT(특정 컬럼 선택) = SELECT 절, RESTRICT/SELECT(특정 행 선택) = WHERE 절, JOIN(두 테이블 조인) = JOIN 절/FROM 절, DIVIDE = 서브쿼리 조합. PROJECT는 수직적 부분 집합(컬럼 선택)이므로 SQL에서 SELECT 절에 해당한다.",
+    "tags": ["관계대수", "PROJECT", "순수관계연산자"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c2_004",
+    "part": 2,
+    "chapter": "2",
+    "questionType": "concept",
+    "content": "다음 중 집합 연산자 사용 시 규칙으로 올바른 것은?",
+    "options": [
+      "UNION과 UNION ALL은 항상 동일한 결과를 반환한다",
+      "집합 연산자로 연결된 각 SELECT는 서로 다른 수의 컬럼을 가질 수 있다",
+      "집합 연산자를 사용할 때 ORDER BY는 마지막 SELECT 이후에 한 번만 사용할 수 있다",
+      "INTERSECT와 MINUS는 중복된 결과를 포함하여 반환한다"
+    ],
+    "answer": 3,
+    "explanation": "집합 연산자(UNION, UNION ALL, INTERSECT, MINUS) 사용 시 ORDER BY는 전체 결과를 정렬하는 것이므로 마지막 SELECT 문 뒤에 한 번만 사용할 수 있다. 각 SELECT의 컬럼 수는 동일해야 하고, 데이터 타입은 호환되어야 한다. UNION ALL만 중복을 허용하고 나머지는 중복을 제거한다.",
+    "tags": ["집합연산자", "ORDER BY", "UNION"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c2_005",
+    "part": 2,
+    "chapter": "2",
+    "questionType": "result",
+    "content": "아래 테이블에서 SQL을 실행한 결과의 행 수로 올바른 것은?\n\n**T1 테이블**: A, B, C, D (4행)\n\n**T2 테이블**: C, D, E, F (4행)\n\n```sql\nSELECT VAL FROM T1\nUNION ALL\nSELECT VAL FROM T2\nUNION\nSELECT VAL FROM T1;\n```",
+    "options": [
+      "4행",
+      "6행",
+      "8행",
+      "12행"
+    ],
+    "answer": 2,
+    "explanation": "집합 연산자는 위에서 아래로 순서대로 처리된다(같은 우선순위). 먼저 'T1 UNION ALL T2' = A,B,C,D,C,D,E,F (8행). 그 다음 '결과 UNION T1' = A,B,C,D,C,D,E,F 에서 중복 제거하면 A,B,C,D,E,F (6행). 최종 결과는 6행이다.",
+    "tags": ["집합연산자", "UNION ALL", "UNION"],
+    "difficulty": "상"
+  },
+  {
+    "id": "p2c2_006",
+    "part": 2,
+    "chapter": "2",
+    "questionType": "concept",
+    "content": "Oracle 계층형 쿼리에서 ORDER SIBLINGS BY에 대한 설명으로 올바른 것은?",
+    "options": [
+      "전체 결과를 지정한 컬럼으로 정렬한다",
+      "같은 레벨의 형제 노드 간에만 정렬하며 계층 구조를 유지한다",
+      "부모-자식 관계의 순서를 반대로 뒤집는다",
+      "루트에서 리프 방향으로 정렬하는 기능이다"
+    ],
+    "answer": 2,
+    "explanation": "ORDER SIBLINGS BY는 계층형 쿼리에서 같은 레벨(형제 노드)끼리만 정렬하면서 부모-자식 계층 구조를 유지한다. 일반 ORDER BY를 사용하면 계층 구조가 무너지고 전체 행을 기준으로 정렬된다. 따라서 계층 구조를 유지하면서 정렬할 때는 ORDER SIBLINGS BY를 사용해야 한다.",
+    "tags": ["계층형쿼리", "ORDER SIBLINGS BY"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c2_007",
+    "part": 2,
+    "chapter": "2",
+    "questionType": "completion",
+    "content": "다음 SQL의 빈칸에 들어갈 내용으로 올바른 것은?\n\n```sql\nSELECT EMPNO, ENAME, DEPTNO,\n       ______(DEPTNO || '/' || ENAME, '/') AS PATH\n  FROM EMP\nSTART WITH MGR IS NULL\nCONNECT BY PRIOR EMPNO = MGR;\n```\n\n(단, 루트부터 현재 노드까지의 경로를 '/'로 구분하여 표시)",
+    "options": [
+      "CONNECT_BY_PATH",
+      "SYS_CONNECT_BY_PATH",
+      "CONNECT_BY_ROOT",
+      "LEVEL_PATH"
+    ],
+    "answer": 2,
+    "explanation": "SYS_CONNECT_BY_PATH(컬럼, 구분자)는 계층형 쿼리에서 루트 노드부터 현재 행까지의 계층 경로를 구분자로 연결하여 반환한다. 예를 들어 '루트/중간/현재노드' 형태의 경로 문자열을 생성한다. CONNECT_BY_ROOT는 루트 노드의 값을 반환하고, CONNECT_BY_ISLEAF는 리프 노드 여부(0/1)를 반환한다.",
+    "tags": ["계층형쿼리", "SYS_CONNECT_BY_PATH"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c2_008",
+    "part": 2,
+    "chapter": "2",
+    "questionType": "concept",
+    "content": "다음 중 서브쿼리를 사용할 수 없는 위치는?",
+    "options": [
+      "SELECT 절",
+      "FROM 절",
+      "WHERE 절",
+      "GROUP BY 절"
+    ],
+    "answer": 4,
+    "explanation": "서브쿼리는 SELECT 절(스칼라 서브쿼리), FROM 절(인라인 뷰), WHERE 절(중첩 서브쿼리), HAVING 절, ORDER BY 절 등에서 사용 가능하다. 그러나 GROUP BY 절에서는 서브쿼리를 사용할 수 없다. 또한 ORDER BY 절에서는 스칼라 서브쿼리가 가능하다.",
+    "tags": ["서브쿼리", "사용위치"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c2_009",
+    "part": 2,
+    "chapter": "2",
+    "questionType": "result",
+    "content": "아래 테이블에서 SQL을 실행한 결과로 올바른 것은?\n\n**EMP 테이블**\n\n| EMPNO | ENAME  | DEPTNO | BIRTHDAY   |\n|-------|--------|--------|------------|\n| 1001  | 홍길동 | 10     | 1990-05-01 |\n| 1002  | 이순신 | 10     | 1985-03-15 |\n| 1003  | 장보고 | 20     | 1992-07-20 |\n| 1004  | 강감찬 | 20     | 1988-11-30 |\n\n```sql\nSELECT DEPTNO, MIN(BIRTHDAY) AS OLDEST\n  FROM EMP\n GROUP BY DEPTNO\n ORDER BY DEPTNO;\n```",
+    "options": [
+      "10: 1990-05-01, 20: 1992-07-20",
+      "10: 1985-03-15, 20: 1988-11-30",
+      "10: 1990-05-01, 20: 1988-11-30",
+      "10: 1985-03-15, 20: 1992-07-20"
+    ],
+    "answer": 2,
+    "explanation": "MIN(BIRTHDAY)는 날짜 값이 가장 작은(가장 오래된 생일) 값을 반환한다. DEPTNO 10에서 최솟값은 1985-03-15(이순신), DEPTNO 20에서 최솟값은 1988-11-30(강감찬)이다. 날짜에서 MIN은 가장 이른 날짜(가장 오래된)를 반환하므로 10: 1985-03-15, 20: 1988-11-30이 정답이다.",
+    "tags": ["집계함수", "MIN", "날짜"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c2_010",
+    "part": 2,
+    "chapter": "2",
+    "questionType": "result",
+    "content": "아래 테이블에서 SQL을 실행한 결과 행 수로 올바른 것은?\n\n**SALES 테이블**\n\n| REGION | PRODUCT | AMOUNT |\n|--------|---------|--------|\n| 서울   | A       | 1000   |\n| 서울   | B       | 2000   |\n| 부산   | A       | 1500   |\n| 부산   | B       | 2500   |\n| 인천   | A       | 800    |\n\n```sql\nSELECT REGION, PRODUCT, SUM(AMOUNT)\n  FROM SALES\n GROUP BY ROLLUP(REGION, PRODUCT);\n```",
+    "options": [
+      "5행",
+      "6행",
+      "9행",
+      "12행"
+    ],
+    "answer": 3,
+    "explanation": "ROLLUP(REGION, PRODUCT) 실행 시 생성되는 행: ①상세 데이터(REGION, PRODUCT별): 서울-A, 서울-B, 부산-A, 부산-B, 인천-A = 5행, ②REGION별 소계: 서울, 부산, 인천 = 3행, ③전체 합계: 1행. 총 5+3+1=9행이 반환된다.",
+    "tags": ["그룹함수", "ROLLUP"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c2_011",
+    "part": 2,
+    "chapter": "2",
+    "questionType": "concept",
+    "content": "다음 중 ROLLUP(A, B)와 동일한 결과를 반환하는 GROUPING SETS 표현으로 올바른 것은?",
+    "options": [
+      "GROUPING SETS((A, B), (A), (B))",
+      "GROUPING SETS((A, B), (A), ())",
+      "GROUPING SETS((A), (B), ())",
+      "GROUPING SETS((A, B), (B), ())"
+    ],
+    "answer": 2,
+    "explanation": "ROLLUP(A, B)는 (A, B)→(A)→() 순서의 계층적 소계를 생성한다. 이는 GROUPING SETS((A, B), (A), ())와 동일하다. CUBE(A, B)는 GROUPING SETS((A, B), (A), (B), ())와 동일하다. ROLLUP은 맨 오른쪽 컬럼부터 순차적으로 제거하는 방식으로 소계를 생성한다.",
+    "tags": ["그룹함수", "ROLLUP", "GROUPING SETS"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c2_012",
+    "part": 2,
+    "chapter": "2",
+    "questionType": "completion",
+    "content": "다음 SQL의 빈칸에 들어갈 내용으로 올바른 것은?\n\n```sql\nSELECT REGION, PRODUCT, SUM(AMOUNT),\n       GROUPING(REGION) AS GRP_REGION,\n       ______(PRODUCT) AS GRP_PRODUCT\n  FROM SALES\n GROUP BY CUBE(REGION, PRODUCT)\n ORDER BY REGION, PRODUCT;\n```",
+    "options": [
+      "CUBE",
+      "ROLLUP",
+      "GROUPING",
+      "GROUPING_ID"
+    ],
+    "answer": 3,
+    "explanation": "GROUPING(컬럼명) 함수는 해당 컬럼이 ROLLUP/CUBE/GROUPING SETS에 의해 소계 집계된 행이면 1을 반환하고, 실제 데이터 값이 있는 행이면 0을 반환한다. 이를 활용하여 소계 행에 '합계', '소계' 등의 레이블을 붙일 수 있다. GROUPING_ID는 여러 컬럼의 GROUPING 값을 비트 마스크로 결합하여 반환한다.",
+    "tags": ["그룹함수", "GROUPING", "CUBE"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c2_013",
+    "part": 2,
+    "chapter": "2",
+    "questionType": "concept",
+    "content": "Oracle에서 ROWNUM에 대한 설명으로 올바른 것은?",
+    "options": [
+      "ROWNUM은 ORDER BY 이후에 부여된다",
+      "ROWNUM은 ORDER BY 이전에 부여되므로 ORDER BY와 함께 사용 시 의도하지 않은 결과가 나올 수 있다",
+      "WHERE ROWNUM >= 2 조건으로 2번째 행부터 조회할 수 있다",
+      "ROWNUM은 ROW_NUMBER() 윈도우 함수와 항상 동일한 결과를 반환한다"
+    ],
+    "answer": 2,
+    "explanation": "ROWNUM은 FROM 절에서 행을 읽는 순서에 따라 WHERE 처리 전에 부여된다. 따라서 ORDER BY와 함께 사용하면 정렬 전 순번이 부여되어 의도와 다른 결과가 나올 수 있다. WHERE ROWNUM >= 2는 조건을 만족하는 행이 없어 빈 결과가 반환된다(ROWNUM은 1부터 시작하고 연속으로 증가). 상위 N건 조회에는 인라인뷰와 함께 사용해야 한다.",
+    "tags": ["ROWNUM", "ORDER BY", "페이징"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c2_014",
+    "part": 2,
+    "chapter": "2",
+    "questionType": "result",
+    "content": "아래 테이블에서 SQL을 실행한 결과로 올바른 것은?\n\n**EMP 테이블**\n\n| EMPNO | DEPTNO |\n|-------|--------|\n| 1001  | A      |\n| 1002  | A      |\n| 1003  | B      |\n| 1004  | B      |\n| 1005  | B      |\n| 1006  | C      |\n\n```sql\nSELECT COUNT(DISTINCT DEPTNO) + COUNT(DISTINCT EMPNO) AS TOTAL\n  FROM EMP;\n```",
+    "options": [
+      "9",
+      "8",
+      "10",
+      "7"
+    ],
+    "answer": 1,
+    "explanation": "COUNT(DISTINCT DEPTNO) = A, B, C 세 가지 = 3, COUNT(DISTINCT EMPNO) = 1001~1006 여섯 가지 = 6(EMPNO는 모두 고유값). 따라서 3 + 6 = 9이다. 보기 ① 9가 정답이다. COUNT(DISTINCT 컬럼)은 NULL을 제외하고 고유값의 수를 반환한다.",
+    "tags": ["집계함수", "COUNT", "DISTINCT"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c2_015",
+    "part": 2,
+    "chapter": "2",
+    "questionType": "concept",
+    "content": "다음 중 조인과 SQL 성능에 관한 설명으로 올바른 것은?",
+    "options": [
+      "OUTER JOIN은 INNER JOIN보다 항상 성능이 낮다",
+      "조인 조건에 인덱스가 없으면 대용량 조인 시 성능 저하가 발생할 수 있다",
+      "테이블을 많이 조인할수록 항상 성능이 좋아진다",
+      "CROSS JOIN은 INNER JOIN보다 성능이 항상 좋다"
+    ],
+    "answer": 2,
+    "explanation": "조인 컬럼에 인덱스가 없으면 Full Table Scan이 반복되어 대용량 데이터 처리 시 성능이 크게 저하된다. OUTER JOIN이 INNER JOIN보다 항상 느리지는 않고, 상황에 따라 다르다. 테이블 수가 많아지면 조합이 복잡해져 일반적으로 성능에 부담이 된다. CROSS JOIN은 카테시안 곱으로 결과 행 수가 폭발적으로 증가하여 성능이 나쁘다.",
+    "tags": ["조인", "성능", "인덱스"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c2_016",
+    "part": 2,
+    "chapter": "2",
+    "questionType": "result",
+    "content": "아래 테이블에서 SQL을 실행한 결과 행 수로 올바른 것은?\n\n**EMP 테이블**\n\n| EMPNO | ENAME  | DEPTNO |\n|-------|--------|--------|\n| 1001  | 홍길동 | 10     |\n| 1002  | 이순신 | 20     |\n| 1003  | 장보고 | 10     |\n| 1004  | 강감찬 | NULL   |\n\n**DEPT 테이블**\n\n| DEPTNO | DNAME  |\n|--------|--------|\n| 10     | 영업팀 |\n| 20     | 개발팀 |\n| 30     | 기획팀 |\n\n```sql\nSELECT E.EMPNO, D.DNAME\n  FROM EMP E LEFT OUTER JOIN DEPT D\n    ON E.DEPTNO = D.DEPTNO;\n```",
+    "options": [
+      "3행",
+      "4행",
+      "5행",
+      "6행"
+    ],
+    "answer": 2,
+    "explanation": "LEFT OUTER JOIN은 왼쪽 테이블(EMP)의 모든 행을 반환한다. EMP의 4행: DEPTNO 10(DEPT에 매칭), DEPTNO 20(DEPT에 매칭), DEPTNO 10(DEPT에 매칭), DEPTNO NULL(매칭 없으므로 DNAME=NULL). 따라서 EMP의 4행이 모두 결과에 포함되어 총 4행이 반환된다.",
+    "tags": ["LEFT OUTER JOIN", "OUTER JOIN"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c2_017",
+    "part": 2,
+    "chapter": "2",
+    "questionType": "concept",
+    "content": "다음 중 UNION과 UNION ALL의 차이에 대한 설명으로 올바른 것은?",
+    "options": [
+      "UNION은 중복을 제거하지 않고, UNION ALL은 중복을 제거한다",
+      "UNION ALL은 정렬 작업이 없어 UNION보다 성능이 빠르다",
+      "UNION은 항상 UNION ALL보다 결과 행 수가 많다",
+      "UNION ALL은 각 SELECT의 컬럼 수가 달라도 된다"
+    ],
+    "answer": 2,
+    "explanation": "UNION ALL은 중복 제거 과정이 없어서 정렬 및 비교 작업이 필요 없으므로 UNION보다 성능이 빠르다. UNION은 중복을 제거하기 위해 내부적으로 정렬 작업이 필요하다. UNION은 중복을 제거하여 결과 행이 UNION ALL보다 적거나 같다. 두 연산자 모두 각 SELECT의 컬럼 수가 동일해야 한다.",
+    "tags": ["집합연산자", "UNION", "UNION ALL", "성능"],
+    "difficulty": "하"
+  },
+  {
+    "id": "p2c2_018",
+    "part": 2,
+    "chapter": "2",
+    "questionType": "result",
+    "content": "아래 테이블에서 SQL을 실행한 결과로 올바른 것은?\n\n**T1 테이블**: D00001, D00002, D00003 (3행)\n\n**T2 테이블**: D00002, D00003, D00004 (3행)\n\n```sql\nSELECT DEPT_CD FROM T1\nMINUS\nSELECT DEPT_CD FROM T2;\n```",
+    "options": [
+      "D00001",
+      "D00002",
+      "D00003",
+      "D00004"
+    ],
+    "answer": 1,
+    "explanation": "MINUS는 첫 번째 SELECT 결과에서 두 번째 SELECT 결과를 빼는 차집합 연산이다. T1(D00001, D00002, D00003)에서 T2(D00002, D00003, D00004)를 빼면 T1에만 있는 D00001이 남는다. INTERSECT이면 D00002, D00003이 반환되고, UNION이면 D00001, D00002, D00003, D00004가 반환된다.",
+    "tags": ["집합연산자", "MINUS"],
+    "difficulty": "하"
+  },
+  {
+    "id": "p2c2_019",
+    "part": 2,
+    "chapter": "2",
+    "questionType": "result",
+    "content": "아래 테이블에서 SQL을 실행한 결과로 올바른 것은?\n\n**DEPT 테이블**\n\n| DEPT_CD | PARENT_CD | DEPT_NM  |\n|---------|-----------|----------|\n| D001    | NULL      | 본사     |\n| D002    | D001      | 영업본부 |\n| D003    | D001      | 개발본부 |\n| D004    | D002      | 영업1팀  |\n| D005    | D002      | 영업2팀  |\n| D006    | D003      | 개발1팀  |\n\n```sql\nSELECT LEVEL, DEPT_NM\n  FROM DEPT\nSTART WITH PARENT_CD IS NULL\nCONNECT BY PRIOR DEPT_CD = PARENT_CD\n       AND DEPT_CD != 'D003';\n```",
+    "options": [
+      "6행 반환 (모든 부서)",
+      "5행 반환 (D006 제외)",
+      "4행 반환 (D003, D006 제외)",
+      "3행 반환 (D003, D004, D006 제외)"
+    ],
+    "answer": 3,
+    "explanation": "CONNECT BY 절에서 'AND DEPT_CD != D003' 조건은 D003 노드 자체를 트리에서 배제한다(가지치기). D003이 배제되면 D003의 자식인 D006도 탐색되지 않는다. 따라서 D001(본사), D002(영업본부), D004(영업1팀), D005(영업2팀) 총 4행이 반환된다. D003과 D006이 제외된다.",
+    "tags": ["계층형쿼리", "CONNECT BY", "가지치기"],
+    "difficulty": "상"
+  },
+  {
+    "id": "p2c2_020",
+    "part": 2,
+    "chapter": "2",
+    "questionType": "completion",
+    "content": "다음 SQL의 빈칸에 들어갈 내용으로 올바른 것은?\n\n```sql\nSELECT E.EMPNO, E.ENAME, D.DNAME\n  FROM EMP E ______ DEPT D\n    ON E.DEPTNO = D.DEPTNO;\n```\n\n(단, DEPT 테이블에 없는 부서의 직원도 결과에 포함하고, EMP에 없는 부서는 제외)",
+    "options": [
+      "INNER JOIN",
+      "RIGHT OUTER JOIN",
+      "LEFT OUTER JOIN",
+      "FULL OUTER JOIN"
+    ],
+    "answer": 3,
+    "explanation": "LEFT OUTER JOIN은 왼쪽 테이블(EMP)의 모든 행을 반환하고, 오른쪽 테이블(DEPT)에 매칭 행이 없으면 NULL로 채운다. 'EMP에 있는 직원은 모두 결과에 포함, DEPT에 없는 부서는 NULL 처리'이므로 LEFT OUTER JOIN이 적합하다. RIGHT OUTER JOIN이면 DEPT 기준으로 모든 부서가 반환되고, FULL이면 양쪽 모두 반환된다.",
+    "tags": ["LEFT OUTER JOIN", "OUTER JOIN"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c2_021",
+    "part": 2,
+    "chapter": "2",
+    "questionType": "error",
+    "content": "다음 SQL 중 실행 시 오류가 발생하는 것은?",
+    "options": [
+      "SELECT MAX(SAL) FROM EMP WHERE DEPTNO = 10;",
+      "SELECT MAX(SAL) FROM EMP GROUP BY DEPTNO HAVING MAX(SAL) > 3000;",
+      "SELECT DEPTNO, MAX(SAL) FROM EMP GROUP BY DEPTNO;",
+      "SELECT MAX(SAL) FROM EMP WHERE MAX(SAL) > 3000;"
+    ],
+    "answer": 4,
+    "explanation": "WHERE 절에서는 집계 함수를 사용할 수 없다. 'WHERE MAX(SAL) > 3000'은 집계 함수를 행 필터 조건으로 사용하는 것으로 오류가 발생한다. 그룹 집계 결과를 조건으로 사용할 때는 HAVING 절을 사용해야 한다. WHERE는 GROUP BY 이전에 개별 행을 필터링하고, HAVING은 GROUP BY 이후에 그룹을 필터링한다.",
+    "tags": ["WHERE", "HAVING", "집계함수", "오류"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c2_022",
+    "part": 2,
+    "chapter": "2",
+    "questionType": "concept",
+    "content": "다음 중 다중 행 서브쿼리(Multi-Row Subquery)에서 사용하는 연산자가 아닌 것은?",
+    "options": [
+      "IN",
+      "ANY",
+      "ALL",
+      "="
+    ],
+    "answer": 4,
+    "explanation": "단일 행을 반환하는 서브쿼리에는 =, >, <, >=, <= 등의 단일 행 비교 연산자를 사용한다. 다중 행을 반환하는 서브쿼리에는 IN(목록 중 하나와 같음), ANY(하나라도 만족), ALL(모두 만족), EXISTS(존재 여부) 등의 다중 행 연산자를 사용해야 한다. = 연산자와 함께 다중 행 서브쿼리를 사용하면 오류가 발생한다.",
+    "tags": ["서브쿼리", "다중행서브쿼리", "IN", "ANY", "ALL"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c2_023",
+    "part": 2,
+    "chapter": "2",
+    "questionType": "result",
+    "content": "아래 테이블에서 SQL을 실행한 결과로 올바른 것은?\n\n**EMP 테이블**\n\n| EMPNO | ENAME  | DEPTNO |\n|-------|--------|--------|\n| 1001  | 홍길동 | 10     |\n| 1002  | 이순신 | 20     |\n| 1003  | 장보고 | NULL   |\n| 1004  | 강감찬 | 30     |\n\n**DEPT 테이블**\n\n| DEPTNO | DNAME  |\n|--------|--------|\n| 10     | 영업팀 |\n| 20     | 개발팀 |\n\n```sql\nSELECT ENAME FROM EMP\n WHERE NOT EXISTS (\n     SELECT 1 FROM DEPT\n      WHERE DEPT.DEPTNO = EMP.DEPTNO\n );\n```",
+    "options": [
+      "장보고, 강감찬",
+      "이순신, 장보고, 강감찬",
+      "홍길동만",
+      "장보고만"
+    ],
+    "answer": 1,
+    "explanation": "NOT EXISTS는 서브쿼리 결과가 없을 때 TRUE를 반환한다. 홍길동(DEPTNO=10): DEPT에 10 존재 → EXISTS=TRUE → NOT EXISTS=FALSE, 이순신(DEPTNO=20): DEPT에 20 존재 → EXISTS=TRUE → NOT EXISTS=FALSE, 장보고(DEPTNO=NULL): DEPT에 NULL 매칭 없음 → EXISTS=FALSE → NOT EXISTS=TRUE, 강감찬(DEPTNO=30): DEPT에 30 없음 → EXISTS=FALSE → NOT EXISTS=TRUE. 따라서 장보고, 강감찬이 반환된다.",
+    "tags": ["NOT EXISTS", "상관서브쿼리", "NULL"],
+    "difficulty": "상"
+  },
+  {
+    "id": "p2c2_024",
+    "part": 2,
+    "chapter": "2",
+    "questionType": "result",
+    "content": "아래 테이블에서 SQL을 실행한 결과로 올바른 것은?\n\n**EMP 테이블**\n\n| EMPNO | ENAME  | DEPTNO | SAL  |\n|-------|--------|--------|------|\n| 1001  | 홍길동 | 10     | 3000 |\n| 1002  | 이순신 | 20     | 4000 |\n| 1003  | 장보고 | 10     | 3000 |\n| 1004  | 강감찬 | 20     | 5000 |\n\n```sql\nSELECT DEPTNO, SAL,\n       MAX(SAL) OVER(PARTITION BY DEPTNO) AS MAX_SAL\n  FROM EMP\n GROUP BY DEPTNO, SAL;\n```",
+    "options": [
+      "2행 반환 (DEPTNO별로 집약됨)",
+      "4행 반환 (원본 행 수 유지, 각 행에 부서별 MAX_SAL 추가)",
+      "3행 반환 (SAL 중복 제거)",
+      "오류 발생"
+    ],
+    "answer": 3,
+    "explanation": "GROUP BY DEPTNO, SAL로 그룹화하면: (10,3000) 1행, (20,4000) 1행, (20,5000) 1행 = 3행이 된다(DEPTNO=10, SAL=3000인 2개 행이 합쳐짐). 각 행에 대해 PARTITION BY DEPTNO의 MAX(SAL)이 계산된다: (10,3000)→MAX_SAL=3000, (20,4000)→MAX_SAL=5000, (20,5000)→MAX_SAL=5000. 따라서 3행이 반환된다. 윈도우 함수는 GROUP BY와 함께 사용 가능하다.",
+    "tags": ["윈도우함수", "MAX OVER", "GROUP BY"],
+    "difficulty": "상"
+  },
+  {
+    "id": "p2c2_025",
+    "part": 2,
+    "chapter": "2",
+    "questionType": "result",
+    "content": "아래 테이블에서 SQL을 실행한 결과 행 수로 올바른 것은?\n\n**SALES 테이블**\n\n| JOB_NM    | DEPT_NM | AMOUNT |\n|-----------|---------|--------|\n| 영업사원  | 서울팀  | 1000   |\n| 영업사원  | 부산팀  | 2000   |\n| 관리자    | 서울팀  | 5000   |\n| 관리자    | 부산팀  | 3000   |\n| 개발자    | 서울팀  | 4000   |\n\n```sql\nSELECT JOB_NM, DEPT_NM, SUM(AMOUNT)\n  FROM SALES\n GROUP BY ROLLUP(JOB_NM, DEPT_NM);\n```",
+    "options": [
+      "5행",
+      "6행",
+      "7행",
+      "9행"
+    ],
+    "answer": 4,
+    "explanation": "ROLLUP(JOB_NM, DEPT_NM) 실행 시 생성되는 행: ①상세 데이터(JOB_NM, DEPT_NM별): 영업사원-서울팀, 영업사원-부산팀, 관리자-서울팀, 관리자-부산팀, 개발자-서울팀 = 5행, ②JOB_NM별 소계: 영업사원, 관리자, 개발자 = 3행, ③전체 합계 = 1행. 총 5+3+1 = 9행이 반환된다.",
+    "tags": ["그룹함수", "ROLLUP"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c2_026",
+    "part": 2,
+    "chapter": "2",
+    "questionType": "concept",
+    "content": "다음 중 GROUPING SETS에서 빈 괄호 '()'의 의미로 올바른 것은?",
+    "options": [
+      "모든 컬럼의 합계를 의미한다",
+      "전체 합계 행(Grand Total)을 생성한다",
+      "NULL 값에 대한 그룹을 의미한다",
+      "결과에서 해당 행을 제외한다"
+    ],
+    "answer": 2,
+    "explanation": "GROUPING SETS에서 빈 괄호 ()는 전체 합계 행(Grand Total)을 생성한다. 예를 들어 GROUPING SETS((DEPTNO), ())는 부서별 합계와 전체 합계를 함께 반환한다. ROLLUP에서 마지막으로 생성되는 전체 합계 행과 동일한 역할을 한다. 빈 괄호를 포함하지 않으면 전체 합계 행이 생성되지 않는다.",
+    "tags": ["그룹함수", "GROUPING SETS", "전체합계"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c2_027",
+    "part": 2,
+    "chapter": "2",
+    "questionType": "completion",
+    "content": "다음 SQL의 빈칸에 들어갈 내용으로 올바른 것은?\n\n```sql\nSELECT JOB_NM, DEPT_NM, SUM(AMOUNT),\n       GROUPING(JOB_NM) AS GRP_JOB,\n       GROUPING(DEPT_NM) AS GRP_DEPT\n  FROM SALES\n GROUP BY ______(JOB_NM, DEPT_NM);\n```\n\n(단, JOB_NM과 DEPT_NM의 모든 가능한 조합의 소계를 생성)",
+    "options": [
+      "ROLLUP",
+      "CUBE",
+      "GROUPING SETS",
+      "PIVOT"
+    ],
+    "answer": 2,
+    "explanation": "CUBE(JOB_NM, DEPT_NM)는 두 컬럼의 모든 가능한 조합의 소계를 생성한다. 생성되는 그룹: (JOB_NM, DEPT_NM), (JOB_NM), (DEPT_NM), () = 2^2 = 4가지 그룹. ROLLUP은 계층적 소계(A,B), (A), ()만 생성하고, GROUPING SETS는 원하는 그룹 조합을 직접 지정한다. '모든 가능한 조합'은 CUBE의 특징이다.",
+    "tags": ["그룹함수", "CUBE"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c2_028",
+    "part": 2,
+    "chapter": "2",
+    "questionType": "result",
+    "content": "아래 테이블에서 SQL을 실행한 결과로 올바른 것은?\n\n**EMP 테이블**\n\n| EMPNO | ENAME  | DEPTNO | SAL  |\n|-------|--------|--------|------|\n| 1001  | 가나다 | 10     | 3000 |\n| 1002  | 나다라 | 10     | 4000 |\n| 1003  | 다라마 | 20     | 2000 |\n| 1004  | 라마바 | 20     | 5000 |\n| 1005  | 마바사 | 10     | 3000 |\n\n```sql\nSELECT EMPNO, ENAME, DEPTNO, SAL,\n       DENSE_RANK() OVER(ORDER BY SAL DESC) AS RANK_VAL\n  FROM EMP;\n```\n\n(결과에서 RANK_VAL이 3인 행의 EMPNO는?)",
+    "options": [
+      "1001, 1005",
+      "1002",
+      "1003",
+      "1004"
+    ],
+    "answer": 1,
+    "explanation": "SAL 내림차순 DENSE_RANK: 5000→1위(EMPNO 1004), 4000→2위(EMPNO 1002), 3000→3위(EMPNO 1001, 1005), 2000→4위(EMPNO 1003). DENSE_RANK는 동일 값에 같은 순위를 부여하고 다음 순위는 연속으로 부여한다. SAL이 3000인 EMPNO 1001과 1005가 모두 RANK_VAL=3을 가지므로 정답은 1001, 1005이다.",
+    "tags": ["윈도우함수", "DENSE_RANK"],
+    "difficulty": "중"
+  },
+  {
+    "id": "p2c2_029",
+    "part": 2,
+    "chapter": "2",
+    "questionType": "completion",
+    "content": "다음 SQL의 빈칸에 들어갈 내용으로 올바른 것은?\n\n```sql\nSELECT EMPNO, ENAME, SAL, DEPTNO,\n       NTILE(______) OVER(ORDER BY SAL DESC) AS GRADE\n  FROM EMP;\n```\n\n(단, 직원을 급여 순으로 4등분하여 1~4 등급으로 구분)",
+    "options": [
+      "2",
+      "3",
+      "4",
+      "10"
+    ],
+    "answer": 3,
+    "explanation": "NTILE(n) 함수는 전체 행을 n개의 버킷으로 균등하게 나누고 각 행에 버킷 번호(1~n)를 부여한다. 4등분(1~4 등급)으로 구분하려면 NTILE(4)를 사용한다. 예를 들어 100명을 NTILE(4)로 나누면 25명씩 1~4 등급으로 분류된다. 4분위수 분석에 자주 활용된다.",
+    "tags": ["윈도우함수", "NTILE"],
+    "difficulty": "하"
+  },
+  {
+    "id": "p2c2_030",
+    "part": 2,
+    "chapter": "2",
+    "questionType": "error",
+    "content": "다음 SQL 중 실행 시 오류가 발생하는 것은?",
+    "options": [
+      "SELECT EMPNO FROM EMP WHERE DEPTNO IN (SELECT DEPTNO FROM DEPT);",
+      "SELECT EMPNO FROM EMP WHERE SAL = (SELECT MAX(SAL) FROM EMP);",
+      "SELECT EMPNO FROM EMP WHERE SAL > (SELECT AVG(SAL) FROM EMP GROUP BY DEPTNO);",
+      "SELECT EMPNO FROM EMP WHERE EXISTS (SELECT 1 FROM DEPT WHERE DEPT.DEPTNO = EMP.DEPTNO);"
+    ],
+    "answer": 3,
+    "explanation": "= 연산자는 단일 행 서브쿼리에만 사용할 수 있다. 'SELECT AVG(SAL) FROM EMP GROUP BY DEPTNO'는 부서별 평균 급여를 반환하므로 여러 행이 반환될 수 있다. 단일 행 비교 연산자(>, =, < 등)에 다중 행 서브쿼리를 사용하면 'ORA-01427: single-row subquery returns more than one row' 오류가 발생한다. 다중 행과 비교할 때는 IN, ANY, ALL을 사용해야 한다.",
+    "tags": ["서브쿼리", "단일행서브쿼리", "오류"],
+    "difficulty": "중"
+  }
+]
