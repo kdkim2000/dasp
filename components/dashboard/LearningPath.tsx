@@ -43,7 +43,7 @@ export default function LearningPath() {
       <h2 className="text-base font-semibold text-ink">학습 경로</h2>
 
       <div className="space-y-6 overflow-x-auto">
-        {[1, 2, 3, 4, 5].map(part => {
+        {[1, 2, 3, 4].map(part => {
           const colors = PART_COLORS[part]
           const chapters = CHAPTERS_BY_PART[part] ?? []
 

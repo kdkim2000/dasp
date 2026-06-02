@@ -22,7 +22,7 @@ export default function QuizNavigator({
     const isBookmarked = bookmarks.has(index)
 
     let base =
-      'relative w-8 h-8 text-xs font-semibold rounded-lg transition-all duration-150 flex items-center justify-center cursor-pointer '
+      'relative w-full aspect-square text-xs font-semibold rounded-lg transition-all duration-150 flex items-center justify-center cursor-pointer '
 
     if (isCurrent) {
       base += 'ring-2 ring-primary-500 ring-offset-1 '

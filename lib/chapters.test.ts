@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest'
 import { CHAPTERS, getChapterById, getChapterTitle, getChapterIdByQuestionId, CHAPTER_IDS } from './chapters'
 
 describe('chapters', () => {
-  it('should have 17 chapters', () => {
-    expect(CHAPTERS).toHaveLength(17)
+  it('should have 14 chapters', () => {
+    expect(CHAPTERS).toHaveLength(14)
   })
 
   it('should have correct chapter counts per part', () => {
@@ -11,7 +11,6 @@ describe('chapters', () => {
     expect(CHAPTERS.filter(c => c.part === 2)).toHaveLength(4)
     expect(CHAPTERS.filter(c => c.part === 3)).toHaveLength(3)
     expect(CHAPTERS.filter(c => c.part === 4)).toHaveLength(4)
-    expect(CHAPTERS.filter(c => c.part === 5)).toHaveLength(3)
   })
 
   it('getChapterById returns correct chapter with official title', () => {
@@ -40,7 +39,12 @@ describe('chapters', () => {
     expect(getChapterIdByQuestionId('p4c1_001')).toBe('part4_ch1')
     expect(getChapterIdByQuestionId('p4c4_001')).toBe('part4_ch4')
     expect(getChapterIdByQuestionId('p2c4_001')).toBe('part2_ch4')
-    expect(getChapterIdByQuestionId('p5c3_015')).toBe('part5_ch3')
+  })
+
+  it('part5 chapters are not included', () => {
+    expect(getChapterById('part5_ch1')).toBeUndefined()
+    expect(getChapterById('part5_ch2')).toBeUndefined()
+    expect(getChapterById('part5_ch3')).toBeUndefined()
   })
 
   it('all chapter ids are unique', () => {

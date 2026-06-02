@@ -7,21 +7,20 @@ const PART_TITLES: Record<number, string> = {
   2: '데이터 요건 분석',
   3: '데이터 표준화',
   4: '데이터 모델링',
-  5: '데이터베이스 설계와 이용',
 }
 
 export default function ResultPage() {
   const router = useRouter()
   const {
     score,
-    p1, p2, p3, p4, p5,
+    p1, p2, p3, p4,
     time,
     total,
     correct,
   } = router.query
 
   const totalScore = Number(score ?? 0)
-  const partScores = [Number(p1 ?? 0), Number(p2 ?? 0), Number(p3 ?? 0), Number(p4 ?? 0), Number(p5 ?? 0)]
+  const partScores = [Number(p1 ?? 0), Number(p2 ?? 0), Number(p3 ?? 0), Number(p4 ?? 0)]
   const timeSeconds = Number(time ?? 0)
   const totalQ = Number(total ?? 0)
   const correctQ = Number(correct ?? 0)

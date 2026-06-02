@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { sampleExamQuestions } from '@/lib/questions'
+import { sampleExamQuestions, getMockExamQuestions } from '@/lib/questions'
 import { useProgress } from '@/context/ProgressContext'
 import QuestionCard from '@/components/quiz/QuestionCard'
 import AnswerFeedback from '@/components/quiz/AnswerFeedback'
@@ -10,6 +10,7 @@ import ExamTimer from '@/components/quiz/ExamTimer'
 import type { Question, AnswerResult, ExamResult } from '@/types'
 
 type ExamPhase = 'intro' | 'exam' | 'result'
+type ExamMode = 'random' | 'exam1' | 'exam2'
 
 interface LocalAnswer {
   selectedIndex: number
@@ -21,13 +22,19 @@ const PART_TITLES: Record<number, string> = {
   2: '데이터 요건 분석',
   3: '데이터 표준화',
   4: '데이터 모델링',
-  5: '데이터베이스 설계와 이용',
+}
+
+const MODE_CONFIG: Record<ExamMode, { label: string; desc: string; icon: string; btnLabel: string }> = {
+  exam1:  { label: '모의고사 1회', desc: '고정 50문항 세트 1',   icon: '📋', btnLabel: '모의고사 1회 시작' },
+  exam2:  { label: '모의고사 2회', desc: '고정 50문항 세트 2',   icon: '📄', btnLabel: '모의고사 2회 시작' },
+  random: { label: '랜덤 출제',    desc: '매회 다른 문제 조합',  icon: '🎲', btnLabel: '랜덤 시험 시작' },
 }
 
 export default function ExamPage() {
   const router = useRouter()
   const { saveExamResult, toggleBookmark, isBookmarked } = useProgress()
   const [phase, setPhase] = useState<ExamPhase>('intro')
+  const [examMode, setExamMode] = useState<ExamMode>('random')
   const [questions, setQuestions] = useState<Question[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [localAnswers, setLocalAnswers] = useState<Record<number, LocalAnswer>>({})
@@ -37,10 +44,13 @@ export default function ExamPage() {
   const [timeUsed, setTimeUsed] = useState(0)
   const startTimeRef = useRef<number>(0)
 
-  const EXAM_SECONDS = 7200 // 120분
+  const EXAM_SECONDS = 5400 // 90분
 
   const startExam = () => {
-    const qs = sampleExamQuestions()
+    const qs =
+      examMode === 'exam1' ? getMockExamQuestions(1) :
+      examMode === 'exam2' ? getMockExamQuestions(2) :
+      sampleExamQuestions()
     setQuestions(qs)
     setCurrentIndex(0)
     setLocalAnswers({})
@@ -56,7 +66,6 @@ export default function ExamPage() {
       2: { correct: 0, total: 0 },
       3: { correct: 0, total: 0 },
       4: { correct: 0, total: 0 },
-      5: { correct: 0, total: 0 },
     }
 
     qs.forEach((q, i) => {
@@ -87,7 +96,6 @@ export default function ExamPage() {
       part2Score: toScore(2),
       part3Score: toScore(3),
       part4Score: toScore(4),
-      part5Score: toScore(5),
       totalTime: elapsed,
       answers: answersMap,
     }
@@ -137,41 +145,78 @@ export default function ExamPage() {
   // Intro screen
   if (phase === 'intro') {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-12 space-y-8">
-        <div className="q-card text-center space-y-6">
-          <div className="text-5xl">📝</div>
-          <div>
+      <div className="max-w-2xl mx-auto px-4 py-12 space-y-6">
+        <div className="q-card space-y-6">
+          <div className="text-center space-y-2">
+            <div className="text-5xl">📝</div>
             <h1 className="text-2xl font-display font-bold text-ink">DAsP 모의고사</h1>
-            <p className="text-ink-muted text-sm mt-2">실전과 동일한 조건으로 실력을 확인해보세요.</p>
+            <p className="text-ink-muted text-sm">실전과 동일한 조건으로 실력을 확인해보세요.</p>
           </div>
 
-          <div className="grid grid-cols-3 gap-4 py-4">
+          {/* Stats */}
+          <div className="grid grid-cols-3 gap-4">
             <div className="q-card bg-surface-soft text-center py-4">
-              <div className="text-2xl font-bold text-primary-600">100</div>
+              <div className="text-2xl font-bold text-primary-600">50</div>
               <div className="text-xs text-ink-muted mt-1">문항</div>
             </div>
             <div className="q-card bg-surface-soft text-center py-4">
-              <div className="text-2xl font-bold text-primary-600">120</div>
+              <div className="text-2xl font-bold text-primary-600">90</div>
               <div className="text-xs text-ink-muted mt-1">분</div>
             </div>
             <div className="q-card bg-surface-soft text-center py-4">
-              <div className="text-2xl font-bold text-primary-600">5</div>
+              <div className="text-2xl font-bold text-primary-600">4</div>
               <div className="text-xs text-ink-muted mt-1">과목</div>
             </div>
           </div>
 
+          {/* Mode selection */}
+          <div className="space-y-2">
+            <div className="text-sm font-semibold text-ink">출제 방식 선택</div>
+            <div className="space-y-2">
+              {(['exam1', 'exam2', 'random'] as ExamMode[]).map(mode => {
+                const cfg = MODE_CONFIG[mode]
+                const selected = examMode === mode
+                return (
+                  <button
+                    key={mode}
+                    onClick={() => setExamMode(mode)}
+                    className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl border-2 text-left transition-all ${
+                      selected
+                        ? 'border-primary-500 bg-primary-50'
+                        : 'border-[var(--q-border)] bg-surface hover:border-primary-300 hover:bg-surface-soft'
+                    }`}
+                  >
+                    <span className="text-2xl">{cfg.icon}</span>
+                    <div className="flex-1">
+                      <div className={`font-semibold text-sm ${selected ? 'text-primary-700' : 'text-ink'}`}>
+                        {cfg.label}
+                      </div>
+                      <div className="text-xs text-ink-muted mt-0.5">{cfg.desc}</div>
+                    </div>
+                    <div className={`w-4 h-4 rounded-full border-2 shrink-0 ${
+                      selected ? 'border-primary-500 bg-primary-500' : 'border-ink-faint'
+                    }`}>
+                      {selected && <div className="w-full h-full rounded-full scale-50 bg-white" />}
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Pass criteria */}
           <div className="text-left bg-primary-50 border border-primary-200 rounded-xl px-4 py-3 text-sm space-y-1">
             <div className="font-semibold text-primary-800 mb-2">합격 기준</div>
             <div className="text-primary-700">• 전체 평균 60점 이상</div>
             <div className="text-primary-700">• 각 과목별 40점 이상</div>
-            <div className="text-primary-700">• 과목당 20문항 (5과목)</div>
+            <div className="text-primary-700">• 1~3과목 10문항, 4과목 20문항</div>
           </div>
 
           <button
             onClick={startExam}
             className="w-full py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-bold text-base transition-colors shadow-q-md"
           >
-            시험 시작
+            {MODE_CONFIG[examMode].btnLabel}
           </button>
         </div>
       </div>
@@ -185,15 +230,13 @@ export default function ExamPage() {
       examResult.part1Score >= 40 &&
       examResult.part2Score >= 40 &&
       examResult.part3Score >= 40 &&
-      examResult.part4Score >= 40 &&
-      examResult.part5Score >= 40
+      examResult.part4Score >= 40
 
     const partScores = [
       examResult.part1Score,
       examResult.part2Score,
       examResult.part3Score,
       examResult.part4Score,
-      examResult.part5Score,
     ]
 
     const stars = examResult.score >= 80 ? 3 : examResult.score >= 60 ? 2 : 1

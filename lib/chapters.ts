@@ -23,10 +23,6 @@ export const CHAPTERS: ChapterDef[] = [
   { id: 'part4_ch2', part: 4, chapter: 2, title: '개념 데이터 모델링',         idPrefix: 'p4c2_', questionCount: 0 },
   { id: 'part4_ch3', part: 4, chapter: 3, title: '논리 데이터 모델링',         idPrefix: 'p4c3_', questionCount: 0 },
   { id: 'part4_ch4', part: 4, chapter: 4, title: '물리 데이터 모델링',         idPrefix: 'p4c4_', questionCount: 0 },
-  // 5과목: 데이터베이스 설계와 이용
-  { id: 'part5_ch1', part: 5, chapter: 1, title: '데이터베이스 설계',          idPrefix: 'p5c1_', questionCount: 0 },
-  { id: 'part5_ch2', part: 5, chapter: 2, title: '데이터베이스 이용',          idPrefix: 'p5c2_', questionCount: 0 },
-  { id: 'part5_ch3', part: 5, chapter: 3, title: 'SQL 응용',                   idPrefix: 'p5c3_', questionCount: 0 },
 ]
 
 export const CHAPTERS_BY_PART: Record<number, ChapterDef[]> = {
@@ -34,7 +30,6 @@ export const CHAPTERS_BY_PART: Record<number, ChapterDef[]> = {
   2: CHAPTERS.filter(c => c.part === 2),
   3: CHAPTERS.filter(c => c.part === 3),
   4: CHAPTERS.filter(c => c.part === 4),
-  5: CHAPTERS.filter(c => c.part === 5),
 }
 
 export const CHAPTER_IDS = CHAPTERS.map(c => c.id)
@@ -66,5 +61,4 @@ export const PART_TITLES: Record<number, string> = {
   2: '데이터 요건 분석',
   3: '데이터 표준화',
   4: '데이터 모델링',
-  5: '데이터베이스 설계와 이용',
 }

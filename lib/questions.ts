@@ -38,11 +38,12 @@ export function getQuestionsByIds(ids: string[]): Question[] {
 
 export function sampleExamQuestions(): Question[] {
   const result: Question[] = []
-  for (let part = 1; part <= 5; part++) {
+  for (let part = 1; part <= 4; part++) {
     const partChapters = CHAPTERS.filter(c => c.part === part)
     const partQuestions = partChapters.flatMap(ch => loadChapterQuestions(ch.id))
+    const targetCount = part === 4 ? 20 : 10  // 4과목: 20문항, 1~3과목: 10문항
     const shuffled = [...partQuestions].sort(() => Math.random() - 0.5)
-    result.push(...shuffled.slice(0, 20))
+    result.push(...shuffled.slice(0, targetCount))
   }
   return result
 }

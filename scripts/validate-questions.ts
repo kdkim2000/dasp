@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 
 const QUESTIONS_DIR = path.join(process.cwd(), 'data', 'questions')
-const ID_PATTERN = /^(p[1-5]c[1-4]_\d{3}|exam[12]_\d{3})$/
+const ID_PATTERN = /^(p[1-4]c[1-4]_\d{3}|exam[12]_\d{3})$/
 
 interface QuestionRaw {
   id: string
@@ -30,7 +30,7 @@ function validateQuestion(q: QuestionRaw, filePath: string): string[] {
   if (!q.id || typeof q.id !== 'string') {
     errors.push(`[${file}] id 필드가 없거나 문자열이 아님`)
   } else if (!ID_PATTERN.test(q.id)) {
-    errors.push(`[${file}] id 패턴 불일치: "${q.id}" (기대: p[1-5]c[1-4]_NNN 또는 exam[12]_NNN)`)
+    errors.push(`[${file}] id 패턴 불일치: "${q.id}" (기대: p[1-4]c[1-4]_NNN 또는 exam[12]_NNN)`)
   }
 
   if (q.part === undefined || q.part < 1 || q.part > 5) {
