@@ -33,9 +33,9 @@ Thumbs.db
 # 로컬 전용 Claude 설정
 .claude/settings.local.json
 
-# 세션 기록 (토큰 등 민감 정보 포함)
+# 세션 기록 (민감 정보 포함 파일)
 docs/journal/history.md
-docs/journal/history2.md
+# history2.md는 마스킹 처리 후 공개 (사용자명·컴퓨터명 → [USERNAME]/DESKTOP-XXXXXXXX)
 docs/journal/.sessions
 
 docs/contents/
