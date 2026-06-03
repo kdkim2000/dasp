@@ -1,9 +1,7 @@
-# SQLD 합격길잡이 🎓
+# DAsP Master 🎓
 
-SQLD(SQL Developer) 자격증 시험 준비를 위한 **웹 기반 학습 플랫폼**입니다.  
-이론 학습 + 예상문제 풀이 + 모의고사를 한 곳에서 제공합니다.
-
-**🔗 라이브 데모:** (배포 대기 중)
+**DAsP(데이터아키텍처 준전문가)** 자격증 시험 준비를 위한 **웹 기반 학습 플랫폼**입니다.  
+이론 학습 + 단원별 문제 풀이 + 모의고사를 한 곳에서 제공합니다.
 
 ---
 
@@ -11,367 +9,365 @@ SQLD(SQL Developer) 자격증 시험 준비를 위한 **웹 기반 학습 플랫
 
 | 항목 | 내용 |
 |------|------|
-| **용도** | SQLD 시험 준비 |
-| **학습 범위** | 1과목(데이터모델링) + 2과목(SQL) |
-| **총 문항** | 100문항 |
-| **주요 기능** | 이론 학습, 단원별 풀이, 모의고사, 오답 재풀이, 북마크 |
+| **용도** | DAsP(데이터아키텍처 준전문가) 시험 준비 |
+| **학습 과목** | 4과목 (전사아키텍처·데이터 요건분석·데이터 표준화·데이터 모델링) |
+| **총 챕터** | 14개 챕터 |
+| **챕터 문제** | 216문항 (챕터별 15~23문항) |
+| **모의고사** | 50문항 × 2회 (exam1·exam2) |
+| **주요 기능** | 이론 학습, 단원별 풀이, 모의고사(3가지 모드), 오답 노트, 북마크, 이어서 풀기 |
 | **진도 추적** | localStorage 기반 (로그인 불필요) |
-| **배포 환경** | Vercel |
+| **배포 환경** | Vercel / Next.js SSG |
+
+---
+
+## 🎯 DAsP 시험 구조
+
+| 과목 | 제목 | 문항 | 배점 |
+|------|------|------|------|
+| 1과목 | 전사아키텍처 이해 | 10문항 | 20점 (문항당 2점) |
+| 2과목 | 데이터 요건 분석 | 10문항 | 20점 (문항당 2점) |
+| 3과목 | 데이터 표준화 | 10문항 | 20점 (문항당 2점) |
+| 4과목 | 데이터 모델링 | 20문항 | 40점 (문항당 2점) |
+| **합계** | | **50문항** | **100점 / 90분** |
+
+**합격 기준**: 전체 60점 이상 + 각 과목 40% 이상 (과락 없이)
 
 ---
 
 ## 🚀 빠른 시작
 
-### 설치
 ```bash
 # 저장소 클론
-git clone https://github.com/kdkim2000/sqld.git
-cd sqld
+git clone https://github.com/kdkim2000/dasp.git
+cd dasp
 
 # 의존성 설치
 npm install
 
-# 개발 서버 실행
+# 개발 서버 실행 (localhost:3000)
 npm run dev
 ```
 
-### 접속
-```
-http://localhost:3000
-```
+### 주요 명령어
 
-### 빌드 & 배포
 ```bash
-# 타입 검사 + ESLint + 빌드
-npm run build
-
-# 프로덕션 서버 실행
-npm run start
+npm run dev          # 개발 서버 (hot reload)
+npm run build        # SSG 빌드
+npm run lint         # ESLint 검사
+npm run type-check   # TypeScript 타입 검사
+npm run test         # Vitest 단위 테스트 (1회)
+npm run test:watch   # Vitest (watch 모드)
 ```
 
 ---
 
-## 🎯 주요 기능
+## 🎓 주요 기능
 
-### 📚 이론 학습
-- **5개 챕터** — 데이터모델링 + SQL 기본·활용·최적화
-- **마크다운 기반** — 표, 코드블록, 예시 포함
-- **진도 추적** — 각 챕터 학습 이력 기록
+### 📚 이론 학습 (`/theory`)
+- **14개 챕터** — 공식 출제 범위 주요항목 기준 구성
+- **마크다운 기반** — 표·코드블록·예시·출제 포인트 포함
+- **TOC(목차)** — 섹션별 빠른 이동
+- **관련 문제 미리보기** — 이론 → 문제 풀기 자연스러운 연계
 
-```
-1과목 데이터모델링
-├─ 1장: 데이터모델링의 이해
-└─ 2장: 데이터 모델과 성능
-
-2과목 SQL
-├─ 1장: SQL 기본
-├─ 2장: SQL 활용
-└─ 3장: SQL 최적화 기본 원리
-```
-
-### 🎯 문제 풀이
-- **단원별 풀기** — 각 챕터별로 순차 풀이
-- **모의고사** — 50문항 + 90분 타이머 (실제 시험과 동일)
-- **오답 재풀이** — 틀린 문제만 모아서 학습
+### 🎯 문제 풀이 (`/quiz`)
+- **단원별 풀기** — 14개 챕터별 순차 풀이, 정답 즉시 확인
+- **오답 노트** — 틀린 문제만 모아서 반복 학습
 - **북마크** — 중요 문제 따로 정리
+- **키보드 단축키** — 선택지 1~4키 빠른 선택
 
-**채점 기준:**
-```
-합격 조건:
-- 총점 60점 이상
-- 1과목 40점 이상 (과락 방지)
-- 2과목 40점 이상 (과락 방지)
-```
+### 📝 모의고사 (`/quiz/exam`)
+- **3가지 출제 모드** 선택 가능:
+  - 모의고사 1회 — 고정 50문항 세트 (EA·정보요구 집중)
+  - 모의고사 2회 — 고정 50문항 세트 (거버넌스·물리모델링 집중)
+  - 랜덤 출제 — 매회 챕터 풀에서 새로운 문제 조합
+- **90분 타이머** — 실전 동일 조건
+- **이어서 풀기** — 이탈 후 재진입해도 진행 상황 자동 복원 (localStorage 세션)
+- **과목별 점수** — 1~4과목 개별 점수 및 합격/불합격 판정
+- **문제 네비게이터** — 그리드로 풀이 상태 시각화
 
-### 📊 학습 대시보드
-- **정답률** — 전체 정답률 원형 차트
-- **과목별 진도** — 1과목/2과목 진도 바
-- **취약 단원** — 정답률 낮은 상위 3개 챕터
-- **학습 기록** — 모의고사 이력 (최근 10개)
+### 📊 대시보드 (`/`)
+- **히어로 배너** — 전체 정답률, 현재 진도 요약
+- **학습 경로** — 14개 챕터 버블 진행 상황 (완료·진행중·잠금)
+- **챕터별 진도** — 4과목 컬러 구분 진도 바
+- **취약 챕터** — 정답률 낮은 상위 챕터 파악
+- **과목별 정답률** — 원형 차트로 시각화
 
-### 🔖 학습 도구
-- **숫자 단축키** — 선택지 1~4 빠르게 선택 (1키, 2키, 3키, 4키)
-- **타이머** — 모의고사 시간 추적 (시간 초과 시 자동 제출)
-- **문제 네비게이터** — 문제 번호 그리드로 풀이 상태 시각화
+---
+
+## 📁 콘텐츠 구성
+
+### 이론 파일 (14개)
+
+| 챕터 ID | 과목 | 주요항목 |
+|---------|------|---------|
+| `part1_ch1` | 1과목 | 전사아키텍처 개요 (EA 정의·프레임워크·참조모델·프로세스) |
+| `part1_ch2` | 1과목 | 전사아키텍처 구축 (방향수립·아키텍처매트릭스·현행분석) |
+| `part1_ch3` | 1과목 | 전사아키텍처 관리 및 활용 (거버넌스·데이터 거버넌스) |
+| `part2_ch1` | 2과목 | 정보 요구 사항 개요 |
+| `part2_ch2` | 2과목 | 정보 요구 사항 조사 (수집기법·면담절차·우선순위) |
+| `part2_ch3` | 2과목 | 정보 요구 사항 분석 (분석대상·상세화·재검토) |
+| `part2_ch4` | 2과목 | 정보 요구 검증 (상관분석·CRUD·명세서·생명주기) |
+| `part3_ch1` | 3과목 | 데이터 표준화 개요 (필요성·개념·관리도구) |
+| `part3_ch2` | 3과목 | 데이터 표준 수립 (단어·용어·도메인·코드 표준) |
+| `part3_ch3` | 3과목 | 데이터 표준 관리 (품질관리·변경관리·거버넌스) |
+| `part4_ch1` | 4과목 | 데이터 모델링 이해 (개요·기법·표기법·관계형모델) |
+| `part4_ch2` | 4과목 | 개념 데이터 모델링 (주제영역·엔터티·관계 정의) |
+| `part4_ch3` | 4과목 | 논리 데이터 모델링 (속성·정규화·이력관리·참조무결성) |
+| `part4_ch4` | 4과목 | 물리 데이터 모델링 (변환·반정규화·인덱스·파티셔닝) |
+
+### 문제 현황
+
+| 구분 | 파일 | 문항 수 |
+|------|------|--------|
+| 1과목 | part1_ch1~ch3 | 23 + 18 + 18 = **59문항** |
+| 2과목 | part2_ch1~ch4 | 15 + 18 + 17 + 18 = **68문항** |
+| 3과목 | part3_ch1~ch3 | 15 + 15 + 15 = **45문항** |
+| 4과목 | part4_ch1~ch4 | 15 + 15 + 19 + 18 = **67문항** |
+| **챕터 합계** | | **239문항** |
+| 모의고사 1회 | exam1.json | **50문항** |
+| 모의고사 2회 | exam2.json | **50문항** |
+| **총 문항** | | **339문항** |
 
 ---
 
 ## 🛠 기술 스택
 
-### 프론트엔드
-- **Next.js 14** (Pages Router, SSG)
-- **TypeScript** — 타입 안전성
-- **Tailwind CSS** — 반응형 스타일링
-- **React Context** — 전역 상태 관리
-
-### 콘텐츠
-- **Markdown** — 이론 콘텐츠
-- **JSON** — 문제 데이터
-- **react-markdown + rehype-highlight** — 마크다운 렌더링
-
-### 저장소
-- **localStorage** — 진도 추적 (서버/DB 불필요)
-- **SSG** — 18개 정적 페이지 사전 생성
-
-### 배포
-- **Vercel** — Next.js 최적화 호스팅
+| 영역 | 기술 | 설명 |
+|------|------|------|
+| 프레임워크 | **Next.js 14** | Pages Router, SSG |
+| 언어 | **TypeScript** | strict 모드 |
+| 스타일링 | **Tailwind CSS** | 인디고/블루 팔레트 (#6366F1) |
+| 상태 관리 | **React Context** | useProgress 훅 |
+| 저장소 | **localStorage** | dasp_progress, dasp_exam_session |
+| 마크다운 | **react-markdown** | rehype-highlight 코드 하이라이팅 |
+| 테스트 | **Vitest + jsdom** | 단위 테스트 |
+| 배포 | **Vercel** | Next.js 최적화 호스팅 |
 
 ---
 
 ## 📁 프로젝트 구조
 
 ```
-sqld/
+dasp/
 ├── pages/
-│   ├── _app.tsx              ← ProgressProvider + Layout 래핑
-│   ├── _document.tsx
-│   ├── index.tsx             ← 대시보드 홈
+│   ├── _app.tsx                    ← ProgressProvider + Layout
+│   ├── index.tsx                   ← 대시보드 홈
 │   ├── theory/
-│   │   ├── index.tsx         ← 이론 목차
-│   │   └── [chapterId].tsx   ← 이론 본문 (SSG)
+│   │   ├── index.tsx               ← 이론 목차 (4과목 그리드)
+│   │   └── [chapterId].tsx         ← 이론 본문 (SSG, 14개 경로)
 │   └── quiz/
-│       ├── index.tsx         ← 문제풀기 허브
-│       ├── chapter/[chapterId].tsx  ← 단원별 풀이 (SSG)
-│       ├── exam.tsx          ← 모의고사 (90분)
-│       ├── wrong.tsx         ← 오답 재풀이
-│       └── bookmarks.tsx     ← 북마크 문제
+│       ├── index.tsx               ← 문제풀기 허브
+│       ├── chapter/[chapterId].tsx ← 단원별 풀이 (SSG, 14개 경로)
+│       ├── exam.tsx                ← 모의고사 (3가지 모드, 세션 영속화)
+│       ├── result.tsx              ← 결과 (4과목별 점수)
+│       ├── wrong.tsx               ← 오답 노트
+│       └── bookmarks.tsx           ← 북마크
 │
 ├── components/
-│   ├── layout/
-│   │   ├── Header.tsx        ← 상단 네비게이션
-│   │   ├── Sidebar.tsx       ← 좌측 챕터 목록
-│   │   └── Layout.tsx        ← 2컬럼 레이아웃
-│   ├── theory/
-│   │   └── TheoryContent.tsx ← 마크다운 렌더링
+│   ├── layout/Layout.tsx, TopBar.tsx
+│   ├── ui/Mascot.tsx, Badge.tsx    ← 마스코트(Archi), 게이미피케이션 배지
 │   ├── quiz/
-│   │   ├── QuestionCard.tsx  ← 문제 카드
-│   │   ├── AnswerFeedback.tsx ← 정답/오답 피드백
-│   │   ├── QuizNavigator.tsx ← 문제 그리드
-│   │   └── ExamTimer.tsx     ← 타이머
+│   │   ├── QuestionCard.tsx        ← 문제 카드 + 키보드 단축키
+│   │   ├── AnswerFeedback.tsx      ← 정답/오답 + 해설
+│   │   ├── QuizNavigator.tsx       ← 문제 번호 그리드
+│   │   └── ExamTimer.tsx           ← 카운트다운 타이머
+│   ├── theory/
+│   │   ├── TheoryContent.tsx       ← 마크다운 렌더링
+│   │   ├── TheoryTOC.tsx           ← 목차 (IntersectionObserver)
+│   │   └── RelatedQuestions.tsx    ← 관련 문제 미리보기
 │   └── dashboard/
-│       ├── ProgressChart.tsx ← 정답률 원형 차트
-│       ├── ChapterProgress.tsx ← 진도 바
-│       └── WeakChapters.tsx  ← 취약 단원
+│       ├── HeroBanner.tsx, LearningPath.tsx
+│       ├── ChapterProgress.tsx, WeakChapters.tsx
+│       ├── WeeklyXP.tsx, ProgressChart.tsx
+│       └── MascotCard.tsx
 │
 ├── lib/
-│   ├── questions.ts          ← 문제 로드/필터링
-│   ├── theory.ts             ← 이론 콘텐츠 로드
-│   └── progress.ts           ← localStorage 진도 관리
+│   ├── chapters.ts     ← CHAPTERS 배열 (14개, 유일한 챕터 소스)
+│   ├── questions.ts    ← 문제 로드·필터링·모의고사 샘플링
+│   ├── theory.ts       ← 이론 마크다운 로드
+│   └── progress.ts     ← localStorage CRUD + 시험 세션 영속화
 │
 ├── context/
-│   └── ProgressContext.tsx   ← useProgress 훅
+│   └── ProgressContext.tsx   ← useProgress 훅 (답변·북마크·XP·스트릭)
 │
 ├── types/
-│   └── index.ts              ← TypeScript 인터페이스
+│   └── index.ts              ← Question, ExamResult, ExamSession 등
 │
 ├── data/
-│   ├── questions/
-│   │   ├── part1_ch1.json    ← 1과목 1장 (20문항)
-│   │   ├── part1_ch2.json    ← 1과목 2장 (15문항)
-│   │   ├── part2_ch1.json    ← 2과목 1장 (30문항)
-│   │   ├── part2_ch2.json    ← 2과목 2장 (25문항)
-│   │   └── part2_ch3.json    ← 2과목 3장 (10문항)
-│   └── theory/
-│       ├── part1_ch1.md      ← 이론 마크다운 (×5)
-│       ├── part1_ch2.md
-│       ├── part2_ch1.md
-│       ├── part2_ch2.md
-│       └── part2_ch3.md
+│   ├── theory/               ← 14개 이론 마크다운 (part{1-4}_ch{1-4}.md)
+│   └── questions/
+│       ├── part{1-4}_ch{1-4}.json  ← 14개 챕터 문제
+│       └── mockexam/
+│           ├── exam1.json    ← 모의고사 1회 (50문항)
+│           └── exam2.json    ← 모의고사 2회 (50문항)
 │
-├── styles/
-│   └── globals.css           ← Tailwind + 커스텀 스타일
+├── scripts/
+│   └── validate-questions.ts ← JSON 스키마 검증
 │
-├── docs/
-│   ├── WORKPLAN.md           ← 구축 계획
-│   ├── AGENTS.md             ← AI 에이전트 역할
-│   ├── ARCHITECTURE.md       ← 아키텍처 설명
-│   └── journal/              ← 개발 기록
-│
-├── CLAUDE.md                 ← 개발자 가이드
+├── docs/plans/               ← 개발 이력 계획 문서 (01~07)
+├── CLAUDE.md                 ← 개발자 가이드 (Claude Code용)
 ├── package.json
-├── tsconfig.json
 ├── tailwind.config.js
-└── next.config.js
+└── tsconfig.json
 ```
 
 ---
 
-## 🔄 데이터 흐름
+## 🔄 핵심 데이터 흐름
 
-### 학습 진도 추적
+### 진도 추적
 ```
 사용자 선택지 선택
     ↓
-QuestionCard 컴포넌트 → handleAnswer 호출
+QuestionCard → handleAnswer()
     ↓
 ProgressContext.markAnswer()
     ↓
-lib/progress.ts → localStorage 저장
+lib/progress.ts → localStorage('dasp_progress') 저장
     ↓
-getStats() 계산 (정답률, 진도 등)
-    ↓
-Dashboard에 반영
+getStats() 계산 → Dashboard 반영
 ```
 
-### 모의고사 플로우
+### 모의고사 세션 영속화
 ```
-시험 준비 화면 (90분 타이머 설정)
+시험 시작 → 문제 로드 + 세션 저장 (dasp_exam_session)
     ↓
-문제 풀이 (50문항, 선택지 선택)
+답변/이동 시마다 자동 저장
     ↓
-제출 버튼
+이탈 후 재진입
     ↓
-채점 (정답/오답 계산)
+인트로 화면에 "이어서 풀기" 배너 표시
     ↓
-결과 화면 (합격/불합격, 과목별 점수, 이력 저장)
+클릭 → examEndTime 기반 남은 시간 계산 + 상태 복원
+    ↓
+제출 → 세션 삭제 + 결과 저장 (dasp_progress.examHistory)
+```
+
+### ID 형식 규칙
+| 용도 | 형식 | 예시 |
+|------|------|------|
+| 파일명·라우팅 | `part{N}_ch{M}` | `part4_ch3` |
+| 챕터 문제 ID | `p{N}c{M}_{3자리}` | `p4c3_015` |
+| 모의고사 ID | `exam{N}_{3자리}` | `exam1_042` |
+
+---
+
+## 🗂 데이터 모델
+
+```typescript
+// 핵심 타입 (types/index.ts)
+interface Question {
+  id: string              // "p2c3_001"
+  part: 1 | 2 | 3 | 4
+  chapter: string         // "part2_ch3"
+  content: string
+  options: string[]       // 4지선다
+  answer: number          // 0-3
+  explanation: string
+  tags?: string[]
+  difficulty?: '하' | '중' | '상'
+  questionType?: 'concept' | 'application' | 'comparison' | 'ordering'
+}
+
+interface ExamSession {   // 모의고사 이탈 복원용
+  mode: 'random' | 'exam1' | 'exam2'
+  questions: Question[]
+  currentIndex: number
+  answers: Record<number, { selectedIndex: number; result: AnswerResult }>
+  examEndTime: number     // 절대 만료 시각 (ms)
+}
 ```
 
 ---
 
-## 📊 통계
+## 📊 콘텐츠 통계
 
-### 콘텐츠
 | 항목 | 수량 |
 |------|------|
-| 총 문항 | 100개 |
-| 1과목 문항 | 35개 |
-| 2과목 문항 | 65개 |
-| 이론 마크다운 | 5개 파일 (2,337줄) |
-| 평균 문제 난이도 | 중(50%), 하(25%), 상(25%) |
-
-### 기술
-| 항목 | 수량 |
-|------|------|
-| React 컴포넌트 | 11개 |
-| Next.js 페이지 | 9개 |
-| SSG 경로 | 18개 |
-| TypeScript 파일 | 20+ |
-| 번들 크기 | 112 KB (공유) |
-| First Load JS | 105~249 KB |
+| 이론 챕터 | 14개 |
+| 챕터 문제 | 239문항 |
+| 모의고사 문제 | 100문항 (2회 × 50) |
+| 총 문제 | 339문항 |
+| SSG 정적 경로 | 28개 (이론 14 + 문제 14) |
 
 ---
 
-## 🧪 개발 명령어
+## 🔐 데이터 저장 구조 (localStorage)
+
+| 키 | 내용 |
+|----|------|
+| `dasp_progress` | 답변 기록, 북마크, 모의고사 이력 (최근 10개) |
+| `dasp_exam_session` | 진행 중 모의고사 세션 (이탈 복원용) |
+| `q-theme` | 다크모드 설정 (`'dark'` \| `'light'`) |
+
+---
+
+## 🎨 UI/UX 특징
+
+- **다크모드** — CSS 변수(`--q-bg` 등) + `[data-theme="dark"]` 전환
+- **반응형** — 모바일·태블릿·데스크톱 최적화
+- **게이미피케이션** — 스트릭(🔥), 보석(💎), XP(⚡) 배지
+- **Archi 마스코트** — 인디고 컬러 SVG 캐릭터 (표정 3가지)
+- **키보드 단축키** — 문제 풀이 중 1~4키로 선택지 선택
+
+---
+
+## 🧪 개발 및 검증
 
 ```bash
-# 개발 서버 (hot reload)
-npm run dev
-
 # 타입 검사
-npx tsc --noEmit
+npm run type-check
 
-# ESLint 검사
+# ESLint
 npm run lint
 
-# 전체 빌드 (tsc + lint + next build)
+# 단위 테스트
+npm run test
+
+# 전체 빌드 + SSG 생성
 npm run build
 
-# 프로덕션 서버
-npm run start
-
-# 문제 데이터 검증
-/validate-data
-
-# 저널 기록
-/log "작업 내용"
+# 단일 테스트 파일
+npx vitest run lib/chapters.test.ts
 ```
 
 ---
 
-## 📱 반응형 디자인
+## 📝 개발 이력 (docs/plans/)
 
-### 모바일 (375px)
-- 사이드바 고정 숨김 + 햄버거 메뉴
-- 세로 스택 레이아웃
-- 터치 친화적 버튼
-
-### 태블릿 (768px)
-- 사이드바 토글 지원
-- 2단 그리드
-
-### 데스크톱 (1440px)
-- 사이드바 항상 표시 (256px fixed)
-- 2컬럼 + 3열 그리드
-- 최적의 가독성
+| 계획 | 내용 |
+|------|------|
+| 01 | SQL 실전 문제 업그레이드 (초기 SQLD 버전) |
+| 02 | 혼합 랜덤 출제 구조 (초기) |
+| 03 | 공식 출제 범위 기준 챕터 재구성 (14챕터) |
+| 04 | 모의고사 문제 품질 1차 개선 |
+| 05 | 이론 기반 누락 문제 추가 (24문항) |
+| 06 | 모의고사 세션 영속화 (이어서 풀기) |
+| 07 | 모의고사 전면 재작성 (실전 수준 품질) |
 
 ---
 
-## 🔐 데이터 보안
-
-### localStorage 사용
-- **장점**: 로그인 불필요, 즉시 시작
-- **단점**: 기기별 독립적 저장 (동기화 불가)
-
-### 향후 개선
-```typescript
-// 클라우드 동기화 (v2.0)
-- Firebase / Supabase 인증
-- 멀티탭 localStorage 동기화
-- 모바일 앱 연동
-```
-
----
-
-## 🐛 알려진 제한사항
+## ⚠️ 알려진 제한사항
 
 1. **기기별 독립 저장** — 다른 기기에서 진도 불러오기 불가
 2. **브라우저 캐시 삭제 시** — 진도 초기화
-3. **오프라인 미지원** — 네트워크 필요
-4. **마크다운 수식** — LaTeX 미지원 (향후 추가 예정)
-
----
-
-## 🎓 학습 팁
-
-### 효과적인 학습 방법
-1. **이론 먼저** — `/theory` 각 챕터 숙독
-2. **단원별 풀이** — `/quiz` → 각 챕터별로 순차 진행
-3. **오답 집중** — `/quiz/wrong` 에서 틀린 문제 반복
-4. **모의고사** — `/quiz/exam` 으로 최종 점검
-5. **북마크 활용** — 중요/어려운 문제 표시
-
-### 합격 기준 달성
-- **목표**: 총점 60점 이상 + 각 과목 40점 이상
-- **소요 기간**: 일일 2~3시간 × 4주
-- **추천 일정**: 주중 5일 학습 + 주말 모의고사
+3. **오프라인 미지원** — 네트워크 필요 (SSG이므로 초기 로드 후 일부 기능 가능)
 
 ---
 
 ## 📞 지원
 
-### 문제 발생 시
-1. 이슈 생성: [GitHub Issues](https://github.com/kdkim2000/sqld/issues)
-2. PR 제출: 개선 제안 환영
-
-### 피드백
-- 기능 요청
-- UI/UX 개선
-- 콘텐츠 오류 신고
+- **이슈**: [GitHub Issues](https://github.com/kdkim2000/dasp/issues)
+- **자격증 공식**: [KDATA 데이터자격검정](https://www.kdata.or.kr/)
 
 ---
 
 ## 📄 라이선스
 
-MIT License — 자유로운 사용, 수정, 배포 가능
+MIT License
 
 ---
 
-## 🙏 감사의 말
-
-- SQLD 시험 범위 기반 문제 및 이론 구성
-- Next.js, React, Tailwind 오픈소스 커뮤니티
-- Claude AI로 코드 생성 및 검증
-
----
-
-## 🔗 링크
-
-- **GitHub**: https://github.com/kdkim2000/sqld
-- **공식 SQLD**: https://www.ksda.or.kr/
-- **Next.js 문서**: https://nextjs.org/docs
-
----
-
-**마지막 업데이트**: 2026-05-05  
-**버전**: 1.0.0  
-**상태**: ✅ 배포 준비 완료
+**마지막 업데이트**: 2026-06-02  
+**버전**: 2.0.0  
+**상태**: ✅ 운영 중
