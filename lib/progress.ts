@@ -1,4 +1,4 @@
-import type { ProgressStore, AnswerResult, ExamResult, Stats } from '@/types'
+import type { ProgressStore, AnswerResult, ExamResult, ExamSession, Stats } from '@/types'
 import { CHAPTERS } from './chapters'
 
 const STORAGE_KEY = 'dasp_progress'
@@ -57,6 +57,33 @@ export function resetProgress(): ProgressStore {
   return fresh
 }
 
+// ── Exam session persistence ──────────────────────────────────────────────
+const EXAM_SESSION_KEY = 'dasp_exam_session'
+
+export function saveExamSession(session: ExamSession): void {
+  if (typeof window === 'undefined') return
+  try {
+    localStorage.setItem(EXAM_SESSION_KEY, JSON.stringify(session))
+  } catch { /* quota exceeded – ignore */ }
+}
+
+export function loadExamSession(): ExamSession | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const raw = localStorage.getItem(EXAM_SESSION_KEY)
+    if (!raw) return null
+    return JSON.parse(raw) as ExamSession
+  } catch {
+    return null
+  }
+}
+
+export function clearExamSession(): void {
+  if (typeof window === 'undefined') return
+  localStorage.removeItem(EXAM_SESSION_KEY)
+}
+
+// ── Stats ─────────────────────────────────────────────────────────────────
 export function getStats(store: ProgressStore, allQuestionIds: Record<string, string>): Stats {
   const byChapter: Stats['byChapter'] = {}
   const byPart: Stats['byPart'] = {}

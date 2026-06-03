@@ -43,6 +43,14 @@ export interface ChapterMeta {
   questionCount: number
 }
 
+export interface ExamSession {
+  mode: 'random' | 'exam1' | 'exam2'
+  questions: Question[]
+  currentIndex: number
+  answers: Record<number, { selectedIndex: number; result: AnswerResult }>
+  examEndTime: number  // Unix ms when exam expires
+}
+
 export interface Stats {
   total: number
   attempted: number

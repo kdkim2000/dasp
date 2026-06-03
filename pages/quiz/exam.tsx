@@ -1,8 +1,13 @@
-import React, { useState, useCallback, useRef } from 'react'
+import React, { useState, useCallback, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { sampleExamQuestions, getMockExamQuestions } from '@/lib/questions'
 import { useProgress } from '@/context/ProgressContext'
+import {
+  saveExamSession,
+  loadExamSession,
+  clearExamSession,
+} from '@/lib/progress'
 import QuestionCard from '@/components/quiz/QuestionCard'
 import AnswerFeedback from '@/components/quiz/AnswerFeedback'
 import QuizNavigator from '@/components/quiz/QuizNavigator'
@@ -30,9 +35,12 @@ const MODE_CONFIG: Record<ExamMode, { label: string; desc: string; icon: string;
   random: { label: '랜덤 출제',    desc: '매회 다른 문제 조합',  icon: '🎲', btnLabel: '랜덤 시험 시작' },
 }
 
+const EXAM_SECONDS = 5400 // 90분
+
 export default function ExamPage() {
   const router = useRouter()
   const { saveExamResult, toggleBookmark, isBookmarked } = useProgress()
+
   const [phase, setPhase] = useState<ExamPhase>('intro')
   const [examMode, setExamMode] = useState<ExamMode>('random')
   const [questions, setQuestions] = useState<Question[]>([])
@@ -42,24 +50,80 @@ export default function ExamPage() {
   const [selectedOption, setSelectedOption] = useState<number | null>(null)
   const [examResult, setExamResult] = useState<ExamResult | null>(null)
   const [timeUsed, setTimeUsed] = useState(0)
-  const startTimeRef = useRef<number>(0)
+  const [remainingSeconds, setRemainingSeconds] = useState(EXAM_SECONDS)
+  const [hasSavedSession, setHasSavedSession] = useState(false)
 
-  const EXAM_SECONDS = 5400 // 90분
+  const examEndTimeRef = useRef<number>(0)
+  const startTimeRef = useRef<number>(0)  // kept for elapsed-time calculation in result
 
+  // ── 마운트 시 저장된 세션 확인 ────────────────────────────────────────
+  useEffect(() => {
+    const saved = loadExamSession()
+    setHasSavedSession(saved !== null)
+  }, [])
+
+  // ── 답변·이동 시 세션 자동 저장 ──────────────────────────────────────
+  useEffect(() => {
+    if (phase !== 'exam' || questions.length === 0) return
+    saveExamSession({
+      mode: examMode,
+      questions,
+      currentIndex,
+      answers: localAnswers,
+      examEndTime: examEndTimeRef.current,
+    })
+  }, [localAnswers, currentIndex, phase, examMode, questions])
+
+  // ── 새 시험 시작 ──────────────────────────────────────────────────────
   const startExam = () => {
+    clearExamSession()
     const qs =
       examMode === 'exam1' ? getMockExamQuestions(1) :
       examMode === 'exam2' ? getMockExamQuestions(2) :
       sampleExamQuestions()
+
+    const endTime = Date.now() + EXAM_SECONDS * 1000
+    examEndTimeRef.current = endTime
+    startTimeRef.current = Date.now()
+
     setQuestions(qs)
     setCurrentIndex(0)
     setLocalAnswers({})
     setShowFeedback(false)
     setSelectedOption(null)
-    startTimeRef.current = Date.now()
+    setRemainingSeconds(EXAM_SECONDS)
+    setHasSavedSession(false)
     setPhase('exam')
   }
 
+  // ── 이어서 풀기 (세션 복원) ───────────────────────────────────────────
+  const resumeExam = () => {
+    const saved = loadExamSession()
+    if (!saved) return
+
+    const remaining = Math.max(0, Math.floor((saved.examEndTime - Date.now()) / 1000))
+    if (remaining === 0) {
+      // 이탈 중 시간 초과 → 세션 삭제, 새 시험 유도
+      clearExamSession()
+      setHasSavedSession(false)
+      return
+    }
+
+    examEndTimeRef.current = saved.examEndTime
+    startTimeRef.current = Date.now() - (EXAM_SECONDS - remaining) * 1000
+
+    setExamMode(saved.mode)
+    setQuestions(saved.questions)
+    setCurrentIndex(saved.currentIndex)
+    setLocalAnswers(saved.answers)
+    setRemainingSeconds(remaining)
+    setShowFeedback(false)
+    setSelectedOption(saved.answers[saved.currentIndex]?.selectedIndex ?? null)
+    setHasSavedSession(false)
+    setPhase('exam')
+  }
+
+  // ── 시험 완료 ─────────────────────────────────────────────────────────
   const computeResult = useCallback((answers: Record<number, LocalAnswer>, qs: Question[], elapsed: number): ExamResult => {
     const partScores: Record<number, { correct: number; total: number }> = {
       1: { correct: 0, total: 0 },
@@ -101,7 +165,8 @@ export default function ExamPage() {
     }
   }, [])
 
-  const finishExam = useCallback((answers: Record<number, LocalAnswer>, forced = false) => {
+  const finishExam = useCallback((answers: Record<number, LocalAnswer>) => {
+    clearExamSession()
     const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000)
     setTimeUsed(elapsed)
     const result = computeResult(answers, questions, elapsed)
@@ -111,7 +176,7 @@ export default function ExamPage() {
   }, [questions, computeResult, saveExamResult])
 
   const handleTimeUp = useCallback(() => {
-    finishExam(localAnswers, true)
+    finishExam(localAnswers)
   }, [finishExam, localAnswers])
 
   const handleAnswer = useCallback((optionIndex: number) => {
@@ -142,7 +207,7 @@ export default function ExamPage() {
     setShowFeedback(prev !== undefined)
   }, [localAnswers])
 
-  // Intro screen
+  // ── 인트로 화면 ───────────────────────────────────────────────────────
   if (phase === 'intro') {
     return (
       <div className="max-w-2xl mx-auto px-4 py-12 space-y-6">
@@ -152,6 +217,22 @@ export default function ExamPage() {
             <h1 className="text-2xl font-display font-bold text-ink">DAsP 모의고사</h1>
             <p className="text-ink-muted text-sm">실전과 동일한 조건으로 실력을 확인해보세요.</p>
           </div>
+
+          {/* 이어서 풀기 배너 */}
+          {hasSavedSession && (
+            <div className="bg-amber-50 border border-amber-300 rounded-xl p-4 flex items-center justify-between gap-3">
+              <div>
+                <div className="font-semibold text-amber-800 text-sm">진행 중인 시험이 있습니다</div>
+                <div className="text-xs text-amber-600 mt-0.5">이전 시험을 이어서 풀 수 있습니다</div>
+              </div>
+              <button
+                onClick={resumeExam}
+                className="shrink-0 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-semibold text-sm transition-colors"
+              >
+                이어서 풀기
+              </button>
+            </div>
+          )}
 
           {/* Stats */}
           <div className="grid grid-cols-3 gap-4">
@@ -193,10 +274,10 @@ export default function ExamPage() {
                       </div>
                       <div className="text-xs text-ink-muted mt-0.5">{cfg.desc}</div>
                     </div>
-                    <div className={`w-4 h-4 rounded-full border-2 shrink-0 ${
+                    <div className={`w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center ${
                       selected ? 'border-primary-500 bg-primary-500' : 'border-ink-faint'
                     }`}>
-                      {selected && <div className="w-full h-full rounded-full scale-50 bg-white" />}
+                      {selected && <div className="w-2 h-2 rounded-full bg-white" />}
                     </div>
                   </button>
                 )
@@ -223,7 +304,7 @@ export default function ExamPage() {
     )
   }
 
-  // Result screen
+  // ── 결과 화면 ─────────────────────────────────────────────────────────
   if (phase === 'result' && examResult) {
     const passed =
       examResult.score >= 60 &&
@@ -240,13 +321,11 @@ export default function ExamPage() {
     ]
 
     const stars = examResult.score >= 80 ? 3 : examResult.score >= 60 ? 2 : 1
-
     const mins = Math.floor(timeUsed / 60)
     const secs = timeUsed % 60
 
     return (
       <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
-        {/* Result card */}
         <div className="q-card text-center space-y-4">
           <div className="text-5xl">{passed ? '🎉' : '😔'}</div>
           <h1 className="text-xl font-display font-bold text-ink">
@@ -257,23 +336,17 @@ export default function ExamPage() {
               <span key={i}>{i < stars ? '★' : '☆'}</span>
             ))}
           </div>
-
           <div className="text-5xl font-display font-bold text-primary-600">
             {examResult.score}점
           </div>
-
           <div className={`inline-block px-4 py-1 rounded-full text-sm font-bold ${
             passed ? 'bg-mint-50 text-mint-700 border border-mint-300' : 'bg-red-50 text-red-700 border border-red-300'
           }`}>
             {passed ? '합격' : '불합격'} (기준: 60점 이상 + 각 과목 40점 이상)
           </div>
-
-          <div className="text-xs text-ink-muted">
-            소요 시간: {mins}분 {secs}초
-          </div>
+          <div className="text-xs text-ink-muted">소요 시간: {mins}분 {secs}초</div>
         </div>
 
-        {/* Part scores */}
         <div className="q-card space-y-3">
           <h2 className="font-semibold text-ink">과목별 점수</h2>
           {partScores.map((score, i) => {
@@ -298,7 +371,6 @@ export default function ExamPage() {
           })}
         </div>
 
-        {/* Actions */}
         <div className="flex gap-3">
           <button
             onClick={() => {
@@ -318,7 +390,7 @@ export default function ExamPage() {
     )
   }
 
-  // Exam screen
+  // ── 시험 화면 ─────────────────────────────────────────────────────────
   const currentQuestion = questions[currentIndex]
   const navigatorAnswers: Record<number, AnswerResult | null> = Object.fromEntries(
     Object.entries(localAnswers).map(([k, v]) => [Number(k), v.result])
@@ -331,7 +403,6 @@ export default function ExamPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6">
-      {/* Exam header */}
       <div className="flex items-center justify-between mb-4">
         <div>
           <h1 className="text-lg font-bold text-ink">DAsP 모의고사</h1>
@@ -340,7 +411,7 @@ export default function ExamPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <ExamTimer totalSeconds={EXAM_SECONDS} onTimeUp={handleTimeUp} />
+          <ExamTimer totalSeconds={remainingSeconds} onTimeUp={handleTimeUp} />
           <button
             onClick={() => finishExam(localAnswers)}
             className="px-4 py-2 bg-primary-600 text-white text-sm rounded-xl font-semibold hover:bg-primary-700 transition-colors"
@@ -351,7 +422,6 @@ export default function ExamPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main */}
         <div className="lg:col-span-2 space-y-4">
           {currentQuestion && (
             <>
@@ -377,7 +447,6 @@ export default function ExamPage() {
           )}
         </div>
 
-        {/* Navigator */}
         <div className="lg:col-span-1">
           <div className="sticky top-20">
             <QuizNavigator

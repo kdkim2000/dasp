@@ -55,7 +55,7 @@ EA 프레임워크는 아키텍처를 개발·관리하기 위한 체계적 방�
 
 ### 2.2 TOGAF (The Open Group Architecture Framework)
 
-The Open Group이 개발한 EA 방법론. **ADM(Architecture Development Method)**을 핵심으로 한다.
+The Open Group이 개발한 EA 방법론. **ADM(Architecture Development Method을 핵심으로 한다.
 
 **ADM 순환 단계:**
 
@@ -108,7 +108,7 @@ The Open Group이 개발한 EA 방법론. **ADM(Architecture Development Method)
 
 ## 3. 전사아키텍처 참조 모델
 
-**EA 참조 모델(Reference Model)**은 아키텍처 구성 요소를 표준화된 방식으로 분류·정의한 모델로, 기관 간 아키텍처 정보 공유와 재사용을 위한 공통 언어를 제공한다.
+**EA 참조 모델(Reference Model)** 은 아키텍처 구성 요소를 표준화된 방식으로 분류·정의한 모델로, 기관 간 아키텍처 정보 공유와 재사용을 위한 공통 언어를 제공한다.
 
 ### 3.1 참조 모델의 역할
 
