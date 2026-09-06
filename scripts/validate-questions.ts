@@ -78,7 +78,8 @@ function main() {
     let data: QuestionRaw[]
 
     try {
-      const raw = fs.readFileSync(filePath, 'utf-8')
+      let raw = fs.readFileSync(filePath, 'utf-8')
+      if (raw.charCodeAt(0) === 0xFEFF) raw = raw.slice(1)
       data = JSON.parse(raw)
     } catch (e) {
       allErrors.push(`[${path.relative(process.cwd(), filePath)}] JSON 파싱 오류: ${e}`)
