@@ -132,9 +132,13 @@ function checkThresholds(agg: ReturnType<typeof aggregate>, label: string): stri
     }
   }
 
-  const longestPct = (agg.longestIsAnswerTies / total) * 100
+  // 단독 최장옵션(동률 없이 정답 하나만 가장 긴 경우)만 게이트로 사용한다.
+  // 동률포함 비율은 오답 길이를 정답과 균형 있게 맞출수록 우연히 같은 글자수가 되는
+  // 경우가 늘어나 자연히 높아지는 지표라 실제 악용 가능성과 무관하다(동률이면
+  // "가장 긴 보기"를 찍어도 그 안에서 다시 추측해야 하므로 신호가 되지 않는다).
+  const longestPct = (agg.longestIsAnswer / total) * 100
   if (longestPct < 20 || longestPct > 35) {
-    problems.push(`${label}: 정답=최장옵션 비율 ${longestPct.toFixed(1)}% (기준 20~35% 벗어남)`)
+    problems.push(`${label}: 정답=최장옵션(단독) 비율 ${longestPct.toFixed(1)}% (기준 20~35% 벗어남)`)
   }
 
   const avgAnswerLen = agg.answerLenSum / total
