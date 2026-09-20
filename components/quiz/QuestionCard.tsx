@@ -3,6 +3,12 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeHighlight from 'rehype-highlight'
 import type { Question } from '@/types'
+import { createMermaidAwareCode, createMermaidAwarePre } from '@/lib/markdownComponents'
+
+const markdownComponents = {
+  code: createMermaidAwareCode(),
+  pre: createMermaidAwarePre(),
+}
 
 interface QuestionCardProps {
   question: Question
@@ -116,7 +122,7 @@ export default function QuestionCard({
 
       {/* Question content */}
       <div className="prose-dasp prose max-w-none text-ink text-base leading-relaxed">
-        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeHighlight]}>
+        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeHighlight]} components={markdownComponents}>
           {question.content}
         </ReactMarkdown>
       </div>

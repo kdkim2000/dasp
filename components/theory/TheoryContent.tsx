@@ -4,6 +4,7 @@ import remarkGfm from 'remark-gfm'
 import rehypeHighlight from 'rehype-highlight'
 import rehypeRaw from 'rehype-raw'
 import type { Components } from 'react-markdown'
+import { createMermaidAwareCode, createMermaidAwarePre } from '@/lib/markdownComponents'
 
 interface TheoryContentProps {
   content: string
@@ -75,7 +76,7 @@ const components: Components = {
       {children}
     </blockquote>
   ),
-  code: ({ className, children, ...props }) => {
+  code: createMermaidAwareCode(({ className, children, ...props }) => {
     const isBlock = className?.includes('language-')
     if (isBlock) {
       return (
@@ -89,12 +90,12 @@ const components: Components = {
         {children}
       </code>
     )
-  },
-  pre: ({ children }) => (
+  }),
+  pre: createMermaidAwarePre(({ children }) => (
     <pre className="bg-gray-900 text-gray-100 rounded-xl p-4 overflow-x-auto mb-4 text-xs">
       {children}
     </pre>
-  ),
+  )),
   strong: ({ children }) => (
     <strong className="font-bold text-primary-700">{children}</strong>
   ),
