@@ -3,6 +3,12 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeHighlight from 'rehype-highlight'
 import type { Question } from '@/types'
+import { createMermaidAwareCode, createMermaidAwarePre } from '@/lib/markdownComponents'
+
+const markdownComponents = {
+  code: createMermaidAwareCode(),
+  pre: createMermaidAwarePre(),
+}
 
 interface AnswerFeedbackProps {
   question: Question
@@ -54,7 +60,7 @@ export default function AnswerFeedback({
       <div>
         <h4 className="text-sm font-semibold text-ink-muted mb-2">해설</h4>
         <div className="prose-dasp prose max-w-none text-sm text-ink leading-relaxed bg-surface-soft rounded-xl px-4 py-3 border border-[var(--q-border)]">
-          <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeHighlight]}>
+          <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeHighlight]} components={markdownComponents}>
             {question.explanation}
           </ReactMarkdown>
         </div>
